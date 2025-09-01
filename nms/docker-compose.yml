@@ -10,6 +10,8 @@ services:
       POSTGRES_DB: zabbix
     volumes:
       - zabbix_pg_data:/var/lib/postgresql/data
+    networks:
+      - zabbix-net
 
   # Zabbix server
   zabbix-server:
@@ -25,6 +27,8 @@ services:
       - postgres
     ports:
       - "10051:10051"
+    networks:
+      - zabbix-net
 
   # Zabbix web (frontend)
   zabbix-web:
@@ -43,6 +47,8 @@ services:
       - zabbix-server
     ports:
       - "8080:8080"
+    networks:
+      - zabbix-net
 
   # Zabbix agent
   zabbix-agent:
@@ -56,6 +62,11 @@ services:
       - zabbix-server
     ports:
       - "10050:10050"
+    networks:
+      - zabbix-net
 
 volumes:
   zabbix_pg_data:
+
+networks:
+  zabbix-net:
