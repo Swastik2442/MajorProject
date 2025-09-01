@@ -1,0 +1,16 @@
+{
+  "event": {
+    "id": "{EVENT.ID}",
+    "time": "{EVENT.TIME}",
+    "date": "{EVENT.DATE}",
+    "name": "{EVENT.NAME}",
+    "severity": "{EVENT.SEVERITY}",
+    "opdata": "{EVENT.OPDATA}"
+  },
+  "host": {
+    "name": "{HOST.NAME}"
+  },
+  "trigger": {
+    "url": "{TRIGGER.URL}"
+  }
+}

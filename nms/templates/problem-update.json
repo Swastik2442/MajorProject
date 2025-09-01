@@ -1,0 +1,18 @@
+{
+  "user": {
+    "fullname": "{USER.FULLNAME}"
+  },
+  "event": {
+    "status": "{EVENT.STATUS}",
+    "age": "{EVENT.AGE}",
+    "ack": {
+      "status": "{EVENT.ACK.STATUS}"
+    },
+    "update": {
+      "action": "{EVENT.UPDATE.ACTION}",
+      "date": "{EVENT.UPDATE.DATE}",
+      "time": "{EVENT.UPDATE.TIME}",
+      "message": "{EVENT.UPDATE.MESSAGE}"
+    }
+  }
+}

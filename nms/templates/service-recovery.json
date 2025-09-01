@@ -1,0 +1,16 @@
+{
+  "event": {
+    "id": "{EVENT.ID}",
+    "name": "{EVENT.NAME}",
+    "severity": "{EVENT.SEVERITY}",
+    "duration": "{EVENT.DURATION}",
+    "recovery": {
+      "time": "{EVENT.RECOVERY.TIME}",
+      "date": "{EVENT.RECOVERY.DATE}"
+    }
+  },
+  "service": {
+    "name": "{SERVICE.NAME}",
+    "description": "{SERVICE.DESCRIPTION}"
+  }
+}

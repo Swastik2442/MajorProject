@@ -1,0 +1,18 @@
+{
+  "event": {
+    "id": "{EVENT.ID}",
+    "name": "{EVENT.NAME}",
+    "severity": "{EVENT.SEVERITY}",
+    "duration": "{EVENT.DURATION}",
+    "recovery": {
+      "time": "{EVENT.RECOVERY.TIME}",
+      "date": "{EVENT.RECOVERY.DATE}"
+    }
+  },
+  "host": {
+    "name": "{HOST.NAME}"
+  },
+  "trigger": {
+    "url": "{TRIGGER.URL}"
+  }
+}

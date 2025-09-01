@@ -1,0 +1,15 @@
+{
+  "event": {
+    "update": {
+      "severity": "{EVENT.UPDATE.SEVERITY}",
+      "date": "{EVENT.UPDATE.DATE}",
+      "time": "{EVENT.UPDATE.TIME}"
+    },
+    "age": "{EVENT.AGE}"
+  },
+  "service": {
+    "name": "{SERVICE.NAME}",
+    "description": "{SERVICE.DESCRIPTION}",
+    "rootcause": "{SERVICE.ROOTCAUSE}"
+  }
+}
