@@ -1,4 +1,5 @@
 {
+  "type": "service_update",
   "event": {
     "update": {
       "severity": "{EVENT.UPDATE.SEVERITY}",

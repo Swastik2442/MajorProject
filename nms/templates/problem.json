@@ -1,9 +1,10 @@
 {
+  "type": "problem",
   "event": {
     "id": "{EVENT.ID}",
+    "name": "{EVENT.NAME}",
     "time": "{EVENT.TIME}",
     "date": "{EVENT.DATE}",
-    "name": "{EVENT.NAME}",
     "severity": "{EVENT.SEVERITY}",
     "opdata": "{EVENT.OPDATA}"
   },

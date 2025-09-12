@@ -5,6 +5,8 @@ import logging
 from pydantic import BaseModel
 from fastapi import FastAPI, Request, Response, status
 
+from templates import parse_json_message
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
 
@@ -21,11 +23,14 @@ async def receive_alert(alert: ZabbixAlert, request: Request):
     if request.client is None:
         return {"status": "error"}
 
-    client_host = request.client.host
-    logger.info("Received alert from %s", client_host)
-    logger.info("To: %s", alert.to)
-    logger.info("Subject: %s", alert.subject)
+    logger.info("Received alert (%s) from %s with subject %s", alert.to, request.client.host, alert.subject)
     logger.info("Message: %s", alert.message)
+    try:
+        data = parse_json_message(alert.message)
+        logger.info("Parsed Data: %s", data)
+    except ValueError as e:
+        logger.warning("Failed to parse alert message: %s", e)
+        return {"status": "error", "message": "Invalid alert message"}
 
     return {"status": "success"}
 

@@ -1,4 +1,5 @@
 {
+  "type": "service_recovery",
   "event": {
     "id": "{EVENT.ID}",
     "name": "{EVENT.NAME}",
