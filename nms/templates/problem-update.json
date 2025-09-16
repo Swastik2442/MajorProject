@@ -1,4 +1,5 @@
 {
+  "type": "problem_update",
   "user": {
     "fullname": "{USER.FULLNAME}"
   },
