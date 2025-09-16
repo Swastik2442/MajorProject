@@ -1,5 +1,5 @@
 import json
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -47,11 +47,23 @@ class ProblemEvent(BaseModel):
     opdata: str
 
 class ProblemUpdateEvent(BaseModel):
+    id: str
+    name: str
     status: str
     age: str
-    update: Update2
+    update: Update
+
+class ServiceEvent(BaseModel):
+    id: str
+    name: str
+    severity: str
+    time: str
+    date: str
+    recovery: Recovery
 
 class ServiceUpdateEvent(BaseModel):
+    id: str
+    name: str
     age: str
     update: Update2
 
@@ -63,42 +75,39 @@ class RecoveryEvent(BaseModel):
     recovery: Recovery
 
 # Main models
-class MessageBaseModel(BaseModel):
-    type: str
-
 # Problem models
-class ProblemRecovery(MessageBaseModel):
-    type: str = Field("problem_recovery", frozen=True)
+class ProblemRecovery(BaseModel):
+    type: Literal["problem_recovery"] = Field("problem_recovery", frozen=True)
     event: RecoveryEvent
     host: Host
     trigger: Trigger
 
-class ProblemUpdate(MessageBaseModel):
-    type: str = Field("problem_update", frozen=True)
+class ProblemUpdate(BaseModel):
+    type: Literal["problem_update"] = Field("problem_update", frozen=True)
     event: ProblemUpdateEvent
     user: User
 
-class Problem(MessageBaseModel):
-    type: str = Field("problem", frozen=True)
+class Problem(BaseModel):
+    type: Literal["problem"] = Field("problem", frozen=True)
     event: ProblemEvent
     host: Host
     trigger: Trigger
 
 # Service models
-class ServiceRecovery(MessageBaseModel):
-    type: str = Field("service_recovery", frozen=True)
+class ServiceRecovery(BaseModel):
+    type: Literal["service_recovery"] = Field("service_recovery", frozen=True)
     service: ServiceInfo
     event: RecoveryEvent
 
-class ServiceUpdate(MessageBaseModel):
-    type: str = Field("service_update", frozen=True)
-    service: ServiceInfo
+class ServiceUpdate(BaseModel):
+    type: Literal["service_update"] = Field("service_update", frozen=True)
+    service: ServiceInfoWithRootCause
     event: ServiceUpdateEvent
 
-class Service(MessageBaseModel):
-    type: str = Field("service", frozen=True)
+class Service(BaseModel):
+    type: Literal["service"] = Field("service", frozen=True)
     service: ServiceInfoWithRootCause
-    event: RecoveryEvent
+    event: ServiceEvent
 
 TYPE_MAP = {
     "problem_recovery": ProblemRecovery,
@@ -108,7 +117,7 @@ TYPE_MAP = {
     "service_update": ServiceUpdate,
     "service": Service
 }
-def parse_json_message(data: str | dict[str, Any]) -> MessageBaseModel:
+def parse_json_message(data: str | dict[str, Any]):
     "Parse JSON data into the appropriate MessageBaseModel subclass"
 
     if isinstance(data, str):
