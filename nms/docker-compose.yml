@@ -1,5 +1,5 @@
 services:
-  # PostgreSQL Database
+  # PostgreSQL Database for Zabbix
   postgres:
     image: postgres:15
     container_name: zabbix-postgres
@@ -65,8 +65,39 @@ services:
     networks:
       - zabbix-net
 
+  # MongoDB Database for Server
+  mongodb:
+    image: mongo:latest
+    container_name: db
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_DATABASE=nms
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  # Alerts receiving Server
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: server
+    restart: unless-stopped
+    environment:
+      - MONGO_CONNECTION_URI=mongodb://root:password@db:27017/
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+    volumes:
+      - ./:/app
+
 volumes:
   zabbix_pg_data:
+  mongodb_data:
 
 networks:
   zabbix-net:

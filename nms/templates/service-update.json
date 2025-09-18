@@ -1,6 +1,8 @@
 {
   "type": "service_update",
   "event": {
+    "id": "{EVENT.ID}",
+    "name": "{EVENT.NAME}",
     "update": {
       "severity": "{EVENT.UPDATE.SEVERITY}",
       "date": "{EVENT.UPDATE.DATE}",

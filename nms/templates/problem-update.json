@@ -4,6 +4,8 @@
     "fullname": "{USER.FULLNAME}"
   },
   "event": {
+    "id": "{EVENT.ID}",
+    "name": "{EVENT.NAME}",
     "status": "{EVENT.STATUS}",
     "age": "{EVENT.AGE}",
     "ack": {
