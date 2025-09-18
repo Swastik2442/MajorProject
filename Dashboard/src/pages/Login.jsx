@@ -11,8 +11,8 @@ export default function Login() {
   const handleLogin = (e) => {
     e.preventDefault();
 
-    // Mock credentials
-    if (username === "123" && password === "123") {
+    // Temporary credentials
+    if (username === "nms" && password === "nms") {
       localStorage.setItem("isLoggedIn", "true");
       navigate("/dashboard");
     } else {
