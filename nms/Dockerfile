@@ -4,6 +4,9 @@ WORKDIR /app
 
 COPY templates /app
 COPY api.py /app
+COPY config.py /app
+COPY models.py /app
+COPY utils.py /app
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt

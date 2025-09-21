@@ -1,9 +1,10 @@
 from datetime import datetime
 
 from pydantic import BaseModel, Field
+from pymongo import ASCENDING
+from pymongo.collection import Collection
 
-def none(): return None
-def to_doc(obj: BaseModel): return {k: v for k, v in obj.model_dump().items() if v is not None}
+from utils import fields, none
 
 class Update(BaseModel):
     action: str = Field()
@@ -63,3 +64,9 @@ class ServiceUpdate(BaseModel):
     severity: str = Field()
     duration: str | None = Field(default_factory=none)
     age: str | None = Field(default_factory=none)
+
+def init_problems_col(collection: Collection):
+    collection.create_index([(fields(Problem).zid, ASCENDING)], unique=True)
+
+def init_services_col(collection: Collection):
+    collection.create_index([(fields(Service).zid, ASCENDING)], unique=True)
