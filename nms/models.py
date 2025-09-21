@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 from pymongo import ASCENDING
-from pymongo.collection import Collection
+from pymongo.asynchronous.collection import AsyncCollection
 
 from utils import fields, none
 
@@ -65,8 +65,8 @@ class ServiceUpdate(BaseModel):
     duration: str | None = Field(default_factory=none)
     age: str | None = Field(default_factory=none)
 
-def init_problems_col(collection: Collection):
-    collection.create_index([(fields(Problem).zid, ASCENDING)], unique=True)
+async def init_problems_col(collection: AsyncCollection):
+    await collection.create_index([(fields(Problem).zid, ASCENDING)], unique=True)
 
-def init_services_col(collection: Collection):
-    collection.create_index([(fields(Service).zid, ASCENDING)], unique=True)
+async def init_services_col(collection: AsyncCollection):
+    await collection.create_index([(fields(Service).zid, ASCENDING)], unique=True)

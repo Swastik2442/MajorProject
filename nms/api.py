@@ -5,8 +5,8 @@ import logging
 
 from fastapi import FastAPI, Request, Response, status
 from pydantic import BaseModel, Field
-from pymongo import MongoClient
-from pymongo.database import Database
+from pymongo import AsyncMongoClient
+from pymongo.asynchronous.database import AsyncDatabase
 
 from templates import parse_json_message
 from config import DB_NAME, MONGO_CONNECTION_URI, PROBLEMS_COL_NAME, SERVICES_COL_NAME
@@ -18,14 +18,14 @@ logger = logging.getLogger()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.db_client = MongoClient(MONGO_CONNECTION_URI)
+    app.state.db_client = AsyncMongoClient(MONGO_CONNECTION_URI)
     app.state.db = app.state.db_client[DB_NAME]
     logger.info("Connected to MongoDB database")
-    init_problems_col(app.state.db[PROBLEMS_COL_NAME])
-    init_services_col(app.state.db[SERVICES_COL_NAME])
+    await init_problems_col(app.state.db[PROBLEMS_COL_NAME])
+    await init_services_col(app.state.db[SERVICES_COL_NAME])
     yield
 
-    app.state.db_client.close()
+    await app.state.db_client.close()
     logger.info("Closed connection to database")
 
 app = FastAPI(lifespan=lifespan)
@@ -50,10 +50,10 @@ async def receive_alert(alert: ZabbixAlert, request: Request):
         return {"status": "error", "message": "Invalid alert message"}
 
     # Insert/Update in the Database
-    db: Database = request.app.state.db
+    db: AsyncDatabase = request.app.state.db
     match data.type:
         case "problem":
-            db[PROBLEMS_COL_NAME].insert_one(to_doc(Problem(
+            await db[PROBLEMS_COL_NAME].insert_one(to_doc(Problem(
                 zid=data.event.id,
                 name=data.event.name,
                 severity=data.event.severity,
@@ -63,9 +63,9 @@ async def receive_alert(alert: ZabbixAlert, request: Request):
                 status="Started"
             )))
         case "problem_recovery":
-            problem = db[PROBLEMS_COL_NAME].find_one({"zid": data.event.id})
+            problem = await db[PROBLEMS_COL_NAME].find_one({"zid": data.event.id})
             if problem is None:
-                problem = db[PROBLEMS_COL_NAME].insert_one(to_doc(Problem(
+                problem = await db[PROBLEMS_COL_NAME].insert_one(to_doc(Problem(
                     zid=data.event.id,
                     name=data.event.name,
                     severity=data.event.severity,
@@ -78,7 +78,7 @@ async def receive_alert(alert: ZabbixAlert, request: Request):
                     status="Recovered"
                 )))
             else:
-                db[PROBLEMS_COL_NAME].update_one(
+                await db[PROBLEMS_COL_NAME].update_one(
                     {"zid": data.event.id},
                     {"$set": to_doc(ProblemUpdate(
                         severity=data.event.severity,
@@ -93,9 +93,9 @@ async def receive_alert(alert: ZabbixAlert, request: Request):
                     ))}}
                 )
         case "problem_update":
-            problem = db[PROBLEMS_COL_NAME].find_one({"zid": data.event.id})
+            problem = await db[PROBLEMS_COL_NAME].find_one({"zid": data.event.id})
             if problem is None:
-                problem = db[PROBLEMS_COL_NAME].insert_one(to_doc(Problem(
+                problem = await db[PROBLEMS_COL_NAME].insert_one(to_doc(Problem(
                     zid=data.event.id,
                     name=data.event.name,
                     severity="Not classified",
@@ -106,7 +106,7 @@ async def receive_alert(alert: ZabbixAlert, request: Request):
                     status=data.event.status
                 )))
             else:
-                db[PROBLEMS_COL_NAME].update_one(
+                await db[PROBLEMS_COL_NAME].update_one(
                     {"zid": data.event.id},
                     {"$push": {"updates": to_doc(Update(
                         action=data.event.update.action,
@@ -117,7 +117,7 @@ async def receive_alert(alert: ZabbixAlert, request: Request):
                     ))}}
                 )
         case "service":
-            db[SERVICES_COL_NAME].insert_one(to_doc(Service(
+            await db[SERVICES_COL_NAME].insert_one(to_doc(Service(
                 zid=data.event.id,
                 name=data.event.name,
                 description=data.service.description,
@@ -127,9 +127,9 @@ async def receive_alert(alert: ZabbixAlert, request: Request):
                 severity=data.event.severity
             )))
         case "service_recovery":
-            service = db[SERVICES_COL_NAME].find_one({"zid": data.event.id})
+            service = await db[SERVICES_COL_NAME].find_one({"zid": data.event.id})
             if service is None:
-                db[SERVICES_COL_NAME].insert_one(to_doc(Service(
+                await db[SERVICES_COL_NAME].insert_one(to_doc(Service(
                     zid=data.event.id,
                     name=data.event.name,
                     description=data.service.description,
@@ -141,7 +141,7 @@ async def receive_alert(alert: ZabbixAlert, request: Request):
                     severity=data.event.severity
                 )))
             else:
-                db[SERVICES_COL_NAME].update_one(
+                await db[SERVICES_COL_NAME].update_one(
                     {"zid": data.event.id},
                     {"$set": to_doc(ServiceUpdate(
                         recovery_date=data.event.recovery.date,
@@ -155,9 +155,9 @@ async def receive_alert(alert: ZabbixAlert, request: Request):
                     ))}}
                 )
         case "service_update":
-            service = db[SERVICES_COL_NAME].find_one({"zid": data.event.id})
+            service = await db[SERVICES_COL_NAME].find_one({"zid": data.event.id})
             if service is None:
-                db[SERVICES_COL_NAME].insert_one(to_doc(Service(
+                await db[SERVICES_COL_NAME].insert_one(to_doc(Service(
                     zid=data.event.id,
                     name=data.event.name,
                     description=data.service.description,
@@ -167,7 +167,7 @@ async def receive_alert(alert: ZabbixAlert, request: Request):
                     severity=data.event.update.severity
                 )))
             else:
-                db[SERVICES_COL_NAME].update_one(
+                await db[SERVICES_COL_NAME].update_one(
                     {"zid": data.event.id},
                     {"$set": to_doc(ServiceUpdate(
                         severity=data.event.update.severity,
@@ -184,10 +184,10 @@ async def receive_alert(alert: ZabbixAlert, request: Request):
 
     return {"status": "success"}
 
-@app.get("/")
+@app.get("/", include_in_schema=False)
 def root():
     return {"message": "API for Zabbix Alerts Storage"}
 
-@app.get("/favicon.ico")
+@app.get("/favicon.ico", include_in_schema=False)
 def favicon():
     return Response(status_code=status.HTTP_204_NO_CONTENT)
