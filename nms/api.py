@@ -4,8 +4,8 @@ from contextlib import asynccontextmanager
 import logging
 from typing import Annotated
 
-from fastapi import FastAPI, HTTPException, Query, Request, Response, status
-from fastapi.exceptions import RequestValidationError
+from fastapi import FastAPI, Query, Request, Response, status
+from fastapi.exceptions import HTTPException, RequestValidationError
 from pydantic import BaseModel, Field
 from pymongo import AsyncMongoClient, DESCENDING
 from pymongo.asynchronous.database import AsyncDatabase
@@ -13,8 +13,9 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from templates import parse_json_message
 from config import DB_NAME, MONGO_CONNECTION_URI, PROBLEMS_COL_NAME, SERVICES_COL_NAME
+from exceptions import HTTPException as CustomHTTPException, RequestValidationError as CustomRequestValidationError, http_exception_handler, validation_exception_handler
 from models import Problem, ProblemUpdate, Service, ServiceUpdate, Update, init_problems_col, init_services_col
-from utils import CustomRequestValidationError, FilterParams, PaginatedResponseModel, ResponseModel, none, to_doc
+from utils import FilterParams, PaginatedDataResponse, Response as CustomResponse, none, to_doc
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
@@ -31,21 +32,17 @@ async def lifespan(app: FastAPI):
     await app.state.db_client.close()
     logger.info("Closed connection to database")
 
-app = FastAPI(title="NMS API", lifespan=lifespan)
-
-@app.exception_handler(StarletteHTTPException)
-async def http_exception_handler(_req: Request, exc: StarletteHTTPException):
-    return Response(
-        ResponseModel(status="error", message=exc.detail).model_dump_json(),
-        status_code=exc.status_code
-    )
-
-@app.exception_handler(RequestValidationError)
-def validation_exception_handler(_req: Request, exc: RequestValidationError):
-    return Response(
-        CustomRequestValidationError(error=list(exc.errors())[0]).model_dump_json(),
-        status.HTTP_422_UNPROCESSABLE_ENTITY,
-    )
+app = FastAPI(
+    title="NMS API",
+    lifespan=lifespan,
+    exception_handlers={
+        StarletteHTTPException: http_exception_handler,
+        RequestValidationError: validation_exception_handler
+    },
+    responses={
+        422: {"model": CustomRequestValidationError}
+    }
+)
 
 class ZabbixAlert(BaseModel):
     "Expected Payload from Zabbix webhook"
@@ -53,12 +50,12 @@ class ZabbixAlert(BaseModel):
     subject: str = Field(description="Subject of the Alert")
     message: str = Field(description="JSON message containing the details of the Alert")
 
-@app.post("/zabbix/webhook", response_model=ResponseModel[None])
-async def receive_alert(request: Request, alert: ZabbixAlert):
-    if request.client is None:
+@app.post("/zabbix/webhook", response_model=CustomResponse, responses={400: {"model": CustomHTTPException}})
+async def receive_alert(req: Request, alert: ZabbixAlert):
+    if req.client is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot determine client address")
 
-    logger.debug("Received alert (at %s) from %s with subject \"%s\"", alert.to, request.client.host, alert.subject)
+    logger.debug("Received alert (at %s) from %s with subject \"%s\"", alert.to, req.client.host, alert.subject)
     logger.debug("Message: %s", alert.message)
     try:
         data = parse_json_message(alert.message)
@@ -67,7 +64,7 @@ async def receive_alert(request: Request, alert: ZabbixAlert):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid alert message") from e
 
     # Insert/Update in the Database
-    db: AsyncDatabase = request.app.state.db
+    db: AsyncDatabase = req.app.state.db
     match data.type:
         case "problem":
             await db[PROBLEMS_COL_NAME].insert_one(to_doc(Problem(
@@ -199,35 +196,35 @@ async def receive_alert(request: Request, alert: ZabbixAlert):
             logger.warning("Unknown Alert Type: %s", data.type)
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unknown alert type")
 
-    return ResponseModel[None]()
+    return CustomResponse()
 
-@app.get("/alerts/problems", response_model=PaginatedResponseModel[list[Problem]])
-async def get_trigger_alerts(request: Request, filter_query: Annotated[FilterParams, Query()]):
+@app.get("/alerts/problems", response_model=PaginatedDataResponse[list[Problem]])
+async def get_trigger_alerts(req: Request, filter_query: Annotated[FilterParams, Query()]):
     offset = (filter_query.page - 1) * filter_query.limit
-    db: AsyncDatabase = request.app.state.db
+    db: AsyncDatabase = req.app.state.db
     cursor = db[PROBLEMS_COL_NAME].find(
         sort=[("updatedAt", DESCENDING), ("createdAt", DESCENDING)],
         skip=offset,
         limit=filter_query.limit
     )
     results = [Problem(**doc) async for doc in cursor]
-    return PaginatedResponseModel[list[Problem]](data=results, page=filter_query.page, limit=filter_query.limit)
+    return PaginatedDataResponse[list[Problem]](data=results, page=filter_query.page, limit=filter_query.limit)
 
-@app.get("/alerts/services", response_model=PaginatedResponseModel[list[Service]])
-async def get_service_alerts(request: Request, filter_query: Annotated[FilterParams, Query()]):
+@app.get("/alerts/services", response_model=PaginatedDataResponse[list[Service]])
+async def get_service_alerts(req: Request, filter_query: Annotated[FilterParams, Query()]):
     offset = (filter_query.page - 1) * filter_query.limit
-    db: AsyncDatabase = request.app.state.db
+    db: AsyncDatabase = req.app.state.db
     cursor = db[SERVICES_COL_NAME].find(
         sort=[("updatedAt", DESCENDING), ("createdAt", DESCENDING)],
         skip=offset,
         limit=filter_query.limit
     )
     results = [Service(**doc) async for doc in cursor]
-    return PaginatedResponseModel[list[Service]](data=results, page=filter_query.page, limit=filter_query.limit)
+    return PaginatedDataResponse[list[Service]](data=results, page=filter_query.page, limit=filter_query.limit)
 
 @app.get("/", include_in_schema=False)
 def root():
-    return ResponseModel[None](message="API for Zabbix Alerts Storage")
+    return CustomResponse(message="API for Zabbix Alerts Storage")
 
 @app.get("/favicon.ico", include_in_schema=False)
 def favicon():

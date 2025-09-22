@@ -5,6 +5,7 @@ WORKDIR /app
 COPY templates /app
 COPY api.py /app
 COPY config.py /app
+COPY exceptions.py /app
 COPY models.py /app
 COPY utils.py /app
 

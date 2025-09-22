@@ -9,25 +9,23 @@ from pydantic_core import core_schema
 def none():
     return None
 def to_doc(obj: BaseModel):
-    return {k: v for k, v in obj.model_dump().items() if v is not None}
+    return obj.model_dump(exclude_none=True)
 
 class FilterParams(BaseModel):
     page: int = Field(1, ge=1)
     limit: int = Field(20, ge=1, le=100)
 
-TData = TypeVar('TData')
-class ResponseModel(BaseModel, Generic[TData]):
+class Response(BaseModel):
     status: Literal["success", "error"] = Field(default_factory=lambda: "success")
     message: str | None = Field(default_factory=none)
+
+TData = TypeVar('TData')
+class DataResponse(Response, Generic[TData]):
     data: TData | None = Field(default_factory=none)
 
-class PaginatedResponseModel(ResponseModel, FilterParams, Generic[TData]):
+class PaginatedDataResponse(DataResponse, FilterParams, Generic[TData]):
+    # Override to provide Generic support
     data: TData | None = Field(default_factory=none)
-
-class CustomRequestValidationError(ResponseModel[None]):
-    status: Literal["success", "error"] = Field(default_factory=lambda: "error", frozen=True)
-    message: str | None = Field(default_factory=lambda: "Validation Error")
-    error: Any
 
 # Ref: https://github.com/pydantic/pydantic/discussions/8600#discussioncomment-8212526
 @dataclass(frozen=True)
