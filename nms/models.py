@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from pymongo import ASCENDING
 from pymongo.asynchronous.collection import AsyncCollection
 
-from utils import fields, none
+from utils import PyObjectId, fields, none
 
 class Update(BaseModel):
     action: str = Field()
@@ -14,6 +14,7 @@ class Update(BaseModel):
     username: str | None = Field(default_factory=none)
 
 class Problem(BaseModel):
+    id: PyObjectId | None = Field(default_factory=none, alias="_id")
     createdAt: datetime = Field(default_factory=datetime.now)
     updatedAt: datetime = Field(default_factory=datetime.now)
 
@@ -40,6 +41,7 @@ class ProblemUpdate(BaseModel):
     status: str = Field()
 
 class Service(BaseModel):
+    id: PyObjectId | None = Field(default_factory=none, alias="_id")
     createdAt: datetime = Field(default_factory=datetime.now)
     updatedAt: datetime = Field(default_factory=datetime.now)
 
