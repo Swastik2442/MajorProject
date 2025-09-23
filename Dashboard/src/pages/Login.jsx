@@ -1,22 +1,23 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useMutation } from '@tanstack/react-query';
+import { useAuth } from "../providers/authProvider.jsx";
 import NetworkBackground from "../components/NetworkBackground";
 
 export default function Login() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+
+  const { loginUser } = useAuth();
+  const { mutate, isPending, isError, error } = useMutation({
+    mutationFn: loginUser,
+    onSuccess: () => navigate("/")
+  });
 
   const handleLogin = (e) => {
     e.preventDefault();
-
-    if (username === "nms" && password === "nms") {
-      localStorage.setItem("isLoggedIn", "true");
-      navigate("/dashboard");
-    } else {
-      setError("Invalid username or password!");
-    }
+    mutate({ username, password });
   };
 
   return (
@@ -25,7 +26,7 @@ export default function Login() {
 
       <div className="bg-white/20 backdrop-blur-md p-8 rounded-2xl shadow-xl w-80 text-center animate-fadeIn">
         <img
-          src="vite.jpeg"
+          src="logo.jpeg"
           alt="Logo"
           className="w-20 h-20 mb-5 mx-auto rounded-full bg-white/70 p-2 shadow"
         />
@@ -34,9 +35,9 @@ export default function Login() {
           NMS <span className="text-green-600">LOGIN</span>
         </h2>
 
-        {error && (
+        {isError && (
           <div className="bg-red-100 text-red-700 px-3 py-2 mb-4 rounded text-sm">
-            {error}
+            {error.message}
           </div>
         )}
 
@@ -47,6 +48,7 @@ export default function Login() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             className="w-full mb-4 p-3 rounded-lg border border-gray-300 bg-white/80 focus:ring-2 focus:ring-blue-500 outline-none"
+            disabled={isPending}
             required
           />
           <input
@@ -55,11 +57,13 @@ export default function Login() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full mb-6 p-3 rounded-lg border border-gray-300 bg-white/80 focus:ring-2 focus:ring-blue-500 outline-none"
+            disabled={isPending}
             required
           />
           <button
             type="submit"
             className="w-full py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white font-semibold rounded-full hover:shadow-lg transform hover:-translate-y-0.5 transition"
+            disabled={isPending}
           >
             LOG IN
           </button>
