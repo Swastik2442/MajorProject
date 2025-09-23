@@ -7,7 +7,7 @@
    * Script: `python setupZabbix.py`
    * Frontend:
      1. Go to [`localhost:8080`](http://localhost:8080) and login using username and password.
-     2. Create a new Trigger Media Type of type Webhook and URL `http://host.docker.internal:5000/zabbix/webhook`.
+     2. Create a new Alert Media Type of type Webhook and URL `http://host.docker.internal:5000/zabbix/webhook`.
         1. Add the script in [`webhook-script.js`](./webhook-script.js) in the Script text box.
         2. Add the Message Templates using the JSON strings in [`/templates`](./templates/).
      3. Create a new Media for a user with the type as the created Media Type.

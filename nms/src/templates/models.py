@@ -1,3 +1,5 @@
+"Models for parsing Zabbix Alert Messages"
+
 import json
 from typing import Any, Literal
 

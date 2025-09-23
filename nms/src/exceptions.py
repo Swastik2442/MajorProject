@@ -1,3 +1,5 @@
+"Exception Handlers for the API"
+
 from typing import Literal
 
 from fastapi import Request, Response, status
@@ -7,7 +9,7 @@ from pydantic import Field
 from pydantic_core import ErrorDetails
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from utils import Response as CustomResponse
+from .utils import Response as CustomResponse
 
 class RequestValidationError(CustomResponse):
     status: Literal["success", "error"] = Field(default_factory=lambda: "error", init=False, frozen=True)

@@ -1,10 +1,12 @@
+"MongoDB Schema Models"
+
 from datetime import datetime
 
 from pydantic import BaseModel, Field
 from pymongo import ASCENDING
 from pymongo.asynchronous.collection import AsyncCollection
 
-from utils import PyObjectId, fields, none
+from .utils import PyObjectId, fields, none
 
 class Update(BaseModel):
     action: str = Field()
