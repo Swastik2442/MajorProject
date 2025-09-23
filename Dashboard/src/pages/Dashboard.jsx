@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/Dashboard.css";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -13,7 +12,6 @@ export default function Dashboard() {
       return;
     }
 
-    // ✅ Fetch problems from backend
     fetch("http://localhost:5000/api/problems")
       .then((res) => res.json())
       .then((data) => setProblems(data))
@@ -26,17 +24,21 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="dashboard-container">
-      <h1 className="dashboard-title">Dashboard</h1>
-      <p className="dashboard-subtitle">Showing data from nms_problems collection</p>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6 text-center animate-fadeIn">
+      <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
+      <p className="text-gray-600 my-4">
+        Showing data from <span className="font-medium">nms_problems</span> collection
+      </p>
 
-      {/* Show problems */}
-      <h2>Problems:</h2>
-      <div className="problems-list">
+      <h2 className="text-xl font-semibold mb-4">Problems:</h2>
+      <div className="grid gap-4 w-full max-w-3xl">
         {problems.length > 0 ? (
           problems.map((problem) => (
-            <div className="problem-card" key={problem._id}>
-              <h3>{problem.name}</h3>
+            <div
+              key={problem._id}
+              className="bg-white p-4 rounded-xl shadow-md text-left border hover:shadow-lg transition"
+            >
+              <h3 className="font-bold text-lg mb-2">{problem.name}</h3>
               <p><strong>ZID:</strong> {problem.zid}</p>
               <p><strong>Status:</strong> {problem.status}</p>
               <p><strong>Severity:</strong> {problem.severity}</p>
@@ -47,11 +49,14 @@ export default function Dashboard() {
             </div>
           ))
         ) : (
-          <p>No problems found</p>
+          <p className="text-gray-500">No problems found</p>
         )}
       </div>
 
-      <button className="logout-button" onClick={handleLogout}>
+      <button
+        onClick={handleLogout}
+        className="mt-6 px-6 py-2 bg-gray-800 text-white rounded-lg shadow hover:bg-gray-900 transition"
+      >
         Logout
       </button>
     </div>
