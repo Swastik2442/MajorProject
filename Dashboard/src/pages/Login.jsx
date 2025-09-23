@@ -1,6 +1,6 @@
-import NetworkBackground from "./NetworkBackground";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import NetworkBackground from "../components/NetworkBackground";
 
 export default function Login() {
   const navigate = useNavigate();
