@@ -13,7 +13,7 @@ from src.config import DB_NAME, MONGO_CONNECTION_URI, PROBLEMS_COL_NAME, SERVICE
 from src.exceptions import RequestValidationError as CustomRequestValidationError, http_exception_handler, validation_exception_handler
 from src.models import init_problems_col, init_services_col
 from src.routes import alerts_router, zabbix_router
-from src.utils import Response as CustomResponse
+from src.schemas import Response as CustomResponse
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()

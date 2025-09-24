@@ -6,12 +6,12 @@ from pydantic import BaseModel, Field
 from pymongo import ASCENDING
 from pymongo.asynchronous.collection import AsyncCollection
 
+from .templates.models import Severity
 from .utils import PyObjectId, fields, none
 
 class Update(BaseModel):
     action: str = Field()
-    date: str = Field()
-    time: str = Field()
+    timestamp: datetime = Field()
     message: str = Field(default_factory=lambda: "")
     username: str | None = Field(default_factory=none)
 
@@ -22,13 +22,11 @@ class Problem(BaseModel):
 
     zid: str = Field(title="Zabbix Event ID")
     name: str = Field(title="Zabbix Event Name")
-    start_date: str = Field()
-    start_time: str = Field()
-    recovery_date: str | None = Field(default_factory=none)
-    recovery_time: str | None = Field(default_factory=none)
+    startedAt: datetime = Field()
+    recoveryAt: datetime | None = Field(default_factory=none)
     age: str | None = Field(default_factory=none)
     status: str = Field()
-    severity: str = Field()
+    severity: Severity = Field()
     duration: str | None = Field(default_factory=none)
     hostname: str = Field()
     updates: list[Update] = Field(default_factory=list)
@@ -36,9 +34,8 @@ class Problem(BaseModel):
 class ProblemUpdate(BaseModel):
     updatedAt: datetime = Field(default_factory=datetime.now)
 
-    recovery_date: str | None = Field(default_factory=none)
-    recovery_time: str | None = Field(default_factory=none)
-    severity: str = Field()
+    recoveryAt: datetime | None = Field(default_factory=none)
+    severity: Severity = Field()
     duration: str | None = Field(default_factory=none)
     status: str = Field()
 
@@ -49,12 +46,10 @@ class Service(BaseModel):
 
     zid: str = Field(title="Zabbix Event ID")
     name: str = Field(title="Zabbix Event Name")
-    start_date: str = Field()
-    start_time: str = Field()
-    recovery_date: str | None = Field(default_factory=none)
-    recovery_time: str | None = Field(default_factory=none)
+    startedAt: datetime = Field()
+    recoveryAt: datetime | None = Field(default_factory=none)
     age: str | None = Field(default_factory=none)
-    severity: str = Field()
+    severity: Severity = Field()
     duration: str | None = Field(default_factory=none)
     description: str = Field()
     rootcause: str = Field()
@@ -63,9 +58,8 @@ class Service(BaseModel):
 class ServiceUpdate(BaseModel):
     updatedAt: datetime = Field(default_factory=datetime.now)
 
-    recovery_date: str | None = Field(default_factory=none)
-    recovery_time: str | None = Field(default_factory=none)
-    severity: str = Field()
+    recoveryAt: datetime | None = Field(default_factory=none)
+    severity: Severity = Field()
     duration: str | None = Field(default_factory=none)
     age: str | None = Field(default_factory=none)
 

@@ -5,10 +5,16 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
+Severity = Literal["Not classified", "Information", "Warning", "Average", "High", "Disaster"]
+
+ZABBIX_DATETIME_FORMAT = "%Y.%m.%d %H:%M:%S"
+ZABBIX_DATE_REGEX = r"^\d{4}.\d{2}.\d{2}$"
+ZABBIX_TIME_REGEX = r"^\d{2}:\d{2}:\d{2}$"
+
 # Common sub-models
 class Recovery(BaseModel):
-    time: str
-    date: str
+    time: str = Field(pattern=ZABBIX_TIME_REGEX)
+    date: str = Field(pattern=ZABBIX_DATE_REGEX)
 
 class Acknowledgement(BaseModel):
     status: str
@@ -24,14 +30,14 @@ class User(BaseModel):
 
 class Update(BaseModel):
     action: str
-    date: str
-    time: str
+    date: str = Field(pattern=ZABBIX_DATE_REGEX)
+    time: str = Field(pattern=ZABBIX_TIME_REGEX)
     message: str
 
 class Update2(BaseModel):
-    date: str
-    time: str
-    severity: str
+    date: str = Field(pattern=ZABBIX_DATE_REGEX)
+    time: str = Field(pattern=ZABBIX_TIME_REGEX)
+    severity: Severity
 
 class ServiceInfo(BaseModel):
     name: str
@@ -43,9 +49,9 @@ class ServiceInfoWithRootCause(ServiceInfo):
 class ProblemEvent(BaseModel):
     id: str
     name: str
-    severity: str
-    time: str
-    date: str
+    severity: Severity
+    time: str = Field(pattern=ZABBIX_TIME_REGEX)
+    date: str = Field(pattern=ZABBIX_DATE_REGEX)
     opdata: str
 
 class ProblemUpdateEvent(BaseModel):
@@ -58,9 +64,9 @@ class ProblemUpdateEvent(BaseModel):
 class ServiceEvent(BaseModel):
     id: str
     name: str
-    severity: str
-    time: str
-    date: str
+    severity: Severity
+    time: str = Field(pattern=ZABBIX_TIME_REGEX)
+    date: str = Field(pattern=ZABBIX_DATE_REGEX)
     recovery: Recovery
 
 class ServiceUpdateEvent(BaseModel):
@@ -72,7 +78,7 @@ class ServiceUpdateEvent(BaseModel):
 class RecoveryEvent(BaseModel):
     id: str
     name: str
-    severity: str
+    severity: Severity
     duration: str
     recovery: Recovery
 

@@ -2,32 +2,16 @@
 
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import TypeVar, cast, Any, Generic, Literal, TYPE_CHECKING
+from typing import TypeVar, cast, Any, TYPE_CHECKING
 
 from bson import ObjectId
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from pydantic_core import core_schema
 
 def none():
     return None
 def to_doc(obj: BaseModel):
     return obj.model_dump(exclude_none=True)
-
-class FilterParams(BaseModel):
-    page: int = Field(1, ge=1)
-    limit: int = Field(20, ge=1, le=100)
-
-class Response(BaseModel):
-    status: Literal["success", "error"] = Field(default_factory=lambda: "success")
-    message: str | None = Field(default_factory=none)
-
-TData = TypeVar('TData')
-class DataResponse(Response, Generic[TData]):
-    data: TData | None = Field(default_factory=none)
-
-class PaginatedDataResponse(DataResponse, FilterParams, Generic[TData]):
-    # Override to provide Generic support
-    data: TData | None = Field(default_factory=none)
 
 # Ref: https://github.com/pydantic/pydantic/discussions/8600#discussioncomment-8212526
 @dataclass(frozen=True)
