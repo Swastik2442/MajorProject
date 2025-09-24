@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import TypeVar, Generic, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ValidationInfo, Field, field_validator
 
 from .utils import none
 
@@ -13,6 +13,15 @@ class TimePeriodParams(BaseModel):
     start: datetime = Field(description="Start Time")
     end: datetime = Field(default_factory=datetime.now, description="End Time")
     interval: Literal['hour', 'day', 'week', 'month'] = Field(default_factory=lambda: 'day', description="Time interval for aggregation")
+
+    @field_validator('end', mode='after')
+    @classmethod
+    def check_end_time(cls, value: datetime, info: ValidationInfo) -> datetime:
+        if value <= info.data['start']:
+            raise ValueError('End time must be after start time')
+        if value > datetime.now():
+            raise ValueError('End time must not be in future')
+        return value
 
 class Response(BaseModel):
     status: Literal["success", "error"] = Field(default_factory=lambda: "success")
@@ -31,6 +40,12 @@ class StatCounts(BaseModel):
     problemsInLast24Hours: int = Field(ge=0)
     problemsInLastWeek: int = Field(ge=0)
     problemsInLastMonth: int = Field(ge=0)
+
+class StatTrends(BaseModel):
+    timestamp: datetime
+    new: int = Field(ge=0)
+    resolved: int = Field(ge=0)
+    active: int = Field(ge=0)
 
 class StatHealthScores(BaseModel):
     id: str = Field(alias="_id", title="Zabbix Host ID")

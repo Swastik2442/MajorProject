@@ -1,6 +1,7 @@
 "API Routes for serving Zabbix Alerts"
 
-from datetime import datetime
+from datetime import datetime, timedelta
+from math import ceil
 from typing import Annotated
 
 from fastapi import APIRouter, Query, Request
@@ -9,7 +10,7 @@ from pymongo.asynchronous.database import AsyncDatabase
 
 from ..config import PROBLEMS_COL_NAME, SERVICES_COL_NAME
 from ..models import Problem, Service
-from ..schemas import DataResponse, PaginationParams, PaginatedDataResponse, StatCounts, StatHealthScores
+from ..schemas import DataResponse, PaginationParams, PaginatedDataResponse, StatCounts, StatHealthScores, StatTrends, TimePeriodParams
 from ..utils import fields
 
 router = APIRouter(
@@ -65,6 +66,74 @@ async def get_trigger_alerts_count(req: Request):
         problemsInLastWeek=problemsInLastWeek,
         problemsInLastMonth=problemsInLastMonth
     ))
+
+IntervalSeconds = {'hour': 3600, 'day': 86400, 'week': 604800, 'month': 2592000}
+@router.get("/problems/trends", response_model=DataResponse[list[StatTrends]])
+async def get_trigger_alerts_trends(req: Request, search_query: Annotated[TimePeriodParams, Query()]):
+    db: AsyncDatabase = req.app.state.db
+
+    # Get specific time periods
+    bins: list[tuple[datetime, datetime]] = []
+    intervalStr = "days" if search_query.interval == "month" else search_query.interval + "s"
+    intervalDiff = 30 if search_query.interval == "month" else 1
+    num_periods = ceil((search_query.end.timestamp() - search_query.start.timestamp()) / IntervalSeconds[search_query.interval])
+    for i in range(num_periods):
+        bin_start = search_query.start + timedelta(**{intervalStr: i * intervalDiff})
+        bin_end = bin_start + timedelta(**{intervalStr: intervalDiff})
+        if bin_end > search_query.end:
+            bins.append((bin_start, search_query.end))
+            break
+        bins.append((bin_start, bin_end))
+
+    # Fetch all problems in the whole time period (plus those that started before but are still active)
+    min_time = bins[0][0]
+    max_time = bins[-1][1]
+    problems = [
+        Problem(**doc)
+        async for doc in db[PROBLEMS_COL_NAME].find({
+            "$or": [
+                {fields(Problem).startedAt: {"$gte": min_time, "$lt": max_time}},
+                {
+                    fields(Problem).startedAt: {"$lt": min_time},
+                    fields(Problem).status: {"$ne": "Recovered"},
+                    fields(Problem).recoveryAt: {"$gte": min_time}
+                }
+            ]
+        })
+    ]
+
+    new_counts = [0] * num_periods
+    resolved_counts = [0] * num_periods
+    active_counts = [0] * num_periods
+
+    for p in problems:
+        # New Problems
+        for i, (bin_start, bin_end) in enumerate(bins):
+            if bin_start <= p.startedAt < bin_end:
+                new_counts[i] += 1
+                break
+
+        # Resolved Problems
+        if p.status == "Recovered":
+            assert p.recoveryAt is not None, "recoveryAt must be set when Recovered"
+            for i, (bin_start, bin_end) in enumerate(bins):
+                if bin_start <= p.recoveryAt < bin_end:
+                    resolved_counts[i] += 1
+                    break
+
+        # Active Problems
+        for i, (bin_start, bin_end) in enumerate(bins):
+            if bin_start >= p.startedAt and (
+                p.status != "Recovered" or (p.recoveryAt is not None and p.recoveryAt >= bin_end)
+            ):
+                active_counts[i] += 1
+
+    return DataResponse[list[StatTrends]](data=[StatTrends(
+        timestamp=bins[i][0],
+        new=new_counts[i],
+        resolved=resolved_counts[i],
+        active=active_counts[i]
+    ) for i in range(num_periods)])
 
 @router.get("/hosts/health", response_model=DataResponse[list[StatHealthScores]])
 async def hosts_health_scores(req: Request):
