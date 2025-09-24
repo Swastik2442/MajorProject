@@ -5,6 +5,7 @@ import logging
 
 from fastapi import FastAPI, Response, status
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 from pymongo import AsyncMongoClient
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -39,6 +40,15 @@ app = FastAPI(
     responses={
         422: {"model": CustomRequestValidationError}
     }
+)
+
+origins = ["http://localhost:5173"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
 )
 
 @app.get("/", include_in_schema=False)

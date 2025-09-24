@@ -1,71 +1,5 @@
 services:
-  # PostgreSQL Database for Zabbix
-  postgres:
-    image: postgres:15
-    container_name: zabbix-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: zabbix
-      POSTGRES_PASSWORD: zabbix_pass
-      POSTGRES_DB: zabbix
-    volumes:
-      - zabbix_pg_data:/var/lib/postgresql/data
-    networks:
-      - zabbix-net
-
-  # Zabbix server
-  zabbix-server:
-    image: zabbix/zabbix-server-pgsql:alpine-latest
-    container_name: zabbix-server
-    restart: unless-stopped
-    environment:
-      DB_SERVER_HOST: postgres
-      POSTGRES_USER: zabbix
-      POSTGRES_PASSWORD: zabbix_pass
-      POSTGRES_DB: zabbix
-    depends_on:
-      - postgres
-    ports:
-      - "10051:10051"
-    networks:
-      - zabbix-net
-
-  # Zabbix web (frontend)
-  zabbix-web:
-    image: zabbix/zabbix-web-nginx-pgsql:alpine-latest
-    container_name: zabbix-web
-    restart: unless-stopped
-    environment:
-      DB_SERVER_HOST: postgres
-      POSTGRES_USER: zabbix
-      POSTGRES_PASSWORD: zabbix_pass
-      POSTGRES_DB: zabbix
-      ZBX_SERVER_HOST: zabbix-server
-      PHP_TZ: Asia/Kolkata   # change timezone if needed
-    depends_on:
-      - postgres
-      - zabbix-server
-    ports:
-      - "8080:8080"
-    networks:
-      - zabbix-net
-
-  # Zabbix agent
-  zabbix-agent:
-    image: zabbix/zabbix-agent:alpine-latest
-    container_name: zabbix-agent
-    restart: unless-stopped
-    environment:
-      ZBX_SERVER_HOST: zabbix-server
-      ZBX_HOSTNAME: zabbix-agent
-    depends_on:
-      - zabbix-server
-    ports:
-      - "10050:10050"
-    networks:
-      - zabbix-net
-
-  # MongoDB Database for Server
+  # MongoDB Database
   mongodb:
     image: mongo:latest
     container_name: db
@@ -79,7 +13,7 @@ services:
     volumes:
       - mongodb_data:/data/db
 
-  # Alerts receiving Server
+  # API Server
   server:
     build:
       context: .
@@ -96,8 +30,4 @@ services:
       - ./:/app
 
 volumes:
-  zabbix_pg_data:
   mongodb_data:
-
-networks:
-  zabbix-net:

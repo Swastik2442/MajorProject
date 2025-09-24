@@ -4,7 +4,7 @@ from typing import Literal
 
 from zabbix_utils import ZabbixAPI
 
-templates_dir = os.path.join(os.path.dirname(__file__), 'src', 'templates')
+templates_dir = os.path.join(os.path.dirname(__file__), '..', 'src', 'templates')
 _json_files_content: dict[str, str] = {}
 for filename in os.listdir(templates_dir):
     if filename.endswith('.json'):
