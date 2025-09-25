@@ -1,6 +1,25 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 import LogoutButton from "../components/LogoutButton.jsx";
 
+// Dashboard components
+import LoadingSpinner from "../components/dashboard/LoadingSpinner.jsx";
+import AlertBanner from "../components/dashboard/AlertBanner.jsx";
+import StatusCards from "../components/dashboard/StatusCards.jsx";
+import ActivityStream from "../components/dashboard/ActivityStream.jsx";
+import SeverityMatrix from "../components/dashboard/SeverityMatrix.jsx";
+import TrendsChart from "../components/dashboard/TrendsChart.jsx";
+import HostScorecards from "../components/dashboard/HostScorecards.jsx";
+import KPIring from "../components/dashboard/KPIring.jsx";
+
+// Local utilities
+import {
+  normalizeProblems,
+  computeHostScores,
+  computeSeverityMatrix,
+  compute24hTrends,
+} from "../utils/tranform.js";
+
+// Fetch problems from backend
 async function getProblems() {
   const response = await fetch("http://localhost:5000/api/problems");
   if (!response.ok) {
@@ -10,49 +29,98 @@ async function getProblems() {
 }
 
 export default function Dashboard() {
-  const { data: problems, isError, error, isPending } = useQuery({
+  const { data, isError, error, isPending } = useQuery({
     queryKey: ["problems"],
-    queryFn: getProblems
+    queryFn: getProblems,
   });
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6 text-center animate-fadeIn">
-      <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
-      <p className="text-gray-600 my-4">
-        Showing data from <span className="font-medium">nms_problems</span> collection
-      </p>
+  if (isPending) {
+    return (
+      <div className="p-8">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
-      <h2 className="text-xl font-semibold mb-4">Problems:</h2>
-      <div className="grid gap-4 w-full max-w-3xl">
-        {isPending ? (<>
-          <p className="text-gray-500">Loading problems...</p>
-          {isError && (
-            <p className="text-red-500">{error.message}</p>
-          )}
-        </>) : (<>
-          {problems && problems.length > 0 ? (
-            problems.map((problem) => (
-              <div
-                key={problem._id}
-                className="bg-white p-4 rounded-xl shadow-md text-left border hover:shadow-lg transition"
-              >
-                <h3 className="font-bold text-lg mb-2">{problem.name}</h3>
-                <p><strong>ZID:</strong> {problem.zid}</p>
-                <p><strong>Status:</strong> {problem.status}</p>
-                <p><strong>Severity:</strong> {problem.severity}</p>
-                <p><strong>Start:</strong> {problem.start_date} {problem.start_time}</p>
-                <p><strong>Recovery:</strong> {problem.recovery_date} {problem.recovery_time}</p>
-                <p><strong>Duration:</strong> {problem.duration}</p>
-                <p><strong>Host:</strong> {problem.hostname}</p>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-500">No problems found</p>
-          )}
-        </>)}
+  if (isError) {
+    return (
+      <div className="p-8 text-red-500">
+        Error loading problems: {error.message}
+      </div>
+    );
+  }
+
+  // --- Transform data ---
+  const problems = normalizeProblems(data || []);
+  const hostScores = computeHostScores(problems);
+  const severityMatrix = computeSeverityMatrix(problems);
+  const trends = compute24hTrends(problems);
+
+  const totalActive = problems.filter((p) => p.isActive).length;
+  const totalToday = problems.filter((p) => {
+    if (!p.startAt) return false;
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    return p.startAt >= start;
+  }).length;
+  const resolvedCount = problems.filter((p) =>
+    /recover/i.test(String(p.status))
+  ).length;
+  const resolutionRate = problems.length
+    ? Math.round((resolvedCount / problems.length) * 100)
+    : 0;
+
+  // Pick a few problems for the activity stream
+  const activityItems = problems.slice(0, 6).map((p) => ({
+    id: p.id,
+    message: p.message?.slice(0, 70) || "No message",
+    host: p.host,
+    severity: p.severity,
+    startAt: p.startAt,
+    durationSeconds: p.durationSeconds,
+    spark: Array.from({ length: 6 }, () =>
+      Math.round(Math.random() * 3)
+    ), // placeholder sparkline
+  }));
+
+  return (
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-semibold">
+          Unified Operations & Predictive Insight Dashboard
+        </h1>
+        <LogoutButton />
       </div>
 
-      <LogoutButton />
+      {/* Critical Alert Banner */}
+      <AlertBanner text="CRITICAL SECURITY ALERT: ACTIVE! SQL Injection on DB-SRV01 - High Packet Loss" />
+
+      {/* Layout grid */}
+      <div className="grid grid-cols-12 gap-6">
+        {/* Left column */}
+        <div className="col-span-7 space-y-6">
+          <StatusCards
+            totalActive={totalActive}
+            totalToday={totalToday}
+          />
+          <ActivityStream items={activityItems} />
+        </div>
+
+        {/* Right column */}
+        <div className="col-span-5 space-y-6">
+          <SeverityMatrix data={severityMatrix} />
+          <div className="grid grid-cols-3 gap-4">
+            <div className="col-span-2">
+              <TrendsChart data={trends} />
+            </div>
+            <div className="col-span-1">
+              <KPIring percent={resolutionRate} label="Resolved" />
+            </div>
+          </div>
+          <HostScorecards hosts={hostScores} />
+        </div>
+      </div>
     </div>
   );
 }
