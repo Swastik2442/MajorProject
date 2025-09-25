@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import TypeVar, Generic, Literal
 
 from pydantic import BaseModel, ValidationInfo, Field, field_validator
+import pytz
 
 from .utils import none
 
@@ -19,7 +20,7 @@ class TimePeriodParams(BaseModel):
     def check_end_time(cls, value: datetime, info: ValidationInfo) -> datetime:
         if value <= info.data['start']:
             raise ValueError('End time must be after start time')
-        if value > datetime.now():
+        if value > datetime.now(pytz.utc):
             raise ValueError('End time must not be in future')
         return value
 

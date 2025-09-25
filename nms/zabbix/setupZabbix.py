@@ -29,6 +29,7 @@ def createMediaType(zapi: ZabbixAPI, apiUrl: str, mediaTypeId: str | None = None
             {"name": "URL","value": apiUrl}
         ],
         "script": _getWebhookScript(),
+        "status": "0",
         "message_templates": [
             {
                 "eventsource": "0",
@@ -77,9 +78,9 @@ def createMediaType(zapi: ZabbixAPI, apiUrl: str, mediaTypeId: str | None = None
     response = method(params)
 
     if mediaTypeId is not None:
-        assert hasattr(response, "mediatypeids") and mediaTypeId in response["mediatypeids"], "Updating Media Type failed"
+        assert "mediatypeids" in response and mediaTypeId in response["mediatypeids"], "Updating Media Type failed"
     else:
-        assert hasattr(response, "mediatypeids") and len(response["mediatypeids"]) > 0, "Creating Media Type failed"
+        assert "mediatypeids" in response and (len(response["mediatypeids"]) > 0), "Creating Media Type failed"
         return response["mediatypeids"][0]
 
 def createMedia(zapi: ZabbixAPI, apiUrl: str, userId: str, mediaTypeId: str) -> None:
@@ -90,7 +91,7 @@ def createMedia(zapi: ZabbixAPI, apiUrl: str, userId: str, mediaTypeId: str) -> 
             "sendto": apiUrl
         }]
     })
-    assert hasattr(response, "userids") and str(userId) in response["userids"], "Could not add Media to User"
+    assert "userids" in response and str(userId) in response["userids"], "Could not add Media to User"
 
 def createAction(zapi: ZabbixAPI, userId: str, mediaTypeId: str, eventsource: Literal[0, 4], name: str = "Report to API") -> None:
     response = zapi.action.create({ # type: ignore
@@ -113,7 +114,7 @@ def createAction(zapi: ZabbixAPI, userId: str, mediaTypeId: str, eventsource: Li
             "opmessage": {"mediatypeid": mediaTypeId}
         }]
     })
-    assert hasattr(response, "actionids") and len(response["actionids"]) > 0, "Could not create Action"
+    assert "actionids" in response and len(response["actionids"]) > 0, "Could not create Action"
 
 if __name__ == "__main__":
     from dotenv import load_dotenv
@@ -131,12 +132,16 @@ if __name__ == "__main__":
     # Create Media Type
     mediaTypeId = createMediaType(zapi, apiUrl)
     assert mediaTypeId is not None
+    print("\nCreated Media Type with ID:", mediaTypeId)
 
     # Create Media for selected User
     createMedia(zapi, apiUrl, userId, mediaTypeId)
+    print("Added Media to User")
 
     # Create Actions with Media Type for selected User
     createAction(zapi, userId, mediaTypeId, 0, "Report Triggers to API")
+    print("Created Action for Triggers")
     createAction(zapi, userId, mediaTypeId, 4, "Report Service Updates to API")
+    print("Created Action for Service Updates")
 
-    print("Triggers added successfully")
+    print("\nTriggers added successfully")

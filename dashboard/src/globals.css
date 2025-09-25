@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+@theme {
+    --color-dash-bg: #0b1217;
+    --color-card-bg: #0f1720;
+    --color-muted: #9ca3af;
+    --color-accent-red: #ef4444;
+    --color-accent-green: #10b981;
+    --color-accent-yellow: #f59e0b;
+}
