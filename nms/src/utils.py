@@ -1,17 +1,29 @@
 "Utilities"
 
 from dataclasses import dataclass
+from datetime import datetime
 from functools import lru_cache
-from typing import TypeVar, cast, Any, TYPE_CHECKING
+from typing import Annotated, Any, TypeVar, cast, TYPE_CHECKING
+from zoneinfo import ZoneInfo
 
 from bson import ObjectId
-from pydantic import BaseModel
+from pydantic import BaseModel, AfterValidator
 from pydantic_core import core_schema
 
-def none():
+utc_tz = ZoneInfo("UTC")
+
+def none() -> None:
     return None
+def now() -> datetime:
+    return datetime.now(utc_tz)
 def to_doc(obj: BaseModel):
     return obj.model_dump(exclude_none=True)
+
+def normalize_to_utc(dt: datetime) -> datetime:
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=utc_tz)
+    return dt.astimezone(utc_tz)
+MyDatetime = Annotated[datetime, AfterValidator(normalize_to_utc)]
 
 # Ref: https://github.com/pydantic/pydantic/discussions/8600#discussioncomment-8212526
 @dataclass(frozen=True)

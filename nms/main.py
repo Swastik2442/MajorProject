@@ -59,5 +59,5 @@ def root():
 def favicon():
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-app.include_router(zabbix_router)
+app.include_router(zabbix_router, include_in_schema=False)
 app.include_router(alerts_router)

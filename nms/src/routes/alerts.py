@@ -11,7 +11,7 @@ from pymongo.asynchronous.database import AsyncDatabase
 from ..config import PROBLEMS_COL_NAME, SERVICES_COL_NAME
 from ..models import Problem, Service
 from ..schemas import DataResponse, PaginationParams, PaginatedDataResponse, StatCounts, StatHealthScores, StatTrends, TimePeriodParams
-from ..utils import fields
+from ..utils import fields, now
 
 router = APIRouter(
     prefix="/alerts",
@@ -46,18 +46,18 @@ async def get_service_alerts(req: Request, filter_query: Annotated[PaginationPar
 async def get_trigger_alerts_count(req: Request):
     db: AsyncDatabase = req.app.state.db
 
-    now = datetime.now().timestamp()
+    curr = now().timestamp()
     activeProblems = await db[PROBLEMS_COL_NAME].count_documents(
         {fields(Problem).status: {"$ne": "Recovered"}}
     )
     problemsInLast24Hours = await db[PROBLEMS_COL_NAME].count_documents(
-        {fields(Problem).createdAt: {"$gte": (now - 86400)}} # type: ignore
+        {fields(Problem).createdAt: {"$gte": (curr - 86400)}} # type: ignore
     )
     problemsInLastWeek = await db[PROBLEMS_COL_NAME].count_documents(
-        {fields(Problem).createdAt: {"$gte": (now - 604800)}} # type: ignore
+        {fields(Problem).createdAt: {"$gte": (curr - 604800)}} # type: ignore
     )
     problemsInLastMonth = await db[PROBLEMS_COL_NAME].count_documents(
-        {fields(Problem).createdAt: {"$gte": (now - 2592000)}} # type: ignore
+        {fields(Problem).createdAt: {"$gte": (curr - 2592000)}} # type: ignore
     )
 
     return DataResponse[StatCounts](data=StatCounts(
