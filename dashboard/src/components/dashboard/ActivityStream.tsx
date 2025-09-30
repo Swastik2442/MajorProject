@@ -5,10 +5,17 @@ import LoadingSpinner from "./LoadingSpinner";
 
 function MiniSpark({ data = [] }: { data: { v: number }[] }) {
   return (
-    <div style={{ width: 100, height: 36 }}>
+    <div style={{ width: 80, height: 28 }}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>
-          <Line type="monotone" dataKey="v" stroke="#3b82f6" strokeWidth={2} dot={false} strokeLinecap="round" />
+          <Line
+            type="monotone"
+            dataKey="v"
+            stroke="#22c55e" // green for activity trend
+            strokeWidth={2}
+            dot={false}
+            strokeLinecap="round"
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>
@@ -36,29 +43,56 @@ export default function ActivityStream() {
       </div>
     );
   }
+
   const items = data?.data ?? [];
 
   return (
-    <div className="card">
+    <div className="bg-gray-900 rounded-xl shadow-md p-5 border border-gray-700">
+      {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <div className="text-lg font-semibold">PROBLEM ACTIVITY STREAM</div>
-        <div className="small-muted">latest</div>
+        <h2 className="text-sm font-semibold tracking-wider text-gray-300 uppercase">
+          Problem Activity Stream
+        </h2>
+        <span className="text-xs text-gray-500">Latest</span>
       </div>
 
-      <div className="space-y-4">
+      {/* Items */}
+      <div className="space-y-3">
         {items.map((it) => (
-          <div key={it.zid} className="flex items-center justify-between gap-4 border border-gray-800 rounded-xl p-3">
+          <div
+            key={it.zid}
+            className="flex items-center justify-between gap-4 bg-gray-800 rounded-lg px-3 py-2 hover:bg-gray-700 transition"
+          >
+            {/* Left side: severity + text */}
             <div className="flex items-start gap-3">
-              <div className={`w-3 h-3 rounded-full mt-1 ${/crit/i.test(it.severity) ? "bg-red-500" : /warn/i.test(it.severity) ? "bg-yellow-500" : "bg-green-500"}`} />
+              <div
+                className={`w-3 h-3 rounded-full mt-1 ${
+                  /crit/i.test(it.severity)
+                    ? "bg-red-500"
+                    : /warn/i.test(it.severity)
+                    ? "bg-yellow-400"
+                    : "bg-green-500"
+                }`}
+              />
               <div>
-                <div className="font-medium">{it.name} </div>
-                <div className="small-muted mt-1">{it.hostname} · {new Date(it.startedAt).toLocaleString()}</div>
+                <div className="text-sm font-medium text-gray-200">
+                  {it.name}
+                </div>
+                <div className="text-xs text-gray-400 mt-0.5">
+                  {it.hostname} ·{" "}
+                  {new Date(it.startedAt).toLocaleString()}
+                </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
-              <MiniSpark data={([0,1,0,2,1,0]).map((v) => ({ v }))} />
-              <div className="small-muted text-right">{it.duration}</div>
+            {/* Right side: spark + duration */}
+            <div className="flex items-center gap-3">
+              <MiniSpark
+                data={[0, 1, 0, 2, 1, 0].map((v) => ({ v }))}
+              />
+              <span className="text-xs text-gray-400 text-right">
+                {it.duration}
+              </span>
             </div>
           </div>
         ))}

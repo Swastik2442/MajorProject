@@ -9,38 +9,43 @@ import KPIring from "../components/dashboard/KPIring";
 
 export default function Dashboard() {
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-semibold">
-          Unified Operations & Predictive Insight Dashboard
-        </h1>
-        <LogoutButton />
+    <div className="min-h-screen w-full bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white p-6">
+      {/* Page Title */}
+      <h1 className="text-2xl font-bold mb-6">
+        Unified Operations & Predictive Insight Dashboard
+      </h1>
+
+      {/* Alert Banner */}
+      <div className="mb-6 rounded-xl bg-red-600/90 text-white px-4 py-3 flex items-center justify-between shadow-lg">
+        <div className="flex items-center gap-2">
+          <span className="text-xl">⚠️</span>
+          <span className="font-medium">
+            CRITICAL SECURITY ALERT: ACTIVE! SQL Injection on DB-SRV01 – High
+            Packet Loss
+          </span>
+        </div>
+        <button className="text-white/70 hover:text-white">✕</button>
       </div>
 
-      {/* Critical Alert Banner */}
-      <AlertBanner text="CRITICAL SECURITY ALERT: ACTIVE! SQL Injection on DB-SRV01 - High Packet Loss" />
-
-      {/* Layout grid */}
+      {/* Main Grid */}
       <div className="grid grid-cols-12 gap-6">
-        {/* Left column */}
-        <div className="col-span-7 space-y-6">
+        {/* Left Side */}
+        <div className="col-span-12 lg:col-span-8 space-y-6">
+          {/* Status Cards */}
           <StatusCards />
+
+          {/* Activity Stream */}
           <ActivityStream />
+
+          {/* Host Scorecard (bottom left) */}
+          <HostScorecards />
         </div>
 
-        {/* Right column */}
-        <div className="col-span-5 space-y-6">
+        {/* Right Side */}
+        <div className="col-span-12 lg:col-span-4 space-y-6">
           <SeverityMatrix />
-          <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-2">
-              <TrendsChart />
-            </div>
-            <div className="col-span-1">
-              <KPIring />
-            </div>
-          </div>
-          <HostScorecards />
+          <TrendsChart />
+          <KPIring />
         </div>
       </div>
     </div>
