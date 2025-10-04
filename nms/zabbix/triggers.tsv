@@ -1,0 +1,931 @@
+name	category
+AIX: Zabbix agent is not available (for {$AGENT.TIMEOUT})	Agent/Service Status
+APC Smart-UPS: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})	High Temperature
+APC Smart-UPS: Battery has low capacity (below {$BATTERY.CAPACITY.MIN.WARN}%)	Low Battery
+APC Smart-UPS: Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})	Overwhelming Usage
+APC Smart-UPS: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+APC Smart-UPS: Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})	Invalid Input
+APC Smart-UPS: Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})	Invalid Input
+APC Smart-UPS: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+APC UPS Galaxy: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})	High Temperature
+APC UPS Galaxy: Battery has low capacity (below {$BATTERY.CAPACITY.MIN.WARN}%)	Low Battery
+APC UPS Galaxy: Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})	Overwhelming Usage
+APC UPS Galaxy: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+APC UPS Galaxy: Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})	Invalid Input
+APC UPS Galaxy: Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})	Invalid Input
+APC UPS Galaxy: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+APC UPS Symmetra: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})	High Temperature
+APC UPS Symmetra: Battery has low capacity (below {$BATTERY.CAPACITY.MIN.WARN}%)	Low Battery
+APC UPS Symmetra: Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})	Overwhelming Usage
+APC UPS Symmetra: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+APC UPS Symmetra: Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})	Invalid Input
+APC UPS Symmetra: Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})	Invalid Input
+APC UPS Symmetra: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+APC UPS: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})	High Temperature
+APC UPS: Battery has low capacity (below {$BATTERY.CAPACITY.MIN.WARN}%)	Low Battery
+APC UPS: Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})	Overwhelming Usage
+APC UPS: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+APC UPS: Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})	Invalid Input
+APC UPS: Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})	Invalid Input
+APC UPS: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+AWS EC2: Byte Credit balance is too low (less {$AWS.EBS.BYTE.CREDIT.BALANCE.MIN.WARN}% for 5m)	Low Balance
+AWS EC2: High CPU utilization (over {$AWS.EC2.CPU.UTIL.WARN.MAX}% for 15m)	System Performance
+AWS EC2: I/O Credit balance is too low (less {$AWS.EBS.IO.CREDIT.BALANCE.MIN.WARN}% for 5m)	Low Balance
+AWS EC2: Instance CPU Credit balance is too low (less {$AWS.EC2.CPU.CREDIT.BALANCE.MIN.WARN} for 5m)	Low Balance
+AWS EC2: Instance has spent too many CPU surplus credits (over {$AWS.EC2.CPU.CREDIT.SURPLUS.BALANCE.MAX.WARN} for 15m)'	Low Balance
+AWS ECS Cluster: High CPU utilization (over {$AWS.ECS.CLUSTER.CPU.UTIL.WARN}% for 15m)	System Performance
+AWS ECS Cluster: High memory utilization (over {$AWS.ECS.CLUSTER.MEMORY.UTIL.WARN}% for 15m)	System Memory
+AWS ECS Serverless: High CPU utilization (over {$AWS.ECS.CLUSTER.CPU.UTIL.WARN}% for 15m)	System Performance
+AWS ECS Serverless: High memory utilization (over {$AWS.ECS.CLUSTER.MEMORY.UTIL.WARN}% for 15m)	System Memory
+AWS ELB ALB: Failed to get CloudWatch alarms for Application Load Balancer	Request Failure
+AWS ELB ALB: Failed to get CloudWatch metrics for Application Load Balancer	Request Failure
+AWS ELB ALB: Too many HTTP 4XX error codes (over {$AWS.HTTP.4XX.FAIL.MAX.WARN} for 5m)	High Error Rate
+AWS ELB ALB: Too many HTTP 5XX error codes (over {$AWS.HTTP.5XX.FAIL.MAX.WARN} for 5m)	High Error Rate
+AWS ELB NLB: Failed to get CloudWatch alarms for Network Load Balancer	Request Failure
+AWS ELB NLB: Failed to get CloudWatch metrics for Network Load Balancer	Request Failure
+AWS Lambda: Failed to get CloudWatch alarms for the Lambda function	Request Failure
+AWS Lambda: Failed to get CloudWatch metrics for the Lambda function	Request Failure
+AWS RDS: Burst balance is too low (less {$AWS.RDS.BURST.CREDIT.BALANCE.MIN.WARN}% for 5m)	Low Balance
+AWS RDS: Byte Credit balance is too low (less {$AWS.EBS.BYTE.CREDIT.BALANCE.MIN.WARN}% for 5m)	Low Balance
+AWS RDS: High CPU utilization (over {$AWS.RDS.CPU.UTIL.WARN.MAX}% for 15m)	System Performance
+AWS RDS: I/O Credit balance is too low (less {$AWS.EBS.IO.CREDIT.BALANCE.MIN.WARN}% for 5m)	Low Balance
+AWS RDS: Instance CPU Credit balance is too low (less {$AWS.RDS.CPU.CREDIT.BALANCE.MIN.WARN} for 5m)	Low Balance
+Alcatel TiMOS: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)	System Performance
+Alcatel TiMOS: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)	System Memory
+Alcatel TiMOS: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Alcatel TiMOS: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Apache Cassandra: Failed to fetch info data (or no data for 15m)	Agent/Service Status
+Apache Cassandra: Many pending tasks (over {$CASSANDRA.PENDING_TASKS.MAX.WARN} for 15m)	Overwhelming Usage
+Apache Cassandra: Too many pending tasks (over {$CASSANDRA.PENDING_TASKS.MAX.HIGH} for 15m)	Overwhelming Usage
+Apache Cassandra: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Apache Kafka: Failed to fetch info data (or no data for 15m)	Agent/Service Status
+Apache Kafka: Kafka service has been restarted (uptime < 10m)	Agent/Service Status
+Apache Kafka: Network processor average idle percent is too low (under {$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN} for 15m)	Overwhelming Usage
+Apache Kafka: Request handler average idle percent is too low (under {$KAFKA.REQUEST_HANDLER_AVG_IDLE.MIN.WARN} for 15m)	Overwhelming Usage
+Apache Kafka: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Apache Tomcat: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Apache: Failed to fetch status page (or no data for 30m)	Agent/Service Status
+Apache: Service has been restarted (uptime < 10m)	Agent/Service Status
+Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m)	Slow Response Time
+Apache: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Arista: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)	System Performance
+Arista: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Arista: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Asterisk: Configuration has been reloaded (last reload < 10m ago)	System Configuration Info
+Asterisk: Failed to fetch AMI page (or no data for 30m)	Agent/Service Status
+Asterisk: Service has been restarted (uptime < 10m)	Agent/Service Status
+Asterisk: Service response time is too high (over {$AMI.RESPONSE_TIME.MAX.WARN} for 5m)	Slow Response Time
+Asterisk: Total number of active channels of IAX trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"} for 10m)	Overwhelming Usage
+Asterisk: Total number of active channels of PJSIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"} for 10m)	Overwhelming Usage
+Asterisk: Total number of active channels of SIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"} for 10m)	Overwhelming Usage
+Asterisk: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Azure Cost: Error in daily costs requests to API	Request Failure
+Azure Cost: Error in monthly costs requests to API	Request Failure
+Azure SQL instance: Critically high CPU utilization: (over >= {$AZURE.SQL.INST.CPU.CRIT}% over last 10m)	System Performance
+Azure SQL instance: High CPU utilization: (over >= {$AZURE.SQL.INST.CPU.WARN}% over last 10m)	System Performance
+Azure SQL instance: The free storage space is critically low (below {$AZURE.SQL.INST.SPACE.CRIT}% for 5m)	Filesystem
+Azure SQL instance: The free storage space is low (below {$AZURE.SQL.INST.SPACE.WARN}% for 5m)	Filesystem
+Azure VM Scale: CPU utilization is high (over {$AZURE.SCALESET.CPU.UTIL.CRIT}% for last 5m)	System Performance
+Azure VM Scale: Number of VMs is high (over {$AZURE.SCALESET.VM.COUNT.CRIT} for last 5m)	Overwhelming Usage
+Azure VM: CPU utilization is high (over {$AZURE.VM.CPU.UTIL.CRIT}% for last 5m)	System Performance
+Brocade FC: Device has been replaced (new serial number received)	System Configuration Info
+Brocade FC: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)	System Performance
+Brocade FC: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)	System Memory
+Brocade FC: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Brocade FC: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Brocade Nonstackable: Device has been replaced (new serial number received)	System Configuration Info
+Brocade Nonstackable: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)	System Performance
+Brocade Nonstackable: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)	System Memory
+Brocade Nonstackable: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Brocade Nonstackable: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Brocade Stackable: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)	System Performance
+Brocade Stackable: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)	System Memory
+Brocade Stackable: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Brocade Stackable: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Ceph: Minimum monitor release version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Certificate: {?jsonpath(last(//cert.get.data),"$.error.message", "")}	Certificate Problem
+Check Point: Device has been replaced (new serial number received)	System Configuration Info
+Check Point: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)	System Performance
+Check Point: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)	System Memory
+Check Point: Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)	System Performance
+Check Point: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Check Point: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Cisco ASAv: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Cisco Catalyst 3750V2-24FS: Device has been replaced (new serial number received)	System Configuration Info
+Cisco Catalyst 3750V2-24FS: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Cisco Catalyst 3750V2-24FS: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Cisco Catalyst 3750V2-24PS: Device has been replaced (new serial number received)	System Configuration Info
+Cisco Catalyst 3750V2-24PS: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Cisco Catalyst 3750V2-24PS: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Cisco Catalyst 3750V2-24TS: Device has been replaced (new serial number received)	System Configuration Info
+Cisco Catalyst 3750V2-24TS: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Cisco Catalyst 3750V2-24TS: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Cisco Catalyst 3750V2-48PS: Device has been replaced (new serial number received)	System Configuration Info
+Cisco Catalyst 3750V2-48PS: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Cisco Catalyst 3750V2-48PS: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Cisco Catalyst 3750V2-48TS: Device has been replaced (new serial number received)	System Configuration Info
+Cisco Catalyst 3750V2-48TS: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Cisco Catalyst 3750V2-48TS: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Cisco IOS: Device has been replaced (new serial number received)	System Configuration Info
+Cisco IOS: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)	System Performance
+Cisco IOS: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Cisco IOS: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Cisco Nexus 9000: Device has been replaced (new serial number received)	System Configuration Info
+Cisco Nexus 9000: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Cisco Nexus 9000: {HOST.NAME} has been restarted or reinitialized (uptime < 10m)	Agent/Service Status
+Cisco SD-WAN: Device has been replaced (new serial number received)	System Configuration Info
+Cisco SD-WAN: High CPU utilization (over {$SDWAN.CPU.UTIL.CRIT}% for 5m)	System Performance
+Cisco SD-WAN: High memory utilization (>{$SDWAN.MEMORY.UTIL.MAX}% for 5m)	System Memory
+Cisco SD-WAN: Lack of available memory (<{$SDWAN.MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})	System Memory
+Cisco SD-WAN: Load average is too high (per CPU load over {$SDWAN.LA.PER.CPU.MAX.WARN} for 5m)	System Performance
+Cisco SD-WAN: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Cisco SD-WAN: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Cisco Secure FTD: Device has been replaced (new serial number received)	System Configuration Info
+Cisco Secure FTD: High CPU utilization (over {$CISCO.FTD.CPU.UTIL.WARN}% for 15m)	System Performance
+Cisco Secure FTD: High memory utilization (over {$CISCO.FTD.MEMORY.UTIL.WARN}% for 15m)	System Memory
+Cisco Secure FTD: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Cisco UCS Manager: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Cisco UCS Manager: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Cisco UCS: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Cisco UCS: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+ClickHouse: Failed to fetch info data (or no data for 30m)	Agent/Service Status
+ClickHouse: Replication lag is too high (over {$CLICKHOUSE.REPLICA.MAX.WARN} sec for 5min)	Slow Response Time
+ClickHouse: There are queries running more than {$CLICKHOUSE.QUERY_TIME.MAX.WARN} seconds	Slow Response Time
+ClickHouse: Too many MergeTree parts (over 90% of {$CLICKHOUSE.PARTS.PER.PARTITION.WARN})	Overwhelming Usage
+ClickHouse: Too many distributed files to insert (over {$CLICKHOUSE.DELAYED.FILES.DISTRIBUTED.COUNT.MAX.WARN} for 5 min)	Overwhelming Usage
+ClickHouse: Too many network errors (over {$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN} in 5m)	High Error Rate
+ClickHouse: Too many throttled insert queries (over {$CLICKHOUSE.DELAYED.INSERTS.MAX.WARN} for 5 min)	Overwhelming Usage
+ClickHouse: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+ClickHouse: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Cloudflare: Cached bandwidth is too low (less than {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}% for 3 last measurements)	System Cache
+Cloudflare: Ratio of non-2xx responses is too high (more than {$CLOUDFLARE.ERRORS.MAX.WARN}% for 3 last measurements)	High Error Rate
+CockroachDB: CA certificate expires soon (less than {$COCKROACHDB.CERT.CA.EXPIRY.WARN} days)	Certificate Problem
+CockroachDB: Clock offset is too high (over {$COCKROACHDB.CLOCK.OFFSET.MAX.WARN}ms for 5m)	System Configuration Info
+CockroachDB: Current number of open files is too high (over {$COCKROACHDB.OPEN.FDS.MAX.WARN}% for 10m)	Overwhelming Usage
+CockroachDB: Failed to fetch node data (or no data for 5m)	Agent/Service Status
+CockroachDB: Node certificate expires soon (less than {$COCKROACHDB.CERT.NODE.EXPIRY.WARN} days)	Certificate Problem
+CockroachDB: Node has been restarted (uptime < 10m)	Agent/Service Status
+CockroachDB: SQL statements errors rate is too high (over {$COCKROACHDB.STATEMENTS.ERRORS.MAX.WARN} per second for 5m)	High Error Rate
+CockroachDB: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+D-Link DES 7200: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)	System Performance
+D-Link DES 7200: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+D-Link DES 7200: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+D-Link DES_DGS Switch: Device has been replaced (new serial number received)	System Configuration Info
+D-Link DES_DGS Switch: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)	System Performance
+D-Link DES_DGS Switch: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+D-Link DES_DGS Switch: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Dell Force S-Series: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Dell Force S-Series: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Dell R660: Current CPU utilization is high (util >= {$DELL.HTTP.CPU.UTIL.WARN}%)	System Performance
+Dell R660: Current CPU utilization is too high (util >= {$DELL.HTTP.CPU.UTIL.HIGH}%)	System Performance
+Dell R660: Current IO utilization is high (util >= {$DELL.HTTP.IO.UTIL.WARN}%)	Filesystem
+Dell R660: Current IO utilization is too high (util >= {$DELL.HTTP.IO.UTIL.HIGH}%)	Filesystem
+Dell R660: Current SYS utilization is high (util >= {$DELL.HTTP.SYS.UTIL.WARN}%)	System Performance
+Dell R660: Current SYS utilization is too high (util >= {$DELL.HTTP.SYS.UTIL.HIGH}%)	System Performance
+Dell R660: Current memory utilization is high (util >= {$DELL.HTTP.MEM.UTIL.WARN}%)	System Memory
+Dell R660: Current memory utilization is too high (util >= {$DELL.HTTP.MEM.UTIL.HIGH}%)	System Memory
+Dell R660: Device has been replaced (new serial number received)	System Configuration Info
+Dell R660: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Dell R660: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Dell R720: Current CPU utilization is high (util >= {$DELL.HTTP.CPU.UTIL.WARN}%)	System Performance
+Dell R720: Current CPU utilization is too high (util >= {$DELL.HTTP.CPU.UTIL.HIGH}%)	System Performance
+Dell R720: Current IO utilization is high (util >= {$DELL.HTTP.IO.UTIL.WARN}%)	Filesystem
+Dell R720: Current IO utilization is too high (util >= {$DELL.HTTP.IO.UTIL.HIGH}%)	Filesystem
+Dell R720: Current SYS utilization is high (util >= {$DELL.HTTP.SYS.UTIL.WARN}%)	System Performance
+Dell R720: Current SYS utilization is too high (util >= {$DELL.HTTP.SYS.UTIL.HIGH}%)	System Performance
+Dell R720: Current memory utilization is high (util >= {$DELL.HTTP.MEM.UTIL.WARN}%)	System Memory
+Dell R720: Current memory utilization is too high (util >= {$DELL.HTTP.MEM.UTIL.HIGH}%)	System Memory
+Dell R720: Device has been replaced (new serial number received)	System Configuration Info
+Dell R720: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Dell R720: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Dell R740: Current CPU utilization is high (util >= {$DELL.HTTP.CPU.UTIL.WARN}%)	System Performance
+Dell R740: Current CPU utilization is too high (util >= {$DELL.HTTP.CPU.UTIL.HIGH}%)	System Performance
+Dell R740: Current IO utilization is high (util >= {$DELL.HTTP.IO.UTIL.WARN}%)	Filesystem
+Dell R740: Current IO utilization is too high (util >= {$DELL.HTTP.IO.UTIL.HIGH}%)	Filesystem
+Dell R740: Current SYS utilization is high (util >= {$DELL.HTTP.SYS.UTIL.WARN}%)	System Performance
+Dell R740: Current SYS utilization is too high (util >= {$DELL.HTTP.SYS.UTIL.HIGH}%)	System Performance
+Dell R740: Current memory utilization is high (util >= {$DELL.HTTP.MEM.UTIL.WARN}%)	System Memory
+Dell R740: Current memory utilization is too high (util >= {$DELL.HTTP.MEM.UTIL.HIGH}%)	System Memory
+Dell R740: Device has been replaced (new serial number received)	System Configuration Info
+Dell R740: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Dell R740: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Dell R750: Current CPU utilization is high (util >= {$DELL.HTTP.CPU.UTIL.WARN}%)	System Performance
+Dell R750: Current CPU utilization is too high (util >= {$DELL.HTTP.CPU.UTIL.HIGH}%)	System Performance
+Dell R750: Current IO utilization is high (util >= {$DELL.HTTP.IO.UTIL.WARN}%)	Filesystem
+Dell R750: Current IO utilization is too high (util >= {$DELL.HTTP.IO.UTIL.HIGH}%)	Filesystem
+Dell R750: Current SYS utilization is high (util >= {$DELL.HTTP.SYS.UTIL.WARN}%)	System Performance
+Dell R750: Current SYS utilization is too high (util >= {$DELL.HTTP.SYS.UTIL.HIGH}%)	System Performance
+Dell R750: Current memory utilization is high (util >= {$DELL.HTTP.MEM.UTIL.WARN}%)	System Memory
+Dell R750: Current memory utilization is too high (util >= {$DELL.HTTP.MEM.UTIL.HIGH}%)	System Memory
+Dell R750: Device has been replaced (new serial number received)	System Configuration Info
+Dell R750: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Dell R750: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Dell R820: Current CPU utilization is high (util >= {$DELL.HTTP.CPU.UTIL.WARN}%)	System Performance
+Dell R820: Current CPU utilization is too high (util >= {$DELL.HTTP.CPU.UTIL.HIGH}%)	System Performance
+Dell R820: Current IO utilization is high (util >= {$DELL.HTTP.IO.UTIL.WARN}%)	Filesystem
+Dell R820: Current IO utilization is too high (util >= {$DELL.HTTP.IO.UTIL.HIGH}%)	Filesystem
+Dell R820: Current SYS utilization is high (util >= {$DELL.HTTP.SYS.UTIL.WARN}%)	System Performance
+Dell R820: Current SYS utilization is too high (util >= {$DELL.HTTP.SYS.UTIL.HIGH}%)	System Performance
+Dell R820: Current memory utilization is high (util >= {$DELL.HTTP.MEM.UTIL.WARN}%)	System Memory
+Dell R820: Current memory utilization is too high (util >= {$DELL.HTTP.MEM.UTIL.HIGH}%)	System Memory
+Dell R820: Device has been replaced (new serial number received)	System Configuration Info
+Dell R820: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Dell R820: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Dell R840: Current CPU utilization is high (util >= {$DELL.HTTP.CPU.UTIL.WARN}%)	System Performance
+Dell R840: Current CPU utilization is too high (util >= {$DELL.HTTP.CPU.UTIL.HIGH}%)	System Performance
+Dell R840: Current IO utilization is high (util >= {$DELL.HTTP.IO.UTIL.WARN}%)	Filesystem
+Dell R840: Current IO utilization is too high (util >= {$DELL.HTTP.IO.UTIL.HIGH}%)	Filesystem
+Dell R840: Current SYS utilization is high (util >= {$DELL.HTTP.SYS.UTIL.WARN}%)	System Performance
+Dell R840: Current SYS utilization is too high (util >= {$DELL.HTTP.SYS.UTIL.HIGH}%)	System Performance
+Dell R840: Current memory utilization is high (util >= {$DELL.HTTP.MEM.UTIL.WARN}%)	System Memory
+Dell R840: Current memory utilization is too high (util >= {$DELL.HTTP.MEM.UTIL.HIGH}%)	System Memory
+Dell R840: Device has been replaced (new serial number received)	System Configuration Info
+Dell R840: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Dell R840: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Dell iDRAC: Device has been replaced (new serial number received)	System Configuration Info
+Dell iDRAC: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Dell iDRAC: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Docker: Failed to fetch info data (or no data for 30m)	Agent/Service Status
+Docker: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Elasticsearch: Cluster has been restarted (uptime < 10m)	Agent/Service Status
+Elasticsearch: Service response time is too high (over {$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN} for 5m)	Slow Response Time
+Elasticsearch: Space available to JVM (less than {$ELASTICSEARCH.SINGLE.NODE.JVM.SPACE.MIN})	Filesystem
+Envoy Proxy: Failed to fetch metrics data (or no data for 10m)	Request Failure
+Envoy Proxy: SSL certificate expires soon (less than {$CERT.EXPIRY.MIN} days)	Certificate Problem
+Envoy Proxy: Service has been restarted (uptime < 10m)	Agent/Service Status
+Etcd: Cluster version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Etcd: Current number of open files is too high (over {$ETCD.OPEN.FDS.MAX.WARN}% for 5m)	Overwhelming Usage
+Etcd: Failed to fetch info data (or no data for 30m)	Agent/Service Status
+Etcd: Instance has seen too many leader changes (over {$ETCD.LEADER.CHANGES.MAX.WARN} for 15m)	High Error Rate
+Etcd: Server version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Etcd: Too many HTTP requests failures (over {$ETCD.HTTP.FAIL.MAX.WARN} for 5m)	High Error Rate
+Etcd: Too many proposal failures (over {$ETCD.PROPOSAL.FAIL.MAX.WARN} for 5m)	High Error Rate
+Etcd: Too many proposals are queued to commit (over {$ETCD.PROPOSAL.PENDING.MAX.WARN} for 5m)	Overwhelming Usage
+Etcd: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Extreme EXOS: Device has been replaced (new serial number received)	System Configuration Info
+Extreme EXOS: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)	System Performance
+Extreme EXOS: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Extreme EXOS: Temperature is above critical threshold: >{$TEMP_CRIT}	High Temperature
+Extreme EXOS: Temperature is above warning threshold: >{$TEMP_WARN}	High Temperature
+Extreme EXOS: Temperature is too low: <{$TEMP_CRIT_LOW}	Low Temperature
+Extreme EXOS: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+F5 Big-IP: Changes have been made on the device not sync to the device group: {ITEM.VALUE}	System Configuration Info
+F5 Big-IP: Chassis has been replaced (new serial number received)	System Configuration Info
+F5 Big-IP: Cluster not in sync: {ITEM.VALUE}	System Configuration Info
+F5 Big-IP: The device is inconsistent with the device group: {ITEM.VALUE}	System Configuration Info
+F5 Big-IP: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+FortiGate: Device has been replaced (new serial number received)	System Configuration Info
+FortiGate: Free disk space is less than {$DISK.FREE.CRIT}%	Filesystem
+FortiGate: Free disk space is less than {$DISK.FREE.WARN}%	Filesystem
+FortiGate: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)	System Performance
+FortiGate: High CPU utilization (over {$CPU.UTIL.WARN}% for 5m)	System Performance
+FortiGate: High memory utilization (>{$MEMORY.UTIL.CRIT}% for 5m)	System Memory
+FortiGate: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)	System Memory
+FortiGate: High memory utilization (>{$MEMORY.UTIL.WARN}% for 5m)	System Memory
+FortiGate: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+FortiGate: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+FreeBSD: Zabbix agent is not available (for {$AGENT.TIMEOUT})	Agent/Service Status
+GCP Compute Engine Instance: High CPU utilization (over {$GCE.CPU.UTIL.MAX}% for 15m)	System Performance
+GCP Compute Engine Instance: High memory utilization (over {$GCE.RAM.UTIL.MAX}% for 15m)	System Memory
+Generic Java JMX: Memory: Heap memory usage more than {$JMX.HEAP.USAGE.MAX}% for {$JMX.HEAP.MEM.USAGE.TIME}	System Memory
+Generic Java JMX: Memory: Non-Heap memory usage more than {$JMX.NONHEAP.MEM.USAGE.MAX}% for {$JMX.NONHEAP.MEM.USAGE.TIME}	System Memory
+Generic Java JMX: OperatingSystem: Opened file descriptor count more than {$JMX.FILE.DESCRIPTORS.MAX}% of maximum	Filesystem
+Generic Java JMX: OperatingSystem: Process CPU Load more than {$JMX.CPU.LOAD.MAX}% for {$JMX.CPU.LOAD.TIME}	System Performance
+Generic by SNMP: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Generic by SNMP: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+GitHub: API request limit utilization is high (usage is > {$GITHUB.REQUESTS.UTIL.WARN})	Overwhelming Usage
+GitHub: API request limit utilization is very high (usage is > {$GITHUB.REQUESTS.UTIL.HIGH})	Overwhelming Usage
+GitLab: Current number of open files is too high (over {$GITLAB.OPEN.FDS.MAX.WARN}% for 5m)	Overwhelming Usage
+GitLab: Failed to fetch info data (or no data for 30m)	Agent/Service Status
+GitLab: Too many HTTP requests failures (over {$GITLAB.HTTP.FAIL.MAX.WARN} for 5m)	High Error Rate
+GitLab: Too many Redis cache client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)	High Error Rate
+GitLab: Too many Redis queues client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)	High Error Rate
+GitLab: Too many Redis shared_state client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)	High Error Rate
+GitLab: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+HAProxy: Service has been restarted (uptime < 10m)	Agent/Service Status
+HAProxy: Service response time is too high (over {$HAPROXY.RESPONSE_TIME.MAX.WARN} for 5m)	Slow Response Time
+HAProxy: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+HP Comware HH3C: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+HP Comware HH3C: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+HP Enterprise Switch: Device has been replaced (new serial number received)	System Configuration Info
+HP Enterprise Switch: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)	System Performance
+HP Enterprise Switch: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+HP Enterprise Switch: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+HP iLO: Device has been replaced (new serial number received)	System Configuration Info
+HP iLO: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+HP iLO: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+HP-UX: Zabbix agent is not available (for {$AGENT.TIMEOUT})	Agent/Service Status
+HPE ProLiant BL460: Device has been replaced (new serial number received)	System Configuration Info
+HPE ProLiant BL460: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+HPE ProLiant BL460: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+HPE ProLiant BL920: Device has been replaced (new serial number received)	System Configuration Info
+HPE ProLiant BL920: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+HPE ProLiant BL920: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+HPE ProLiant DL360: Device has been replaced (new serial number received)	System Configuration Info
+HPE ProLiant DL360: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+HPE ProLiant DL360: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+HPE ProLiant DL380: Device has been replaced (new serial number received)	System Configuration Info
+HPE ProLiant DL380: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+HPE ProLiant DL380: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Hadoop: NameNode: Cluster capacity remaining is low (below {$HADOOP.CAPACITY_REMAINING.MIN.WARN}% for 15m)	Filesystem
+Hadoop: NameNode: Failed to fetch NameNode API page (or no data for 30m)	Agent/Service Status
+Hadoop: NameNode: Service has been restarted (uptime < 10m)	Agent/Service Status
+Hadoop: NameNode: Service response time is too high (over {$HADOOP.NAMENODE.RESPONSE_TIME.MAX.WARN} for 5m)	Slow Response Time
+Hadoop: ResourceManager: Failed to fetch ResourceManager API page (or no data for 30m)	Agent/Service Status
+Hadoop: ResourceManager: Service has been restarted (uptime < 10m)	Agent/Service Status
+Hadoop: ResourceManager: Service response time is too high (over {$HADOOP.RESOURCEMANAGER.RESPONSE_TIME.MAX.WARN} for 5m)	Slow Response Time
+HashiCorp Consul Cluster: Leader has been changed (new value received: {ITEM.VALUE})	System Configuration Info
+HashiCorp Consul Node: Current number of open files is too high (over {$CONSUL.OPEN.FDS.MAX.WARN}% for 5m)	Overwhelming Usage
+HashiCorp Consul Node: Node's health score is over {$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}	High Error Rate
+HashiCorp Consul Node: Node's health score is too high (over {$CONSUL.NODE.HEALTH_SCORE.MAX.WARN} for 3m)	High Error Rate
+HashiCorp Consul Node: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+HashiCorp Nomad Client: Allocations API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}	Request Failure
+HashiCorp Nomad Client: High CPU utilization: (over >= {$NOMAD.CPU.UTIL.MIN}% over last 10m)	System Performance
+HashiCorp Nomad Client: High memory utilization: (available < {$NOMAD.RAM.AVAIL.MIN}% over last 10m)	System Memory
+HashiCorp Nomad Client: Monitoring API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}	Request Failure
+HashiCorp Nomad Client: Nodes API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}	Request Failure
+HashiCorp Nomad Client: Nomad client version has changed to {ITEM.LASTVALUE}	System Configuration Info
+HashiCorp Nomad Client: The host has been restarted: (uptime < 10m)	System Configuration Info
+HashiCorp Nomad Server: Autopilot redundancy is low (less than {$NOMAD.REDUNDANCY.MIN})	System Configuration Info
+HashiCorp Nomad Server: Cluster role has changed to {ITEM.LASTVALUE}	System Configuration Info
+HashiCorp Nomad Server: Current number of open files is too high (over {$NOMAD.OPEN.FDS.MAX}% for 5m)	Overwhelming Usage
+HashiCorp Nomad Server: Internal stats API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}	Request Failure
+HashiCorp Nomad Server: Leader last contact timeout exceeded: over {$NOMAD.SERVER.LEADER.LATENCY} for the last 5 minutes	Slow Response Time
+HashiCorp Nomad Server: Monitoring API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}	Request Failure
+HashiCorp Nomad Server: Nomad server version has changed to {ITEM.LASTVALUE}	System Configuration Info
+HashiCorp Nomad: Client nodes API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}	Request Failure
+HashiCorp Nomad: Server-related API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}	Request Failure
+HashiCorp Vault: Current number of open files is too high (over {$VAULT.OPEN.FDS.MAX.WARN}% for 5m)	Overwhelming Usage
+HashiCorp Vault: Failed to get metrics (error: {ITEM.VALUE})	Agent/Service Status
+HashiCorp Vault: High frequency of leadership losses (over {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} for 1h)	High Error Rate
+HashiCorp Vault: High frequency of leadership setup failures (over {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} for 1h)	High Error Rate
+HashiCorp Vault: High frequency of leadership step downs (over {$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN} for 1h)	High Error Rate
+HashiCorp Vault: Service has been restarted (uptime < 10m)	Agent/Service Status
+HashiCorp Vault: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Hikvision: Camera has been replaced (new serial number received)	System Configuration Info
+Hikvision: Camera has been restarted (uptime < 10m)	Agent/Service Status
+Hikvision: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)	System Performance
+Hikvision: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)	System Memory
+Hikvision: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Huawei OceanStor 5300 V5: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Huawei OceanStor 5300 V5: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Huawei OceanStor 5300 V5: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Huawei OceanStor V6: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Huawei OceanStor V6: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Huawei OceanStor V6: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Huawei VRP: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Huawei VRP: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+IBM IMM: Device has been replaced (new serial number received)	System Configuration Info
+IBM IMM: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+IBM IMM: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+IIS: Service has been restarted (uptime < 10m)	Agent/Service Status
+InfluxDB: Service has been restarted (uptime < 10m)	Agent/Service Status
+InfluxDB: Too many tasks failure runs (over {$INFLUXDB.TASK.RUN.FAIL.MAX.WARN} for 5m)	High Error Rate
+InfluxDB: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Intel Qlogic: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Intel Qlogic: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Jenkins: Current number of used files is too high (over {$JENKINS.FILE_DESCRIPTORS.MAX.WARN}% for 5m)	Overwhelming Usage
+Jenkins: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Jenkins: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Jira Data Center: DB: Connection usage is near the limit (above {$JIRA_DC.DB.CONNECTION.USAGE.WARN}%)	Overwhelming Usage
+Juniper MX: Device has been replaced (new serial number received)	System Configuration Info
+Juniper MX: Failed to get metrics for interface information using RPC request	Agent/Service Status
+Juniper MX: Failed to get metrics for interface optics diagnostics information using RPC request	Agent/Service Status
+Juniper MX: Failed to get metrics for resource using RPC request	Agent/Service Status
+Juniper MX: Failed to get metrics for routing protocol using RPC request	Agent/Service Status
+Juniper MX: High ICMP ping loss (over {$JUNIPER.MX.ICMP_LOSS_WARN}% for 5m)	High Error Rate
+Juniper MX: High ICMP ping response time (over {$JUNIPER.MX.ICMP_RESPONSE_TIME_WARN}s for 5m)	Slow Response Time
+Juniper MX: NETCONF response time is too high (over {$JUNIPER.MX.NETCONF.RESPONSE_TIME.MAX.WARN}s for 5m)	Slow Response Time
+Juniper MX: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Juniper MX: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Juniper: Device has been replaced (new serial number received)	System Configuration Info
+Juniper: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Juniper: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Kubernetes API server: Too many client errors (over {$KUBE.API.HTTP.CLIENT.ERROR} for 5m)	High Error Rate
+Kubernetes API server: Too many server errors (over {$KUBE.API.HTTP.SERVER.ERROR} for 5m)	High Error Rate
+Kubernetes Controller manager: Too many HTTP client errors (over {$KUBE.CONTROLLER.HTTP.CLIENT.ERROR} for 5m)	High Error Rate
+Kubernetes Scheduler: Too many REST Client errors (over {$KUBE.SCHEDULER.HTTP.CLIENT.ERROR} for 5m)	High Error Rate
+Kubernetes Scheduler: Too many schedule attempts with errors (over {$KUBE.SCHEDULER.ERROR} for 5m)	High Error Rate
+Kubernetes Scheduler: Too many unschedulable pods (over {$KUBE.SCHEDULER.UNSCHEDULABLE} for 5m)	Overwhelming Usage
+Linux: /etc/hostname: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"/etc/hostname"}%)	Filesystem
+Linux: /etc/hosts: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"/etc/hosts"}%)	Filesystem
+Linux: /etc/resolv.conf: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"/etc/resolv.conf"}%)	Filesystem
+Linux: Configured max number of open filedescriptors is too low	System Configuration Info
+Linux: Configured max number of open filedescriptors is too low (< {$KERNEL.MAXFILES.MIN})	System Configuration Info
+Linux: Configured max number of processes is too low	System Configuration Info
+Linux: Configured max number of processes is too low (< {$KERNEL.MAXPROC.MIN})	System Configuration Info
+Linux: FS [/etc/hostname]: Filesystem has become read-only	Filesystem
+Linux: FS [/etc/hostname]: Running out of free inodes	Filesystem
+Linux: FS [/etc/hostname]: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"/etc/hostname"}%)	Filesystem
+Linux: FS [/etc/hostname]: Space is critically low	Filesystem
+Linux: FS [/etc/hostname]: Space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"/etc/hostname"}%, total {{?last(//vfs.fs.dependent.size[/etc/hostname,total])/1024/1024/1024}.fmtnum(1)}GB)	Filesystem
+Linux: FS [/etc/hostname]: Space is low (used > {$VFS.FS.PUSED.MAX.WARN:"/etc/hostname"}%, total {{?last(//vfs.fs.dependent.size[/etc/hostname,total])/1024/1024/1024}.fmtnum(1)}GB)	Filesystem
+Linux: FS [/etc/hosts]: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"/etc/hosts"}%)	Filesystem
+Linux: FS [/etc/hosts]: Space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"/etc/hosts"}%, total {{?last(//vfs.fs.dependent.size[/etc/hosts,total])/1024/1024/1024}.fmtnum(1)}GB)	Filesystem
+Linux: FS [/etc/hosts]: Space is low (used > {$VFS.FS.PUSED.MAX.WARN:"/etc/hosts"}%, total {{?last(//vfs.fs.dependent.size[/etc/hosts,total])/1024/1024/1024}.fmtnum(1)}GB)	Filesystem
+Linux: FS [/etc/resolv.conf]: Running out of free inodes	Filesystem
+Linux: FS [/etc/resolv.conf]: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"/etc/resolv.conf"}%)	Filesystem
+Linux: FS [/etc/resolv.conf]: Space is critically low	Filesystem
+Linux: FS [/etc/resolv.conf]: Space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"/etc/resolv.conf"}%, total {{?last(//vfs.fs.dependent.size[/etc/resolv.conf,total])/1024/1024/1024}.fmtnum(1)}GB)	Filesystem
+Linux: FS [/etc/resolv.conf]: Space is low (used > {$VFS.FS.PUSED.MAX.WARN:"/etc/resolv.conf"}%, total {{?last(//vfs.fs.dependent.size[/etc/resolv.conf,total])/1024/1024/1024}.fmtnum(1)}GB)	Filesystem
+Linux: Getting closer to process limit	Overwhelming Usage
+Linux: Getting closer to process limit (over 80% used)	Overwhelming Usage
+Linux: High CPU utilization	System Performance
+Linux: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)	System Performance
+Linux: High memory utilization	System Memory
+Linux: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)	System Memory
+Linux: High swap space usage	System Memory
+Linux: High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)	System Memory
+Linux: Interface eth0: Ethernet has changed to lower speed than it was before	System Configuration Info
+Linux: Interface eth0: High bandwidth usage	Overwhelming Usage
+Linux: Interface eth0: High bandwidth usage (>{$IF.UTIL.MAX:"eth0"}%)	Overwhelming Usage
+Linux: Interface eth0: High error rate	High Error Rate
+Linux: Interface eth0: High error rate (>{$IF.ERRORS.WARN:"eth0"} for 5m)	High Error Rate
+Linux: Interface eth0: Link down	System Configuration Info
+Linux: Lack of available memory	System Memory
+Linux: Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})	System Memory
+Linux: Load average is too high	System Performance
+Linux: Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)	System Performance
+Linux: Number of installed packages has been changed	System Configuration Info
+Linux: Operating system description has changed	System Configuration Info
+Linux: Running out of file descriptors (less than < 20% free)	Filesystem
+Linux: System name has changed	System Configuration Info
+Linux: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Linux: System time is out of sync	System Configuration Info
+Linux: System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX})	System Configuration Info
+Linux: The system is running out of memory	System Memory
+Linux: The system is running out of swap space	System Memory
+Linux: Zabbix agent is not available	Agent/Service Status
+Linux: Zabbix agent is not available (for {$AGENT.TIMEOUT})	Agent/Service Status
+Linux: Zabbix agent is not available (or nodata for {$AGENT.NODATA_TIMEOUT})	Agent/Service Status
+Linux: Zabbix agent is not running	Agent/Service Status
+Linux: etc/passwd has been changed	System Configuration Info
+Linux: node_exporter is not available (or no data for 30m)	Agent/Service Status
+Linux: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Linux: {HOSTNAME} has been restarted	Agent/Service Status
+MSSQL: Failed to fetch info data (or no data for 30m)	Agent/Service Status
+MSSQL: Number of buffers written per second by the lazy writer is high (over {$MSSQL.LAZY_WRITES.MAX} for 5m)	Overwhelming Usage
+MSSQL: Number of deadlocks is high (over {$MSSQL.DEADLOCKS.MAX} for 5m)	Overwhelming Usage
+MSSQL: Number of physical database page reads per second is high (over {$MSSQL.PAGE_READS.MAX} for 5m)	Overwhelming Usage
+MSSQL: Number of physical database page writes per second is high (over {$MSSQL.PAGE_WRITES.MAX} for 5m)	Overwhelming Usage
+MSSQL: Number of rps waiting for a free page is high (over {$MSSQL.FREE_LIST_STALLS.MAX} for 5m)	Overwhelming Usage
+MSSQL: Number of work files created per second is high (over {$MSSQL.WORK_FILES.MAX} for 5m)	Overwhelming Usage
+MSSQL: Number of work tables created per second is high (over {$MSSQL.WORK_TABLES.MAX} for 5m)	Overwhelming Usage
+MSSQL: Page life expectancy is low (less {$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}min for 15m)	Overwhelming Usage
+MSSQL: Percent of ad hoc queries running is over {$MSSQL.PERCENT_COMPILATIONS.MAX}% for 15m	Overwhelming Usage
+MSSQL: Percent of times statement recompiles is over {$MSSQL.PERCENT_RECOMPILATIONS.MAX}% for 15m	Overwhelming Usage
+MSSQL: Percentage of the buffer cache efficiency is low (below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}% for 5m)	System Cache
+MSSQL: Percentage of the buffer cache efficiency is low (below {$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}% for 5m)	System Cache
+MSSQL: Percentage of work tables available from the work table cache is low (below {$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}% for 5m)	System Cache
+MSSQL: Service has been restarted (uptime < 10m)	Agent/Service Status
+MSSQL: Total average wait time for locks is high (over {$MSSQL.AVERAGE_WAIT_TIME.MAX}ms for 5m)	Slow Response Time
+MSSQL: Total lock requests per second that timed out is high (over {$MSSQL.LOCK_TIMEOUTS.MAX} for 5m)	Slow Response Time
+MSSQL: Total number of locks per second is high (over {$MSSQL.LOCK_REQUESTS.MAX} for 5m)	Overwhelming Usage
+MSSQL: Version has changed (new version value received: {ITEM.VALUE})	System Configuration Info
+Mellanox: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)	System Performance
+Mellanox: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Mellanox: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Memcached: Failed to fetch info data (or no data for 30m)	Agent/Service Status
+Memcached: Memory usage is too high (over {$MEMCACHED.MEM.PUSED.MAX.WARN} in 5m)	System Memory
+Memcached: Service has been restarted (uptime < 10m)	Agent/Service Status
+Memcached: Too many queued connections (over {$MEMCACHED.CONN.QUEUED.MAX.WARN} in 5m)	Overwhelming Usage
+Memcached: Too many throttled connections (over {$MEMCACHED.CONN.THROTTLED.MAX.WARN} in 5m)	Overwhelming Usage
+Memcached: Total number of connected clients is too high (over {$MEMCACHED.CONN.PRC.MAX.WARN}% in 5m)	Overwhelming Usage
+Memcached: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+MikroTik: Device has been replaced (new serial number received)	System Configuration Info
+MikroTik: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)	System Memory
+MikroTik: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+MikroTik: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+MongoDB cluster: Available connections less then {$MONGODB.CONNS.AVAILABLE.MIN.WARN}	Overwhelming Usage
+MongoDB cluster: Failed to fetch info data (or no data for 10m)	Agent/Service Status
+MongoDB cluster: Mongos server has been restarted (uptime < 10m)	Agent/Service Status
+MongoDB cluster: Too many cursors are timing out (over {$MONGODB.CURSOR.TIMEOUT.MAX.WARN} per second in 5m)	Slow Response Time
+MongoDB cluster: Too many cursors opened by MongoDB for clients (over {$MONGODB.CURSOR.OPEN.MAX.WARN} in 5m)	Overwhelming Usage
+MongoDB cluster: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+MongoDB node: Failed to fetch info data (or no data for 10m)	Agent/Service Status
+MongoDB node: Too many cursors are timing out (over {$MONGODB.CURSOR.TIMEOUT.MAX.WARN} per second in 5m)	Slow Response Time
+MongoDB node: Too many cursors opened by MongoDB for clients (over {$MONGODB.CURSOR.OPEN.MAX.WARN} in 5m)	Overwhelming Usage
+MongoDB node: Total number of open connections is too high (over {$MONGODB.CONNS.PCT.USED.MAX.WARN%} in 5m)	Overwhelming Usage
+MongoDB node: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+MongoDB node: mongod process has been restarted (uptime < 10m)	Agent/Service Status
+Morningstar ProStar MPPT: Status: Device has been restarted (uptime < 10m)	Agent/Service Status
+Morningstar ProStar MPPT: Status: Failed to fetch data (or no data for 5m)	Agent/Service Status
+Morningstar ProStar MPPT: Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)	High Temperature
+Morningstar ProStar MPPT: Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)	Low Temperature
+Morningstar ProStar MPPT: Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)	High Temperature
+Morningstar ProStar PWM: Status: Device has been restarted (uptime < 10m)	Agent/Service Status
+Morningstar ProStar PWM: Status: Failed to fetch data (or no data for 5m)	Agent/Service Status
+Morningstar ProStar PWM: Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)	High Temperature
+Morningstar ProStar PWM: Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)	Low Temperature
+Morningstar ProStar PWM: Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)	High Temperature
+Morningstar ProStar PWM: Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)	Low Temperature
+Morningstar SunSaver MPPT: Status: Device has been restarted (uptime < 10m)	Agent/Service Status
+Morningstar SunSaver MPPT: Status: Failed to fetch data (or no data for 5m)	Agent/Service Status
+Morningstar SunSaver MPPT: Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)	High Temperature
+Morningstar SunSaver MPPT: Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)	Low Temperature
+Morningstar SunSaver MPPT: Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)	High Temperature
+Morningstar SunSaver MPPT: Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)	Low Temperature
+Morningstar SureSine: Status: Device has been restarted (uptime < 10m)	Agent/Service Status
+Morningstar SureSine: Status: Failed to fetch data (or no data for 5m)	Agent/Service Status
+Morningstar TriStar MPPT 600V: Status: Device has been restarted (uptime < 10m)	Agent/Service Status
+Morningstar TriStar MPPT 600V: Status: Failed to fetch data (or no data for 5m)	Agent/Service Status
+Morningstar TriStar MPPT 600V: Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)	High Temperature
+Morningstar TriStar MPPT 600V: Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)	Low Temperature
+Morningstar TriStar MPPT 600V: Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)	High Temperature
+Morningstar TriStar MPPT 600V: Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)	Low Temperature
+Morningstar TriStar MPPT: Status: Device has been restarted (uptime < 10m)	Agent/Service Status
+Morningstar TriStar MPPT: Status: Failed to fetch data (or no data for 5m)	Agent/Service Status
+Morningstar TriStar MPPT: Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)	High Temperature
+Morningstar TriStar MPPT: Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)	Low Temperature
+Morningstar TriStar MPPT: Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)	High Temperature
+Morningstar TriStar MPPT: Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)	Low Temperature
+Morningstar TriStar PWM: Status: Device has been restarted (uptime < 10m)	Agent/Service Status
+Morningstar TriStar PWM: Status: Failed to fetch data (or no data for 5m)	Agent/Service Status
+Morningstar TriStar PWM: Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)	High Temperature
+Morningstar TriStar PWM: Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)	Low Temperature
+Morningstar TriStar PWM: Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)	High Temperature
+Morningstar TriStar PWM: Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)	Low Temperature
+MySQL: Buffer pool utilization is too low (less than {$MYSQL.BUFF_UTIL.MIN.WARN}% for 5m)	System Cache
+MySQL: Failed to fetch info data (or no data for 30m)	Agent/Service Status
+MySQL: Number of internal temporary tables created per second is high (over {$MYSQL.CREATED_TMP_TABLES.MAX.WARN} for 5m)	Overwhelming Usage
+MySQL: Number of on-disk temporary tables created per second is high (over {$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN} for 5m)	Overwhelming Usage
+MySQL: Number of temporary files created per second is high (over {$MYSQL.CREATED_TMP_FILES.MAX.WARN} for 5m)	Overwhelming Usage
+MySQL: Refused connections (max_connections limit reached)	Overwhelming Usage
+MySQL: Server has aborted connections (over {$MYSQL.ABORTED_CONN.MAX.WARN} for 5m)	High Error Rate
+MySQL: Server has slow queries (over {$MYSQL.SLOW_QUERIES.MAX.WARN} for 5m)	Slow Response Time
+MySQL: Service has been restarted (uptime < 10m)	Agent/Service Status
+MySQL: Version has changed (new version value received: {ITEM.VALUE})	System Configuration Info
+NGINX Plus: Failed to fetch info data (or no data for 30m)	Agent/Service Status
+NGINX Plus: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)	High Error Rate
+NGINX Plus: Server response error (text: {ITEM.VALUE})	Request Failure
+NGINX Plus: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+NGINX Plus: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+NetApp AFF A700: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+NetApp FAS3220: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+NetApp FAS3220: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Netgear Fastpath: Device has been replaced (new serial number received)	System Configuration Info
+Netgear Fastpath: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)	System Performance
+Netgear Fastpath: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)	System Memory
+Netgear Fastpath: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Netgear Fastpath: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Network Generic Device: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Network Generic Device: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Nextcloud: CPU load is too high (over {$NEXTCLOUD.CPU.LOAD.MAX} for 5m)	System Performance
+Nextcloud: Database version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Nextcloud: Disk space is low (free < {$NEXTCLOUD.STORAGE.FREE.MIN})	Filesystem
+Nextcloud: High PHP memory utilization (>{$NEXTCLOUD.PHP.MEM.PUSED.MAX}% for 5m)	System Memory
+Nextcloud: High memory utilization (>{$NEXTCLOUD.MEM.PUSED.MAX}% for 5m)	System Memory
+Nextcloud: High swap utilization (>{$NEXTCLOUD.SWAP.PUSED.MAX}% for 5m)	System Memory
+Nextcloud: PHP version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Nextcloud: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Nginx: Failed to fetch stub status page (or no data for 30m)	Agent/Service Status
+Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)	High Error Rate
+Nginx: Service response time is too high (over {$NGINX.RESPONSE_TIME.MAX.WARN}s for 5m)	Slow Response Time
+Nginx: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Nvidia: Driver version on {HOST.HOST} has changed.	System Configuration Info
+Nvidia: NVML library on {HOST.HOST} has changed.	System Configuration Info
+Nvidia: Number of devices on {HOST.HOST} has changed.	System Configuration Info
+OCI Autonomous DB: Current CPU utilization is high (util >= {$OCI.AUTONOMOUS.DB.CPU.UTIL.WARN}%)	System Performance
+OCI Autonomous DB: Current CPU utilization is too high (util >= {$OCI.AUTONOMOUS.DB.CPU.UTIL.HIGH}%)	System Performance
+OCI Autonomous DB: Current storage utilization is high (util >= {$OCI.AUTONOMOUS.DB.STORAGE.UTIL.WARN}%)	Filesystem
+OCI Autonomous DB: Current storage utilization is too high (util >= {$OCI.AUTONOMOUS.DB.STORAGE.UTIL.HIGH}%)	Filesystem
+OCI Autonomous DB: State has changed (new state: {ITEM.VALUE})	System Configuration Info
+OCI Compute: Current CPU utilization is high (util >= {$OCI.COMPUTE.CPU.UTIL.WARN}%)	System Performance
+OCI Compute: Current CPU utilization is too high (util >= {$OCI.COMPUTE.CPU.UTIL.HIGH}%)	System Performance
+OCI Compute: Current memory utilization is high (util >= {$OCI.COMPUTE.MEM.UTIL.WARN}%)	System Memory
+OCI Compute: Current memory utilization is too high (util >= {$OCI.COMPUTE.MEM.UTIL.HIGH}%)	System Memory
+OCI Compute: State has changed (new state: {ITEM.VALUE})	System Configuration Info
+OPNsense: Source tracking table usage more than {$SOURCE.TRACKING.TABLE.UTIL.MAX}.	Overwhelming Usage
+OPNsense: State table usage more than {$STATE.TABLE.UTIL.MAX}.	Overwhelming Usage
+OpenBSD: Zabbix agent is not available (for {$AGENT.TIMEOUT})	Agent/Service Status
+OpenStack Nova: Current RAM usage is high (used >= {$OPENSTACK.NOVA.RAM.UTIL.WARN}%)	System Memory
+OpenStack Nova: Current RAM usage is too high (used >= {$OPENSTACK.NOVA.RAM.UTIL.HIGH}%)	System Memory
+OpenStack Nova: Current instances count is high (used >= {$OPENSTACK.NOVA.INSTANCES.UTIL.WARN}%)	Overwhelming Usage
+OpenStack Nova: Current instances count is too high (used >= {$OPENSTACK.NOVA.INSTANCES.UTIL.HIGH}%)	Overwhelming Usage
+OpenStack Nova: Current vCPU usage is high (used >= {$OPENSTACK.NOVA.CPU.UTIL.WARN}%)	System Performance
+OpenStack Nova: Current vCPU usage is too high (used >= {$OPENSTACK.NOVA.CPU.UTIL.HIGH}%)	System Performance
+Oracle: Failed to fetch info data (or no data for 30m)	Agent/Service Status
+Oracle: Failed to fetch info data (or no data for 5m)	Agent/Service Status
+Oracle: Instance hostname has changed (new hostname received: {ITEM.VALUE})	System Configuration Info
+Oracle: Instance name has changed (new name received: {ITEM.VALUE})	System Configuration Info
+Oracle: Number of REDO logs available for switching is too low (less {$ORACLE.REDO.MIN.WARN} for 5 min)	System Memory
+Oracle: Shared pool free is too low (less {$ORACLE.SHARED.FREE.MIN.WARN}% for 5m)	System Memory
+Oracle: Too high database concurrency (over {$ORACLE.CONCURRENCY.MAX.WARN}% for 5 min)	Overwhelming Usage
+Oracle: Too many active processes (over {$ORACLE.PROCESSES.MAX.WARN}% for 5 min)	Overwhelming Usage
+Oracle: Too many active sessions (over {$ORACLE.SESSIONS.MAX.WARN}% for 5 min)	Overwhelming Usage
+Oracle: Too many database files (over {$ORACLE.DB.FILE.MAX.WARN}% for 5 min)	Overwhelming Usage
+Oracle: Too many locked sessions (over {$ORACLE.SESSIONS.LOCK.MAX.WARN}% for 5 min)	Overwhelming Usage
+Oracle: Too many sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME}s (over {$ORACLE.SESSION.LONG.LOCK.MAX.WARN} for 5 min)	Overwhelming Usage
+Oracle: Total PGA inuse is too high (over {$ORACLE.PGA.USE.MAX.WARN}% for 5 min)	Overwhelming Usage
+Oracle: Version has changed (new version value received: {ITEM.VALUE})	System Configuration Info
+Oracle: Zabbix account will expire soon (under {$ORACLE.EXPIRE.PASSWORD.MIN.WARN} days)	System Configuration Info
+Oracle: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+PFSense: Source tracking table usage more than {$SOURCE.TRACKING.TABLE.UTIL.MAX}.	Overwhelming Usage
+PFSense: State table usage more than {$STATE.TABLE.UTIL.MAX}.	Overwhelming Usage
+PHP-FPM: Failed to fetch info data (or no data for 30m)	Agent/Service Status
+PHP-FPM: Manager changed (new value received: {ITEM.VALUE})	System Configuration Info
+PHP-FPM: Pool has been restarted (uptime < 10m)	Agent/Service Status
+PHP-FPM: Queue utilization is high (over {$PHP_FPM.QUEUE.WARN.MAX}% for 15m)	Overwhelming Usage
+PHP-FPM: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+PostgreSQL: Cache hit ratio too low (under {$PG.CACHE_HITRATIO.MIN.WARN} in 5m)	System Cache
+PostgreSQL: Failed to get items (no data for 30m)	Request Failure
+PostgreSQL: Required checkpoints occur too frequently (over {$PG.CHECKPOINTS_REQ.MAX.WARN})	Overwhelming Usage
+PostgreSQL: Response too long (over {$PG.PING_TIME.MAX.WARN})	Slow Response Time
+PostgreSQL: Service has been restarted (uptime < 10m)	Agent/Service Status
+PostgreSQL: Streaming lag with master is too high (over {$PG.REPL_LAG.MAX.WARN} in 5m)	Slow Response Time
+PostgreSQL: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m)	Overwhelming Usage
+PostgreSQL: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN}% in 5m)	Overwhelming Usage
+PostgreSQL: Version has changed (new version value received: {ITEM.VALUE})	System Configuration Info
+QTech QSW: Device has been replaced (new serial number received)	System Configuration Info
+QTech QSW: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)	System Performance
+QTech QSW: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)	System Memory
+QTech QSW: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+QTech QSW: Temperature is above critical threshold: >{$TEMP_CRIT}	High Temperature
+QTech QSW: Temperature is above warning threshold: >{$TEMP_WARN}	High Temperature
+QTech QSW: Temperature is too low: <{$TEMP_CRIT_LOW}	Low Temperature
+QTech QSW: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+RabbitMQ cluster: Failed to fetch overview data (or no data for 30m)	Agent/Service Status
+RabbitMQ node: Failed to fetch nodes data (or no data for 30m)	Agent/Service Status
+RabbitMQ node: Free disk space alarm (Free space threshold has been reached)	Filesystem
+RabbitMQ node: Memory alarm (Memory usage threshold has been reached)	System Memory
+RabbitMQ node: Number of network partitions is too high (more than 0 for 5m)	Overwhelming Usage
+RabbitMQ node: Service response time is too high (over {$RABBITMQ.RESPONSE_TIME.MAX.WARN}s for 5m)	Slow Response Time
+RabbitMQ node: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+RabbitMQ node: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Redis: Failed to fetch info data (or no data for 30m)	Agent/Service Status
+Redis: Memory fragmentation ratio is too high (over {$REDIS.MEM.FRAG_RATIO.MAX.WARN} in 15m)	System Memory
+Redis: Replication role has changed (new role: {ITEM.VALUE})	System Configuration Info
+Redis: Too many entries in the slowlog (over {$REDIS.SLOWLOG.COUNT.MAX.WARN} per second in 5m)	Overwhelming Usage
+Redis: Total number of connected clients is too high (over {$REDIS.CLIENTS.PRC.MAX.WARN}% in 5m)	Overwhelming Usage
+Redis: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Redis: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Solaris: Zabbix agent is not available (for {$AGENT.TIMEOUT})	Agent/Service Status
+Solaris: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of received HTTP requests)	Filesystem
+Squid: Squid has been restarted (uptime < 10m)	Agent/Service Status
+Squid: Squid is running out of file descriptors (<{$SQUID.FILE.DESC.WARN.MIN})	Filesystem
+Squid: Swap usage is critically high (>{ITEM.VALUE2}%)	System Memory
+Squid: Swap usage is more than high watermark (>{ITEM.VALUE2}%)	System Memory
+Squid: Swap usage is more than low watermark (>{ITEM.VALUE2}%)	System Memory
+Squid: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Supermicro Aten: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Supermicro Aten: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+TP-LINK: Device has been replaced (new serial number received)	System Configuration Info
+TP-LINK: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+TP-LINK: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+TiDB PD: Instance has been restarted (uptime < 10m)	Agent/Service Status
+TiDB PD: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+TiDB TiKV: Instance has been restarted (uptime < 10m)	Agent/Service Status
+TiDB TiKV: Too many coprocessor request error (over {$TIKV.COPROCESSOR.ERRORS.MAX.WARN} in 5m)	High Error Rate
+TiDB TiKV: Too many pending commands (over {$TIKV.PENDING_COMMANDS.MAX.WARN} for 5m)	Overwhelming Usage
+TiDB TiKV: Too many pending tasks (over {$TIKV.PENDING_TASKS.MAX.WARN} for 5m)	Overwhelming Usage
+TiDB: Current number of open files is too high (over {$TIDB.OPEN.FDS.MAX.WARN}% for 5m)	Overwhelming Usage
+TiDB: Heap memory usage is too high (over {$TIDB.HEAP.USAGE.MAX.WARN} for 5m)	System Memory
+TiDB: Instance has been restarted (uptime < 10m)	Agent/Service Status
+TiDB: Too few keep alive operations (less {$TIDB.MONITOR_KEEP_ALIVE.MAX.WARN} for 5m)	Agent/Service Status
+TiDB: Too many DDL waiting jobs (over {$TIDB.DDL.WAITING.MAX.WARN} for 5m)	Overwhelming Usage
+TiDB: Too many region related errors (over {$TIDB.REGION_ERROR.MAX.WARN} for 5m)	High Error Rate
+TiDB: Too many schema lease errors (over {$TIDB.SCHEMA_LEASE_ERRORS.MAX.WARN} for 5m)	High Error Rate
+TiDB: Too many schema lease errors (over {$TIDB.SCHEMA_LOAD_ERRORS.MAX.WARN} for 5m)	High Error Rate
+TiDB: Too many time jump backs (over {$TIDB.TIME_JUMP_BACK.MAX.WARN} for 5m)	Overwhelming Usage
+TiDB: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Travis CI: Failed to fetch home page (or no data for 30m)	Agent/Service Status
+TrueNAS CORE: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)	System Memory
+TrueNAS CORE: High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)	System Memory
+TrueNAS CORE: Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})	System Memory
+TrueNAS CORE: Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)	System Performance
+TrueNAS CORE: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+TrueNAS CORE: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Ubiquiti AirOS: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)	System Memory
+Ubiquiti AirOS: High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)	Filesystem
+Ubiquiti AirOS: Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})	System Memory
+Ubiquiti AirOS: Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)	System Performance
+Ubiquiti AirOS: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Ubiquiti AirOS: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+VMware Guest: Hypervisor is in the maintenance mode	System Configuration Info
+VMware Guest: VM has been restarted (uptime < 10m)	Agent/Service Status
+VMware Hypervisor: Hypervisor has been restarted (uptime < 10m)	Agent/Service Status
+Veeam Backup: Failed job runs is too high (over {$VEEAM.MANAGER.JOB.MAX.FAIL})	High Error Rate
+Veeam Backup: Warning job runs is too high (over {$VEEAM.MANAGER.JOB.MAX.WARN})	High Error Rate
+VeloCloud: Failed to fetch aggregate data (or no data for 30m)	Request Failure
+Website by Browser: Failed to get JSON of the requested website '{$WEBSITE.DOMAIN}'	Request Failure
+Website by Browser: Website {$WEBSITE.DOMAIN} navigation load event time > {$WEBSITE.NAVIGATION.LOAD.MAX.WARN}	Slow Response Time
+Website by Browser: Website {$WEBSITE.DOMAIN} resource load event time > '{$WEBSITE.RESOURCE.LOAD.MAX.WARN}'	Slow Response Time
+WildFly Domain: WildFly: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+WildFly Domain: WildFly: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+WildFly Server: Failed to fetch info data (or no data for 15m)	Agent/Service Status
+WildFly Server: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+WildFly Server: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Windows: CPU interrupt time is too high (over {$CPU.INTERRUPT.CRIT.MAX}% for 5m)	System Performance
+Windows: CPU privileged time is too high (over {$CPU.PRIV.CRIT.MAX}% for 5m)	System Performance
+Windows: CPU queue length is too high (over {$CPU.QUEUE.CRIT.MAX} for 5m)	System Performance
+Windows: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)	System Performance
+Windows: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)	System Memory
+Windows: High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)	Filesystem
+Windows: Host has been restarted (uptime < 10m)	Agent/Service Status
+Windows: Number of free system page table entries is too low (less {$MEM.PAGE_TABLE_CRIT.MIN} for 5m)	System Memory
+Windows: Page file usage is too high (over {$PAGEFILE.PUSED.MAX}% for 5m)	System Memory
+Windows: Page reads/sec is too high (over {$PAGE.READ_SEC.CRIT.MAX} for 5m)	System Memory
+Windows: Page writes/sec is too high (over {$PAGE.WRITE_SEC.CRIT.MAX} for 5m)	System Memory
+Windows: System name has changed (new name: {ITEM.VALUE})	System Configuration Info
+Windows: System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX})	System Configuration Info
+Windows: The Memory Pages/sec is too high (over {$MEM.PAGE_SEC.CRIT.MAX} for 5m)	System Memory
+Windows: Zabbix agent is not available (for {$AGENT.TIMEOUT})	Agent/Service Status
+Windows: Zabbix agent is not available (or nodata for {$AGENT.NODATA_TIMEOUT})	Agent/Service Status
+Windows: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+YugabyteDB Cluster: Average utilization of connections is high (over {$YUGABYTEDB.CONNECTION.UTILIZATION.WARN}% for 5m)	Overwhelming Usage
+YugabyteDB Cluster: Average utilization of connections is too high (over {$YUGABYTEDB.CONNECTION.UTILIZATION.CRIT}% for 5m)	Overwhelming Usage
+YugabyteDB Cluster: CPU utilization is high (over {$YUGABYTEDB.CPU.UTILIZATION.WARN}% for 5m)	System Performance
+YugabyteDB Cluster: CPU utilization is too high (over {$YUGABYTEDB.CPU.UTILIZATION.CRIT}% for 5m)	System Performance
+YugabyteDB Cluster: Cluster software version has changed (new version: {ITEM.VALUE})	System Configuration Info
+YugabyteDB Cluster: Memory utilization is high (>{$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.WARN} for 5m)	System Memory
+YugabyteDB Cluster: Memory utilization is too high (>{$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.CRIT} for 5m)	System Memory
+YugabyteDB Cluster: YB controller version has changed (new version: {ITEM.VALUE})	System Configuration Info
+ZYXEL: Device has been replaced (new serial number received)	System Configuration Info
+ZYXEL: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)	System Performance
+ZYXEL: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)	System Memory
+ZYXEL: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Zabbix agent is not available (for {$AGENT.TIMEOUT})	Agent/Service Status
+Zabbix agent is not available (or nodata for {$AGENT.NODATA_TIMEOUT})	Agent/Service Status
+Zabbix proxy: Failed to fetch stats data (or no data for {$ZABBIX.PROXY.NODATA_TIMEOUT})	Agent/Service Status
+Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX:"configuration cache"}% used in the configuration cache	System Cache
+Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX:"history cache"}% used in the history cache	System Cache
+Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX:"index cache"}% used in the history index cache	System Cache
+Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX:"proxy buffer"}% used in the proxy memory buffer	System Cache
+Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX:"vmware cache"}% used in the vmware cache	System Cache
+Zabbix proxy: Utilization of ODBC poller processes over {$ZABBIX.PROXY.UTIL.MAX:"ODBC poller"}%	Overwhelming Usage
+Zabbix proxy: Utilization of agent poller processes over {$ZABBIX.PROXY.UTIL.MAX:"agent poller"}%	Overwhelming Usage
+Zabbix proxy: Utilization of availability manager processes over {$ZABBIX.PROXY.UTIL.MAX:"availability manager"}%	Overwhelming Usage
+Zabbix proxy: Utilization of browser poller processes over {$ZABBIX.PROXY.UTIL.MAX:"browser poller"}%	Overwhelming Usage
+Zabbix proxy: Utilization of configuration syncer processes over {$ZABBIX.PROXY.UTIL.MAX:"configuration syncer"}%	Overwhelming Usage
+Zabbix proxy: Utilization of data sender processes over {$ZABBIX.PROXY.UTIL.MAX:"data sender"}%	Overwhelming Usage
+Zabbix proxy: Utilization of discovery manager processes over {$ZABBIX.PROXY.UTIL.MAX:"discovery manager"}%	Overwhelming Usage
+Zabbix proxy: Utilization of discovery worker processes over {$ZABBIX.PROXY.UTIL.MAX:"discovery worker"}%	Overwhelming Usage
+Zabbix proxy: Utilization of history syncer processes over {$ZABBIX.PROXY.UTIL.MAX:"history syncer"}%	Overwhelming Usage
+Zabbix proxy: Utilization of housekeeper processes over {$ZABBIX.PROXY.UTIL.MAX:"housekeeper"}%	Overwhelming Usage
+Zabbix proxy: Utilization of http agent poller processes over {$ZABBIX.PROXY.UTIL.MAX:"http agent poller"}%	Overwhelming Usage
+Zabbix proxy: Utilization of http poller processes over {$ZABBIX.PROXY.UTIL.MAX:"http poller"}%	Overwhelming Usage
+Zabbix proxy: Utilization of icmp pinger processes over {$ZABBIX.PROXY.UTIL.MAX:"icmp pinger"}%	Overwhelming Usage
+Zabbix proxy: Utilization of internal poller processes over {$ZABBIX.PROXY.UTIL.MAX:"internal poller"}%	Overwhelming Usage
+Zabbix proxy: Utilization of ipmi manager processes over {$ZABBIX.PROXY.UTIL.MAX:"ipmi manager"}%	Overwhelming Usage
+Zabbix proxy: Utilization of ipmi poller processes over {$ZABBIX.PROXY.UTIL.MAX:"ipmi poller"}%	Overwhelming Usage
+Zabbix proxy: Utilization of java poller processes over {$ZABBIX.PROXY.UTIL.MAX:"java poller"}%	Overwhelming Usage
+Zabbix proxy: Utilization of poller processes over {$ZABBIX.PROXY.UTIL.MAX:"poller"}%	Overwhelming Usage
+Zabbix proxy: Utilization of preprocessing manager processes over {$ZABBIX.PROXY.UTIL.MAX:"preprocessing manager"}%	Overwhelming Usage
+Zabbix proxy: Utilization of preprocessing worker processes over {$ZABBIX.PROXY.UTIL.MAX:"preprocessing worker"}%	Overwhelming Usage
+Zabbix proxy: Utilization of self-monitoring processes over {$ZABBIX.PROXY.UTIL.MAX:"self-monitoring"}%	Overwhelming Usage
+Zabbix proxy: Utilization of snmp poller processes over {$ZABBIX.PROXY.UTIL.MAX:"snmp poller"}%	Overwhelming Usage
+Zabbix proxy: Utilization of snmp trapper processes over {$ZABBIX.PROXY.UTIL.MAX:"snmp trapper"}%	Overwhelming Usage
+Zabbix proxy: Utilization of task manager processes over {$ZABBIX.PROXY.UTIL.MAX:"task manager"}%	Overwhelming Usage
+Zabbix proxy: Utilization of trapper processes over {$ZABBIX.PROXY.UTIL.MAX:"trapper"}%	Overwhelming Usage
+Zabbix proxy: Utilization of unreachable poller processes over {$ZABBIX.PROXY.UTIL.MAX:"unreachable poller"}%	Overwhelming Usage
+Zabbix proxy: Utilization of vmware collector processes over {$ZABBIX.PROXY.UTIL.MAX:"vmware collector"}%	Overwhelming Usage
+Zabbix proxy: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Zabbix proxy: Zabbix proxy template is assigned to Zabbix server	System Configuration Info
+Zabbix proxy: {HOST.NAME} has been restarted (uptime < 10m)	Agent/Service Status
+Zabbix server: Excessive configuration cache usage	System Cache
+Zabbix server: Excessive history cache usage	System Cache
+Zabbix server: Excessive history index cache usage	System Cache
+Zabbix server: Excessive trends cache usage	System Cache
+Zabbix server: Excessive value cache usage	System Cache
+Zabbix server: Excessive vmware cache usage	System Cache
+Zabbix server: Failed to fetch stats data (or no data for {$ZABBIX.SERVER.NODATA_TIMEOUT})	Agent/Service Status
+Zabbix server: More than 10 items have been missing data for over 10 minutes	High Error Rate
+Zabbix server: More than 100 items have been missing data for over 10 minutes	High Error Rate
+Zabbix server: More than 50 items have been missing data for over 10 minutes	High Error Rate
+Zabbix server: More than {$ZABBIX.SERVER.UTIL.MAX:"configuration cache"}% used in the configuration cache	System Cache
+Zabbix server: More than {$ZABBIX.SERVER.UTIL.MAX:"history cache"}% used in the history cache	System Cache
+Zabbix server: More than {$ZABBIX.SERVER.UTIL.MAX:"index cache"}% used in the history index cache	System Cache
+Zabbix server: More than {$ZABBIX.SERVER.UTIL.MAX:"trend cache"}% used in the trends cache	System Cache
+Zabbix server: More than {$ZABBIX.SERVER.UTIL.MAX:"value cache"}% used in the value cache	System Cache
+Zabbix server: More than {$ZABBIX.SERVER.UTIL.MAX:"vmware cache"}% used in the vmware cache	System Cache
+Zabbix server: Utilization of LLD manager processes is high	Overwhelming Usage
+Zabbix server: Utilization of LLD manager processes over {$ZABBIX.SERVER.UTIL.MAX:"LLD manager"}%	Overwhelming Usage
+Zabbix server: Utilization of LLD worker processes is high	Overwhelming Usage
+Zabbix server: Utilization of LLD worker processes over {$ZABBIX.SERVER.UTIL.MAX:"LLD worker"}%	Overwhelming Usage
+Zabbix server: Utilization of ODBC poller processes is high	Overwhelming Usage
+Zabbix server: Utilization of ODBC poller processes over {$ZABBIX.SERVER.UTIL.MAX:"ODBC poller"}%	Overwhelming Usage
+Zabbix server: Utilization of agent poller processes is high	Overwhelming Usage
+Zabbix server: Utilization of agent poller processes over {$ZABBIX.SERVER.UTIL.MAX:"agent poller"}%	Overwhelming Usage
+Zabbix server: Utilization of alert manager processes is high	Overwhelming Usage
+Zabbix server: Utilization of alert manager processes over {$ZABBIX.SERVER.UTIL.MAX:"alert manager"}%	Overwhelming Usage
+Zabbix server: Utilization of alert syncer processes is high	Overwhelming Usage
+Zabbix server: Utilization of alert syncer processes over {$ZABBIX.SERVER.UTIL.MAX:"alert syncer"}%	Overwhelming Usage
+Zabbix server: Utilization of alerter processes is high	Overwhelming Usage
+Zabbix server: Utilization of alerter processes over {$ZABBIX.SERVER.UTIL.MAX:"alerter"}%	Overwhelming Usage
+Zabbix server: Utilization of alerts processes is high	Overwhelming Usage
+Zabbix server: Utilization of api processes is high	Overwhelming Usage
+Zabbix server: Utilization of async poller processes is high	Overwhelming Usage
+Zabbix server: Utilization of audit log writer processes is high	Overwhelming Usage
+Zabbix server: Utilization of availability manager processes is high	Overwhelming Usage
+Zabbix server: Utilization of availability manager processes over {$ZABBIX.SERVER.UTIL.MAX:"availability manager"}%	Overwhelming Usage
+Zabbix server: Utilization of browser poller processes is high	Overwhelming Usage
+Zabbix server: Utilization of browser poller processes over {$ZABBIX.SERVER.UTIL.MAX:"browser poller"}%	Overwhelming Usage
+Zabbix server: Utilization of configuration syncer processes is high	Overwhelming Usage
+Zabbix server: Utilization of configuration syncer processes over {$ZABBIX.SERVER.UTIL.MAX:"configuration syncer"}%	Overwhelming Usage
+Zabbix server: Utilization of configuration syncer worker processes is high	Overwhelming Usage
+Zabbix server: Utilization of configuration syncer worker processes over {$ZABBIX.SERVER.UTIL.MAX:"configuration syncer worker"}%	Overwhelming Usage
+Zabbix server: Utilization of connector manager processes is high	Overwhelming Usage
+Zabbix server: Utilization of connector manager processes over {$ZABBIX.SERVER.UTIL.MAX:"connector manager"}%	Overwhelming Usage
+Zabbix server: Utilization of connector worker processes is high	Overwhelming Usage
+Zabbix server: Utilization of connector worker processes over {$ZABBIX.SERVER.UTIL.MAX:"connector worker"}%	Overwhelming Usage
+Zabbix server: Utilization of database monitor processes is high	Overwhelming Usage
+Zabbix server: Utilization of database writer processes is high	Overwhelming Usage
+Zabbix server: Utilization of discoverer processes is high	Overwhelming Usage
+Zabbix server: Utilization of discovery manager processes is high	Overwhelming Usage
+Zabbix server: Utilization of discovery manager processes over {$ZABBIX.SERVER.UTIL.MAX:"discovery manager"}%	Overwhelming Usage
+Zabbix server: Utilization of discovery worker processes is high	Overwhelming Usage
+Zabbix server: Utilization of discovery worker processes over {$ZABBIX.SERVER.UTIL.MAX:"discovery worker"}%	Overwhelming Usage
+Zabbix server: Utilization of escalator processes is high	Overwhelming Usage
+Zabbix server: Utilization of escalator processes over {$ZABBIX.SERVER.UTIL.MAX:"escalator"}%	Overwhelming Usage
+Zabbix server: Utilization of event processor processes is high	Overwhelming Usage
+Zabbix server: Utilization of event syncer processes is high	Overwhelming Usage
+Zabbix server: Utilization of fping poller processes is high	Overwhelming Usage
+Zabbix server: Utilization of history poller processes is high	Overwhelming Usage
+Zabbix server: Utilization of history poller processes over {$ZABBIX.SERVER.UTIL.MAX:"history poller"}%	Overwhelming Usage
+Zabbix server: Utilization of history syncer processes is high	Overwhelming Usage
+Zabbix server: Utilization of history syncer processes over {$ZABBIX.SERVER.UTIL.MAX:"history syncer"}%	Overwhelming Usage
+Zabbix server: Utilization of housekeeper processes is high	Overwhelming Usage
+Zabbix server: Utilization of housekeeper processes over {$ZABBIX.SERVER.UTIL.MAX:"housekeeper"}%	Overwhelming Usage
+Zabbix server: Utilization of http agent poller processes is high	Overwhelming Usage
+Zabbix server: Utilization of http agent poller processes over {$ZABBIX.SERVER.UTIL.MAX:"http agent poller"}%	Overwhelming Usage
+Zabbix server: Utilization of http poller processes is high	Overwhelming Usage
+Zabbix server: Utilization of http poller processes over {$ZABBIX.SERVER.UTIL.MAX:"http poller"}%	Overwhelming Usage
+Zabbix server: Utilization of icmp pinger processes is high	Overwhelming Usage
+Zabbix server: Utilization of icmp pinger processes over {$ZABBIX.SERVER.UTIL.MAX:"icmp pinger"}%	Overwhelming Usage
+Zabbix server: Utilization of internal poller processes is high	Overwhelming Usage
+Zabbix server: Utilization of internal poller processes over {$ZABBIX.SERVER.UTIL.MAX:"internal poller"}%	Overwhelming Usage
+Zabbix server: Utilization of ipmi manager processes is high	Overwhelming Usage
+Zabbix server: Utilization of ipmi manager processes over {$ZABBIX.SERVER.UTIL.MAX:"ipmi manager"}%	Overwhelming Usage
+Zabbix server: Utilization of ipmi poller processes is high	Overwhelming Usage
+Zabbix server: Utilization of ipmi poller processes over {$ZABBIX.SERVER.UTIL.MAX:"ipmi poller"}%	Overwhelming Usage
+Zabbix server: Utilization of ipmi trapper processes is high	Overwhelming Usage
+Zabbix server: Utilization of java gateway poller processes is high	Overwhelming Usage
+Zabbix server: Utilization of java gateway processes is high	Overwhelming Usage
+Zabbix server: Utilization of java poller processes is high	Overwhelming Usage
+Zabbix server: Utilization of java poller processes over {$ZABBIX.SERVER.UTIL.MAX:"java poller"}%	Overwhelming Usage
+Zabbix server: Utilization of lld poller processes is high	Overwhelming Usage
+Zabbix server: Utilization of log writer processes is high	Overwhelming Usage
+Zabbix server: Utilization of metadata syncer processes is high	Overwhelming Usage
+Zabbix server: Utilization of poller processes is high	Overwhelming Usage
+Zabbix server: Utilization of poller processes over {$ZABBIX.SERVER.UTIL.MAX:"poller"}%	Overwhelming Usage
+Zabbix server: Utilization of preprocessing manager processes is high	Overwhelming Usage
+Zabbix server: Utilization of preprocessing manager processes over {$ZABBIX.SERVER.UTIL.MAX:"preprocessing manager"}%	Overwhelming Usage
+Zabbix server: Utilization of preprocessing worker processes is high	Overwhelming Usage
+Zabbix server: Utilization of preprocessing worker processes over {$ZABBIX.SERVER.UTIL.MAX:"preprocessing worker"}%	Overwhelming Usage
+Zabbix server: Utilization of proxy configurer processes is high	Overwhelming Usage
+Zabbix server: Utilization of proxy discoverer processes is high	Overwhelming Usage
+Zabbix server: Utilization of proxy event processor processes is high	Overwhelming Usage
+Zabbix server: Utilization of proxy group manager processes is high	Overwhelming Usage
+Zabbix server: Utilization of proxy group manager processes over {$ZABBIX.SERVER.UTIL.MAX:"proxy group manager"}%	Overwhelming Usage
+Zabbix server: Utilization of proxy history syncer processes is high	Overwhelming Usage
+Zabbix server: Utilization of proxy housekeeper processes is high	Overwhelming Usage
+Zabbix server: Utilization of proxy icmp pinger processes is high	Overwhelming Usage
+Zabbix server: Utilization of proxy ipmi poller processes is high	Overwhelming Usage
+Zabbix server: Utilization of proxy poller processes is high	Overwhelming Usage
+Zabbix server: Utilization of proxy poller processes over {$ZABBIX.SERVER.UTIL.MAX:"proxy poller"}%	Overwhelming Usage
+Zabbix server: Utilization of report manager processes is high	Overwhelming Usage
+Zabbix server: Utilization of report manager processes over {$ZABBIX.SERVER.UTIL.MAX:"report manager"}%	Overwhelming Usage
+Zabbix server: Utilization of report writer processes is high	Overwhelming Usage
+Zabbix server: Utilization of report writer processes over {$ZABBIX.SERVER.UTIL.MAX:"report writer"}%	Overwhelming Usage
+Zabbix server: Utilization of self-monitoring processes is high	Overwhelming Usage
+Zabbix server: Utilization of self-monitoring processes over {$ZABBIX.SERVER.UTIL.MAX:"self-monitoring"}%	Overwhelming Usage
+Zabbix server: Utilization of service manager processes is high	Overwhelming Usage
+Zabbix server: Utilization of service manager processes over {$ZABBIX.SERVER.UTIL.MAX:"service manager"}%	Overwhelming Usage
+Zabbix server: Utilization of snmp poller processes is high	Overwhelming Usage
+Zabbix server: Utilization of snmp poller processes over {$ZABBIX.SERVER.UTIL.MAX:"snmp poller"}%	Overwhelming Usage
+Zabbix server: Utilization of snmp trapper processes is high	Overwhelming Usage
+Zabbix server: Utilization of snmp trapper processes over {$ZABBIX.SERVER.UTIL.MAX:"snmp trapper"}%	Overwhelming Usage
+Zabbix server: Utilization of sql writer processes is high	Overwhelming Usage
+Zabbix server: Utilization of ssh poller processes is high	Overwhelming Usage
+Zabbix server: Utilization of system run processes is high	Overwhelming Usage
+Zabbix server: Utilization of task manager processes is high	Overwhelming Usage
+Zabbix server: Utilization of task manager processes over {$ZABBIX.SERVER.UTIL.MAX:"task manager"}%	Overwhelming Usage
+Zabbix server: Utilization of timer processes is high	Overwhelming Usage
+Zabbix server: Utilization of timer processes over {$ZABBIX.SERVER.UTIL.MAX:"timer"}%	Overwhelming Usage
+Zabbix server: Utilization of trapper processes is high	Overwhelming Usage
+Zabbix server: Utilization of trapper processes over {$ZABBIX.SERVER.UTIL.MAX:"trapper"}%	Overwhelming Usage
+Zabbix server: Utilization of trigger housekeeper processes is high	Overwhelming Usage
+Zabbix server: Utilization of trigger housekeeper processes over {$ZABBIX.SERVER.UTIL.MAX:"trigger housekeeper"}%	Overwhelming Usage
+Zabbix server: Utilization of unreachable poller processes is high	Overwhelming Usage
+Zabbix server: Utilization of unreachable poller processes over {$ZABBIX.SERVER.UTIL.MAX:"unreachable poller"}%	Overwhelming Usage
+Zabbix server: Utilization of vmware collector processes is high	Overwhelming Usage
+Zabbix server: Utilization of vmware collector processes over {$ZABBIX.SERVER.UTIL.MAX:"vmware collector"}%	Overwhelming Usage
+Zabbix server: Utilization of zabbix server processes is alarmingly high	Overwhelming Usage
+Zabbix server: Utilization of zabbix server processes is critically high	Overwhelming Usage
+Zabbix server: Utilization of zabbix server processes is dangerously high	Overwhelming Usage
+Zabbix server: Utilization of zabbix server processes is extremely high	Overwhelming Usage
+Zabbix server: Utilization of zabbix server processes is high	Overwhelming Usage
+Zabbix server: Version has changed	System Configuration Info
+Zabbix server: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Zabbix server: Wrong template assigned	System Configuration Info
+Zabbix server: Zabbix server template is assigned to Zabbix proxy	System Configuration Info
+Zabbix server: Zabbix value cache working in low-memory mode	System Cache
+Zookeeper: Failed to fetch info data (or no data for 10m)	Agent/Service Status
+Zookeeper: Server mode has changed (new mode: {ITEM.VALUE})	System Configuration Info
+Zookeeper: Too many file descriptors used (over {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% for 5 min)	Filesystem
+Zookeeper: Too many threads (over {$ZOOKEEPER.THREADS.MAX.WARN}% for 5 min)	Overwhelming Usage
+Zookeeper: Too many queued requests (over {$ZOOKEEPER.OUTSTANDING_REQ.MAX.WARN}% for 5 min)	Overwhelming Usage
+Zookeeper: Version has changed (new version: {ITEM.VALUE})	System Configuration Info
+Zookeeper: ZooKeeper has been restarted (uptime < 10m)	Agent/Service Status
+macOS: Zabbix agent is not available (for {$AGENT.TIMEOUT})	Agent/Service Status

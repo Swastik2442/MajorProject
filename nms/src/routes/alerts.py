@@ -69,7 +69,7 @@ async def get_trigger_alerts_count(req: Request):
 
 IntervalSeconds = {'hour': 3600, 'day': 86400, 'week': 604800, 'month': 2592000}
 @router.get("/problems/trends", response_model=DataResponse[list[StatTrends]])
-async def get_trigger_alerts_trends(req: Request, search_query: Annotated[TimePeriodParams, Query()]):
+async def get_trigger_alert_trends(req: Request, search_query: Annotated[TimePeriodParams, Query()]):
     db: AsyncDatabase = req.app.state.db
 
     # Get specific time periods
@@ -136,7 +136,7 @@ async def get_trigger_alerts_trends(req: Request, search_query: Annotated[TimePe
     ) for i in range(num_periods)])
 
 @router.get("/hosts/health", response_model=DataResponse[list[StatHealthScores]])
-async def hosts_health_scores(req: Request):
+async def get_hosts_health_scores(req: Request):
     db: AsyncDatabase = req.app.state.db
 
     # Aggregate problem severity counts per host
