@@ -11,7 +11,7 @@ from pymongo.asynchronous.database import AsyncDatabase
 from ..config import PROBLEMS_COL_NAME, SERVICES_COL_NAME
 from ..models import Problem, Service
 from ..schemas import DataResponse, PaginationParams, PaginatedDataResponse, StatCounts, StatHealthScores, StatTrends, TimePeriodParams
-from ..utils import fields, now
+from ..models.utils import fields, now
 
 router = APIRouter(
     prefix="/alerts",

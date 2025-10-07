@@ -11,9 +11,11 @@ from pymongo.asynchronous.database import AsyncDatabase
 from ..templates import ZABBIX_DATETIME_FORMAT, parse_json_message
 from ..config import PROBLEMS_COL_NAME, SERVICES_COL_NAME
 from ..exceptions import HTTPException as CustomHTTPException
-from ..models import Problem, ProblemUpdate, Service, ServiceUpdate, Update
+from ..models import Problem, ProblemUpdate, Service, ServiceUpdate
+from ..models.problem import Update as PUpdate
+from ..models.service import Update as SUpdate
 from ..schemas import Response as CustomResponse
-from ..utils import none, to_doc
+from ..models.utils import none, to_doc
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +77,7 @@ async def receive_alert(req: Request, alert: ZabbixAlert):
                         recoveryAt=recTime,
                         duration=data.event.duration,
                         status="Recovered"
-                    )), "$push": {"updates": to_doc(Update(
+                    )), "$push": {"updates": to_doc(PUpdate(
                         action="Recovered",
                         timestamp=recTime
                     ))}}
@@ -96,7 +98,7 @@ async def receive_alert(req: Request, alert: ZabbixAlert):
             else:
                 await db[PROBLEMS_COL_NAME].update_one(
                     {"zid": data.event.id},
-                    {"$push": {"updates": to_doc(Update(
+                    {"$push": {"updates": to_doc(PUpdate(
                         action=data.event.update.action,
                         timestamp=updateTime,
                         message=data.event.update.message,
@@ -132,7 +134,7 @@ async def receive_alert(req: Request, alert: ZabbixAlert):
                         recoveryAt=recTime,
                         severity=data.event.severity,
                         duration=data.event.duration
-                    )), "$push": {"updates": to_doc(Update(
+                    )), "$push": {"updates": to_doc(SUpdate(
                         action="Recovered",
                         timestamp=recTime
                     ))}}
@@ -155,7 +157,7 @@ async def receive_alert(req: Request, alert: ZabbixAlert):
                     {"$set": to_doc(ServiceUpdate(
                         severity=data.event.update.severity,
                         age=data.event.age
-                    )), "$push": {"updates": to_doc(Update(
+                    )), "$push": {"updates": to_doc(SUpdate(
                         action="Updated",
                         timestamp=updateTime
                     ))}}
