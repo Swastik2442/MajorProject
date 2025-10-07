@@ -11,21 +11,15 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white p-6">
       {/* Page Title */}
-      <h1 className="text-2xl font-bold mb-6">
-        Unified Operations & Predictive Insight Dashboard
-      </h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">
+          Unified Operations & Predictive Insight Dashboard
+        </h1>
+        <LogoutButton />
+      </div>
 
       {/* Alert Banner */}
-      <div className="mb-6 rounded-xl bg-red-600/90 text-white px-4 py-3 flex items-center justify-between shadow-lg">
-        <div className="flex items-center gap-2">
-          <span className="text-xl">⚠️</span>
-          <span className="font-medium">
-            CRITICAL SECURITY ALERT: ACTIVE! SQL Injection on DB-SRV01 – High
-            Packet Loss
-          </span>
-        </div>
-        <button className="text-white/70 hover:text-white">✕</button>
-      </div>
+      <AlertBanner text="SQL Injection on DB-SRV01 - High" />
 
       {/* Main Grid */}
       <div className="grid grid-cols-12 gap-6">

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { FiX, FiAlertTriangle } from "react-icons/fi";
 
 export default function AlertBanner({ text = null }: { text: string | null }) {
   const [visible, setVisible] = useState(true);
@@ -7,21 +6,21 @@ export default function AlertBanner({ text = null }: { text: string | null }) {
   if (!visible) return null;
 
   return (
-    <div className="w-full rounded-xl p-3 bg-red-600/90 text-white shadow-md mb-6">
-      <div className="max-w-7xl mx-auto flex items-center gap-3">
-        <FiAlertTriangle className="w-6 h-6" />
-        <div className="font-medium flex-1">
-          {text ?? "CRITICAL SECURITY ALERT: ACTIVE! Check details"}
-        </div>
-        <button
-          className="ml-auto hover:text-red-200 hover:cursor-pointer transition-colors"
-          aria-label="Close alert"
-          onClick={() => setVisible(false)}
-          type="button"
-        >
-          <FiX className="w-5 h-5" />
-        </button>
+    <div className="mb-6 rounded-xl bg-red-600/90 text-white px-4 py-3 flex items-center justify-between shadow-lg">
+      <div className="flex items-center gap-2">
+        <span className="text-xl">⚠️</span>
+        <span className="font-medium">
+          CRITICAL SECURITY ALERT: ACTIVE! {text ?? "Check details"}
+        </span>
       </div>
+      <button
+        className="text-white/70 hover:text-white"
+        aria-label="Close alert"
+        onClick={() => {setVisible(false)}}
+        type="button"
+      >
+        ✕
+      </button>
     </div>
   );
 }

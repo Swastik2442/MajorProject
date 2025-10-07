@@ -13,8 +13,10 @@ export default function LogoutButton() {
 
   return (
       <button
-        onClick={() => handleLogout()}
-        className="mt-6 px-6 py-2 bg-gray-800 text-white rounded-lg shadow hover:bg-gray-900 transition"
+        className="px-6 py-2 bg-gray-800 text-white rounded-lg shadow hover:bg-gray-900 transition"
+        aria-label="Logout"
+        onClick={() => {handleLogout()}}
+        type="button"
       >
         Logout
       </button>

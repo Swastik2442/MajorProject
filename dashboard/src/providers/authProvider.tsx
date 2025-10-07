@@ -13,8 +13,14 @@ interface AuthProviderState {
 
 const initialState: AuthProviderState = {
   user: null,
-  loginUser: async () => console.error("loginUser not implemented"),
-  logoutUser: async () => console.error("logoutUser not implemented")
+  loginUser: async () => {
+    console.error("loginUser not implemented");
+    return Promise.resolve();
+  },
+  logoutUser: async () => {
+    console.error("logoutUser not implemented");
+    return Promise.resolve();
+  }
 };
 
 const USER_STORAGE_KEY = "nms.dashboard.user";
@@ -26,9 +32,10 @@ const AuthProviderContext = createContext<AuthProviderState>(initialState);
  * @param props Additional props to the AuthProvider
  */
 export function AuthProvider({ children }: { children: React.ReactNode; }) {
-  const [user, setUser] = useState<AuthProviderState['user']>(localStorage.getItem(USER_STORAGE_KEY) || null);
+  const [user, setUser] = useState<AuthProviderState['user']>(localStorage.getItem(USER_STORAGE_KEY) ?? null);
   const queryClient = useQueryClient();
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   const handleLogin: AuthProviderState['loginUser'] = async (data) => {
     const username = data.username, password = data.password;
     console.log(username, password);
@@ -63,6 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode; }) {
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthProviderContext);
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (context === undefined)
     throw new Error("useAuth must be used within an AuthProvider");
   return context;

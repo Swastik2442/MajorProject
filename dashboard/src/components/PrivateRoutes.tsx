@@ -6,7 +6,7 @@ export default function PrivateRoutes() {
   const { user } = useAuth();
 
   if (user === null) {
-    navigate("/login");
+    void navigate("/login");
   }
   return <Outlet />;
 }
