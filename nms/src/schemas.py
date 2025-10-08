@@ -2,7 +2,7 @@ from typing import TypeVar, Generic, Literal
 
 from pydantic import BaseModel, ValidationInfo, Field, field_validator
 
-from .models.utils import MyDatetime, none, now
+from src.models.utils import MyDatetime, none, now
 
 class PaginationParams(BaseModel):
     page: int = Field(1, ge=1)

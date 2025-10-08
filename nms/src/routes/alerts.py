@@ -4,14 +4,13 @@ from datetime import datetime, timedelta
 from math import ceil
 from typing import Annotated
 
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, Query
 from pymongo import DESCENDING
-from pymongo.asynchronous.database import AsyncDatabase
 
-from ..config import PROBLEMS_COL_NAME, SERVICES_COL_NAME
-from ..models import Problem, Service
-from ..schemas import DataResponse, PaginationParams, PaginatedDataResponse, StatCounts, StatHealthScores, StatTrends, TimePeriodParams
-from ..models.utils import fields, now
+from src.models import Problem, Service
+from src.schemas import DataResponse, PaginationParams, PaginatedDataResponse, StatCounts, StatHealthScores, StatTrends, TimePeriodParams
+from src.services.db import Database
+from src.models.utils import fields, now
 
 router = APIRouter(
     prefix="/alerts",
@@ -19,10 +18,9 @@ router = APIRouter(
 )
 
 @router.get("/problems", response_model=PaginatedDataResponse[list[Problem]])
-async def get_trigger_alerts(req: Request, filter_query: Annotated[PaginationParams, Query()]):
+async def get_trigger_alerts(filter_query: Annotated[PaginationParams, Query()], db: Database):
     offset = (filter_query.page - 1) * filter_query.limit
-    db: AsyncDatabase = req.app.state.db
-    cursor = db[PROBLEMS_COL_NAME].find(
+    cursor = db[Problem.Meta.collection_name()].find(
         sort=[(fields(Problem).updatedAt, DESCENDING), (fields(Problem).createdAt, DESCENDING)],
         skip=offset,
         limit=filter_query.limit
@@ -31,10 +29,9 @@ async def get_trigger_alerts(req: Request, filter_query: Annotated[PaginationPar
     return PaginatedDataResponse[list[Problem]](data=results, page=filter_query.page, limit=filter_query.limit)
 
 @router.get("/services", response_model=PaginatedDataResponse[list[Service]])
-async def get_service_alerts(req: Request, filter_query: Annotated[PaginationParams, Query()]):
+async def get_service_alerts(filter_query: Annotated[PaginationParams, Query()], db: Database):
     offset = (filter_query.page - 1) * filter_query.limit
-    db: AsyncDatabase = req.app.state.db
-    cursor = db[SERVICES_COL_NAME].find(
+    cursor = db[Service.Meta.collection_name()].find(
         sort=[(fields(Service).updatedAt, DESCENDING), (fields(Service).createdAt, DESCENDING)],
         skip=offset,
         limit=filter_query.limit
@@ -43,20 +40,18 @@ async def get_service_alerts(req: Request, filter_query: Annotated[PaginationPar
     return PaginatedDataResponse[list[Service]](data=results, page=filter_query.page, limit=filter_query.limit)
 
 @router.get("/problems/count", response_model=DataResponse[StatCounts])
-async def get_trigger_alerts_count(req: Request):
-    db: AsyncDatabase = req.app.state.db
-
+async def get_trigger_alerts_count(db: Database):
     curr = now().timestamp()
-    activeProblems = await db[PROBLEMS_COL_NAME].count_documents(
+    activeProblems = await db[Problem.Meta.collection_name()].count_documents(
         {fields(Problem).status: {"$ne": "Recovered"}}
     )
-    problemsInLast24Hours = await db[PROBLEMS_COL_NAME].count_documents(
+    problemsInLast24Hours = await db[Problem.Meta.collection_name()].count_documents(
         {fields(Problem).createdAt: {"$gte": (curr - 86400)}} # type: ignore
     )
-    problemsInLastWeek = await db[PROBLEMS_COL_NAME].count_documents(
+    problemsInLastWeek = await db[Problem.Meta.collection_name()].count_documents(
         {fields(Problem).createdAt: {"$gte": (curr - 604800)}} # type: ignore
     )
-    problemsInLastMonth = await db[PROBLEMS_COL_NAME].count_documents(
+    problemsInLastMonth = await db[Problem.Meta.collection_name()].count_documents(
         {fields(Problem).createdAt: {"$gte": (curr - 2592000)}} # type: ignore
     )
 
@@ -69,9 +64,7 @@ async def get_trigger_alerts_count(req: Request):
 
 IntervalSeconds = {'hour': 3600, 'day': 86400, 'week': 604800, 'month': 2592000}
 @router.get("/problems/trends", response_model=DataResponse[list[StatTrends]])
-async def get_trigger_alert_trends(req: Request, search_query: Annotated[TimePeriodParams, Query()]):
-    db: AsyncDatabase = req.app.state.db
-
+async def get_trigger_alert_trends(search_query: Annotated[TimePeriodParams, Query()], db: Database):
     # Get specific time periods
     bins: list[tuple[datetime, datetime]] = []
     intervalStr = "days" if search_query.interval == "month" else search_query.interval + "s"
@@ -90,7 +83,7 @@ async def get_trigger_alert_trends(req: Request, search_query: Annotated[TimePer
     max_time = bins[-1][1]
     problems = [
         Problem(**doc)
-        async for doc in db[PROBLEMS_COL_NAME].find({
+        async for doc in db[Problem.Meta.collection_name()].find({
             "$or": [
                 {fields(Problem).startedAt: {"$gte": min_time, "$lt": max_time}},
                 {
@@ -136,9 +129,7 @@ async def get_trigger_alert_trends(req: Request, search_query: Annotated[TimePer
     ) for i in range(num_periods)])
 
 @router.get("/hosts/health", response_model=DataResponse[list[StatHealthScores]])
-async def get_hosts_health_scores(req: Request):
-    db: AsyncDatabase = req.app.state.db
-
+async def get_hosts_health_scores(db: Database):
     # Aggregate problem severity counts per host
     pipeline = [
         {"$match": {fields(Problem).status: {"$ne": "Recovered"}}},
@@ -190,6 +181,6 @@ async def get_hosts_health_scores(req: Request):
         }},
         {"$sort": {"healthScore": -1}}
     ]
-    cursor = await db[PROBLEMS_COL_NAME].aggregate(pipeline)
+    cursor = await db[Problem.Meta.collection_name()].aggregate(pipeline)
     results = [StatHealthScores(**doc) async for doc in cursor]
     return DataResponse[list[StatHealthScores]](data=results)

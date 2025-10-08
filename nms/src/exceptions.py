@@ -1,6 +1,7 @@
 "Exception Handlers for the API"
 
-from typing import Literal, TypedDict
+from typing import Literal
+from typing_extensions import TypedDict
 
 from fastapi import Request, Response, status
 from fastapi.encoders import jsonable_encoder

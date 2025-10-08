@@ -1,19 +1,15 @@
 "Client Model Schema"
 
-from pydantic import BaseModel, Field
-from pymongo import ASCENDING
-from pymongo.asynchronous.collection import AsyncCollection
+from pydantic import Field
 
-from .utils import PyObjectId, MyDatetime, fields, none, now
+from .base import BaseInterface
 
-class Client(BaseModel):
-    id: PyObjectId | None = Field(default_factory=none, alias="_id")
-    createdAt: MyDatetime = Field(default_factory=now)
-    updatedAt: MyDatetime = Field(default_factory=now)
+class Client(BaseInterface):
+    class Meta(BaseInterface.Meta):
+        @classmethod
+        def collection_name(cls) -> str:
+            return "clients"
 
     name: str = Field(title="Client Name")
     description: str = Field(default_factory=lambda: "", title="Client Description")
     addresses: set[str] = Field(title="Client Addresses", description="IP/DNS Addresses of the Client")
-
-async def init_clients_col(collection: AsyncCollection):
-    await collection.create_index([(fields(Client).name, ASCENDING)], unique=True)
