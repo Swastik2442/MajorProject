@@ -18,3 +18,5 @@ class Settings(BaseSettings):
     CLERK_ISSUER: str
     CLERK_JWKS_URL: str
     CLERK_SECRET_KEY: str
+
+config = Settings() # type: ignore[call-arg]
