@@ -1,6 +1,7 @@
 // src/pages/Dashboard.tsx
 import { useEffect, useState } from "react";
-import { UserButton } from "@clerk/clerk-react";
+import { dark } from "@clerk/themes";
+import { OrganizationSwitcher, UserButton } from "@clerk/clerk-react";
 import AlertBanner from "../components/dashboard/AlertBanner";
 import StatusCards from "../components/dashboard/StatusCards";
 import ActivityStream from "../components/dashboard/ActivityStream";
@@ -10,13 +11,12 @@ import HostScorecards from "../components/dashboard/HostScorecards";
 import KPIring from "../components/dashboard/KPIring";
 
 export default function Dashboard() {
-  // throw new Error("Test: Dashboard Error Boundary is working!"); //for testing error boundary
   const [mounted, setMounted] = useState(false);
 
   // small mount animation to avoid a flash
   useEffect(() => {
-    const t = setTimeout(() => setMounted(true), 40);
-    return () => clearTimeout(t);
+    const t = setTimeout(() => {setMounted(true);}, 40);
+    return () => {clearTimeout(t)};
   }, []);
 
   return (
@@ -30,7 +30,18 @@ export default function Dashboard() {
         <h1 className="text-2xl font-bold leading-tight">
           Unified Operations & Predictive Insight Dashboard
         </h1>
-        <UserButton />
+        <div className="flex items-center justify-between space-x-4">
+          <OrganizationSwitcher
+            hidePersonal={true}
+            afterCreateOrganizationUrl={(org) => `org/${org.id}`}
+            afterLeaveOrganizationUrl='/'
+            afterSelectOrganizationUrl={(org) => `org/${org.id}`}
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            appearance={{ theme: dark }}
+          />
+          {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
+          <UserButton appearance={{ theme: dark }} />
+        </div>
       </div>
 
       {/* Alert Banner */}

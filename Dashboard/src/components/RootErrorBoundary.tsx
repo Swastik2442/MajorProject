@@ -1,9 +1,5 @@
 // src/components/RootErrorBoundary.tsx
-import {
-  useRouteError,
-  isRouteErrorResponse,
-  useNavigate,
-} from "react-router-dom";
+import { useRouteError, isRouteErrorResponse, useNavigate } from "react-router";
 
 export default function RootErrorBoundary() {
   const error = useRouteError();
@@ -11,7 +7,7 @@ export default function RootErrorBoundary() {
 
   const onBack = () => {
     try {
-      navigate(-1);
+      void navigate(-1);
     } catch {
       // fallback
       window.history.back();
@@ -31,7 +27,7 @@ export default function RootErrorBoundary() {
           <h1 className="text-4xl font-bold mb-3">
             {error.status} {error.statusText}
           </h1>
-          <p className="text-lg opacity-80 mb-6">{(error.data as any) ?? ""}</p>
+          <p className="text-lg opacity-80 mb-6">{error.data ?? ""}</p>
 
           <div className="flex items-center justify-center gap-3">
             <button
