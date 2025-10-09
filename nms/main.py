@@ -3,14 +3,15 @@
 from contextlib import asynccontextmanager
 import logging
 
-from fastapi import FastAPI, Response, status
+from fastapi import Depends, FastAPI, Response, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from src.services.db import connect, disconnect
 from src.exceptions import RequestValidationError as CustomRequestValidationError, http_exception_handler, validation_exception_handler
 from src.routes import alerts_router, zabbix_router
+from src.services.auth.http import protect_route
+from src.services.db import connect, disconnect
 from src.schemas import Response as CustomResponse
 
 logging.basicConfig(level=logging.INFO)
@@ -52,4 +53,4 @@ def favicon():
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 app.include_router(zabbix_router, include_in_schema=False)
-app.include_router(alerts_router)
+app.include_router(alerts_router, dependencies=[Depends(protect_route)])
