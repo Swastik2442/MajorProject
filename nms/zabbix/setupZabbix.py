@@ -18,7 +18,7 @@ def _getWebhookScript() -> str:
         whScript = f.read().strip()
     return whScript
 
-def createMediaType(zapi: ZabbixAPI, apiUrl: str, mediaTypeId: str | None = None) -> str | None:
+def createMediaType(zapi: ZabbixAPI, apiUrl: str, apiKey: str, mediaTypeId: str | None = None) -> str | None:
     params = {
         "type": "4",
         "name": "Post to API",
@@ -26,7 +26,8 @@ def createMediaType(zapi: ZabbixAPI, apiUrl: str, mediaTypeId: str | None = None
             {"name": "Message", "value": "{ALERT.MESSAGE}"},
             {"name": "Subject", "value": "{ALERT.SUBJECT}"},
             {"name": "To", "value": "{ALERT.SENDTO}"},
-            {"name": "URL","value": apiUrl}
+            {"name": "URL","value": apiUrl},
+            {"name": "API_KEY", "value": apiKey}
         ],
         "script": _getWebhookScript(),
         "status": "0",
@@ -128,9 +129,10 @@ if __name__ == "__main__":
 
     userId = str(int(input("Enter the ID of the User for whom the Triggers have to be added: ")))
     apiUrl = input("Enter the URL for the API: ").strip()
+    apiKey = input("Enter the API Key for the API: ").strip()
 
     # Create Media Type
-    mediaTypeId = createMediaType(zapi, apiUrl)
+    mediaTypeId = createMediaType(zapi, apiUrl, apiKey)
     assert mediaTypeId is not None
     print("\nCreated Media Type with ID:", mediaTypeId)
 
