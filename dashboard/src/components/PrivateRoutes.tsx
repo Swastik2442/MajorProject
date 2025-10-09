@@ -1,12 +1,15 @@
-import { Outlet, useNavigate } from 'react-router';
-import { useAuth } from '../providers/authProvider';
+import { Outlet, Navigate } from 'react-router';
+import { SignedIn, SignedOut } from '@clerk/clerk-react';
 
 export default function PrivateRoutes() {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-
-  if (user === null) {
-    void navigate("/login");
-  }
-  return <Outlet />;
+  return (
+    <>
+      <SignedIn>
+        <Outlet />
+      </SignedIn>
+      <SignedOut>
+        <Navigate to="/login" replace />
+      </SignedOut>
+    </>
+  );
 }
