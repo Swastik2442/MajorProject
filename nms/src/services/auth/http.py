@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Annotated, Any
 
 from fastapi import HTTPException, Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -30,3 +30,4 @@ def get_user_id(payload: dict[str, Any] = Depends(protect_route)) -> str:
     if user_id is None:
         raise HTTPException(status_code=401, detail="User ID not found in token")
     return user_id
+JwtUserId = Annotated[str, Depends(get_user_id)]
