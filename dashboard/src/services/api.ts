@@ -15,6 +15,21 @@ const api = axios.create({
   timeout: 15000,
 });
 
+// Add a Authorization Header interceptor
+api.interceptors.request.use(async (config) => {
+  // @ts-expect-error clerk-react does not provide getToken outside React components
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+  const token: string = await window.Clerk.session.getToken();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+}, (error) => {
+    const errorMessage = typeof error === "string"
+      ? error
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      : (error as { message?: string })?.message ?? "Request error";
+    return Promise.reject(new Error(errorMessage));
+});
+
 export const apiService: ApiService = {
   fetchProblems: async (page = 1, limit = 20) => {
     try {

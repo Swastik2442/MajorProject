@@ -1,6 +1,6 @@
 // src/pages/Dashboard.tsx
 import { useEffect, useState } from "react";
-import LogoutButton from "../components/LogoutButton";
+import { UserButton } from "@clerk/clerk-react";
 import AlertBanner from "../components/dashboard/AlertBanner";
 import StatusCards from "../components/dashboard/StatusCards";
 import ActivityStream from "../components/dashboard/ActivityStream";
@@ -30,7 +30,7 @@ export default function Dashboard() {
         <h1 className="text-2xl font-bold leading-tight">
           Unified Operations & Predictive Insight Dashboard
         </h1>
-        <LogoutButton />
+        <UserButton />
       </div>
 
       {/* Alert Banner */}

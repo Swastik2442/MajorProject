@@ -7,13 +7,13 @@ from fastapi import Depends
 from pymongo import AsyncMongoClient
 from pymongo.asynchronous.database import AsyncDatabase
 
-from src.config import DB_NAME, MONGO_CONNECTION_URI
+from src.config import config
 from .init_collections import init_collections
 
 logger = getLogger(__name__)
 
-db_client = AsyncMongoClient(MONGO_CONNECTION_URI, connect=False)
-db = db_client[DB_NAME]
+db_client = AsyncMongoClient(str(config.MONGO_CONNECTION_URI), connect=False)
+db = db_client[config.DB_NAME]
 
 def get_db_client() -> AsyncMongoClient[Any]: return db_client
 DatabaseClient = Annotated[AsyncMongoClient[Any], Depends(get_db_client)]

@@ -1,10 +1,22 @@
 "Configuration for the application"
 
-from os import getenv
-from dotenv import load_dotenv
+from pydantic import AliasChoices, Field, MongoDsn
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-load_dotenv()
-MONGO_CONNECTION_URI = getenv("MONGO_CONNECTION_URI")
-assert MONGO_CONNECTION_URI is not None, "MongoDB Connection URI must be set"
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=('.env', '.env.local'),
+        env_file_encoding='utf-8',
+        extra='ignore',
+    )
 
-DB_NAME = "nms"
+    MONGO_CONNECTION_URI: MongoDsn = Field( # type: ignore[valid-type]
+        validation_alias=AliasChoices('MONGO_URI', 'MONGO_CONNECTION_URI', 'MONGODB_URI', 'MONGODB_CONNECTION_URI'),
+    )
+    DB_NAME: str = Field("nms")
+
+    CLERK_ISSUER: str
+    CLERK_JWKS_URL: str
+    CLERK_SECRET_KEY: str
+
+config = Settings() # type: ignore[call-arg]
