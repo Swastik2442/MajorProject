@@ -3,24 +3,33 @@ import { RouterProvider } from "react-router/dom";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ClerkProvider } from "@clerk/clerk-react";
 import PrivateRoutes from "./components/PrivateRoutes";
+import RootErrorBoundary from "./components/RootErrorBoundary";
+import AppLayout from "./layout/AppLayout";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import "./globals.css";
 
 const router = createBrowserRouter([
   {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    element: <PrivateRoutes />,
+    element: <Outlet />,
+    errorElement: <RootErrorBoundary />,
     children: [
       {
-        path: "/",
-        element: <Dashboard />,
+        path: "/login",
+        element: <Login />,
+        errorElement: <RootErrorBoundary />,
       },
-    ],
-  },
+      {
+        element: <PrivateRoutes />,
+        children: [
+          {
+            path: "/",
+            element: <Dashboard />,
+          },
+        ]
+      },
+    ]
+  }
 ]);
 
 const queryClient = new QueryClient();
