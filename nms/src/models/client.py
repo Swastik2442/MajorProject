@@ -3,7 +3,7 @@
 from pydantic import BaseModel, Field
 
 from .base import BaseInterface
-from .utils import MyDatetime, PyObjectId, none, now
+from .utils import PyObjectId, none
 
 class Client(BaseInterface):
     class Meta(BaseInterface.Meta):
@@ -22,7 +22,5 @@ class ClientCreate(BaseModel):
     description: str | None = Field(default_factory=none, title="Client Description")
 
 class ClientUpdate(BaseModel):
-    updatedAt: MyDatetime = Field(default_factory=now)
-
     name: str | None = Field(default_factory=none, title="Client Name", min_length=3, max_length=100)
     description: str | None = Field(default_factory=none, title="Client Description")

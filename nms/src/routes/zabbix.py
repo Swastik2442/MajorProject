@@ -28,7 +28,7 @@ router = APIRouter(
 async def get_client(db: Database, hashed_api_key: str = Depends(get_api_key_hash)) -> Client:
     client = await db[Client.Meta.collection_name()].find_one({fields(Client).apiKey: hashed_api_key})
     if client is None:
-        raise HTTPException(status_code=404, detail="Client not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Client not found")
     return Client(**client)
 ClientFromApiKey = Annotated[Client, Depends(get_client)]
 
@@ -46,7 +46,7 @@ async def receive_alert(
     db: Database
 ):
     if req.client is None or client.id is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot determine client")
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Cannot determine client")
 
     logger.debug("Received alert (at %s) from %s with subject \"%s\"", alert.to, req.client.host, alert.subject)
     logger.debug("Message: %s", alert.message)
@@ -54,7 +54,7 @@ async def receive_alert(
         data = parse_json_message(alert.message)
     except ValueError as e:
         logger.warning("Failed to parse alert message: %s", e)
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid alert message") from e
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Invalid alert message") from e
 
     # Insert/Update in the Database
     match data.type:
@@ -194,6 +194,6 @@ async def receive_alert(
                 )
         case _:
             logger.warning("Unknown Alert Type: %s", data.type)
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unknown alert type")
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, "Unknown alert type")
 
     return CustomResponse()

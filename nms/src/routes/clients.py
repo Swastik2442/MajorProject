@@ -37,7 +37,7 @@ async def is_org_admin(
         limit=1
     )
     if org is None or len(org.data) == 0:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Org not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Org not found")
     return org.data[0].role == "admin"
 
 async def find_client_by_id(
@@ -48,7 +48,7 @@ async def find_client_by_id(
 ) -> ClientWithPerms:
     client = await db[Client.Meta.collection_name()].find_one({"_id": client_id})
     if client is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Client not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Client not found")
     client = Client(**client)
 
     isAdmin = await is_org_admin(client.ownerId, user_id, clerk)
@@ -73,8 +73,8 @@ async def create_client(
 ) -> DataResponse[Client]:
     if not await is_org_admin(client.ownerId, user_id, clerk):
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not have permission to add clients to this organization"
+            status.HTTP_403_FORBIDDEN,
+            "You do not have permission to add clients to this organization"
         )
 
     tm = now()
@@ -86,42 +86,48 @@ async def create_client(
     )).inserted_id
     return DataResponse[Client](data=new_client)
 
+class PaginationWithOwnerId(PaginationParams):
+    owner_id: str | None = Query(
+        default=None,
+        title="Owner ID",
+        description="ID of the Org whose Clients are to be fetched. If not provided, fetches clients from all Orgs the user belongs to."
+    )
+
 @router.get(
     "/",
     response_model=PaginatedDataResponse[list[Client]],
     responses={404: {"model": CustomHTTPException}}
 )
 async def list_clients(
-    owner_id: Annotated[str | None, Query()],
-    filter_query: Annotated[PaginationParams, Query()],
+    query: Annotated[PaginationWithOwnerId, Query()],
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database
 ) -> PaginatedDataResponse[list[Client]]:
-    offset = (filter_query.page - 1) * filter_query.limit
-    if owner_id is None:
+    offset = (query.page - 1) * query.limit
+    if query.owner_id is None:
         orgs = await clerk.organizations.list_async(user_id=[user_id], limit=50)
         if orgs is None or len(orgs.data) == 0:
-            return PaginatedDataResponse[list[Client]](data=[], page=filter_query.page, limit=filter_query.limit)
+            return PaginatedDataResponse[list[Client]](data=[], page=query.page, limit=query.limit)
 
         clients = await db[Client.Meta.collection_name()].find(
             {fields(Client).ownerId: {"$in": [org.id for org in orgs.data]}},
             sort=[(fields(Client).updatedAt, DESCENDING), (fields(Client).createdAt, DESCENDING)],
             skip=offset,
-            limit=filter_query.limit
+            limit=query.limit
         ).to_list()
     else:
-        await is_org_admin(owner_id, user_id, clerk) # just to verify access
+        await is_org_admin(query.owner_id, user_id, clerk) # just to verify access
 
         clients = await db[Client.Meta.collection_name()].find(
-            {fields(Client).ownerId: owner_id},
+            {fields(Client).ownerId: query.owner_id},
             sort=[(fields(Client).updatedAt, DESCENDING), (fields(Client).createdAt, DESCENDING)],
             skip=offset,
-            limit=filter_query.limit
+            limit=query.limit
         ).to_list()
 
     clients = [Client(**client) for client in clients]
-    return PaginatedDataResponse[list[Client]](data=clients, page=filter_query.page, limit=filter_query.limit)
+    return PaginatedDataResponse[list[Client]](data=clients, page=query.page, limit=query.limit)
 
 @router.get(
     "/{client_id}",
@@ -142,8 +148,8 @@ async def regenerate_client_api_key(
 ) -> DataResponse[str]:
     if not findResult.hasEditPerms:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not have permission to regenerate the API key for this client"
+            status.HTTP_403_FORBIDDEN,
+            "You do not have permission to regenerate the API key for this client"
         )
 
     api_key = generate_api_key()
@@ -164,19 +170,19 @@ async def regenerate_client_api_key(
 )
 async def change_client_owner(
     findResult: ClientFromId,
-    new_owner_id: str,
+    new_owner_id: Annotated[str, Query()],
     clerk: ClerkSdk,
     db: Database
 ) -> CustomResponse:
     if not findResult.hasEditPerms:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not have permission to change the owner of this client"
+            status.HTTP_403_FORBIDDEN,
+            "You do not have permission to change the owner of this client"
         )
     if not await is_org_admin(new_owner_id, findResult.client.ownerId, clerk):
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not have permission to add clients to the new organization"
+            status.HTTP_403_FORBIDDEN,
+            "You do not have permission to add clients to the new organization"
         )
 
     await db[Client.Meta.collection_name()].update_one(
@@ -200,13 +206,13 @@ async def update_client(
 ) -> CustomResponse:
     if not findResult.hasEditPerms:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not have permission to edit this client"
+            status.HTTP_403_FORBIDDEN,
+            "You do not have permission to edit this client"
         )
 
     await db[Client.Meta.collection_name()].update_one(
         {"_id": findResult.client.id},
-        {"$set": to_doc(client_update)}
+        {"$set": {**to_doc(client_update), fields(Client).updatedAt: now()}}
     )
     return CustomResponse(message="Client updated successfully")
 
@@ -221,8 +227,8 @@ async def delete_client(
 ) -> CustomResponse:
     if not findResult.hasEditPerms:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not have permission to delete this client"
+            status.HTTP_403_FORBIDDEN,
+            "You do not have permission to delete this client"
         )
 
     await db[Client.Meta.collection_name()].delete_one({"_id": findResult.client.id})

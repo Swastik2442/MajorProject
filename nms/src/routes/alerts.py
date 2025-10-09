@@ -8,7 +8,16 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pymongo import DESCENDING
 
 from src.models import Client, Problem, Service
-from src.schemas import ClientsParams, DataResponse, PaginationParams, PaginatedDataResponse, StatCounts, StatHealthScores, StatTrends, TimePeriodParams
+from src.schemas import (
+    ClientsParams,
+    DataResponse,
+    PaginationParams,
+    PaginatedDataResponse,
+    StatCounts,
+    StatHealthScores,
+    StatTrends,
+    TimePeriodParams
+)
 from src.services.auth import ClerkSdk, JwtUserId
 from src.services.db import Database
 from src.models.utils import fields, now
@@ -32,7 +41,10 @@ async def get_clients(
             limit=1
         )
         if orgs is None or len(orgs.data) == 0:
-            raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Organization not found or you don't have access to it")
+            raise HTTPException(
+                status.HTTP_401_UNAUTHORIZED,
+                "Organization not found or you don't have access to it"
+            )
 
         return [
             Client(**doc) async for doc in db[Client.Meta.collection_name()].find({
@@ -61,7 +73,10 @@ async def get_clients(
             user_id=[user_id]
         )
         if orgs is None or len(orgs.data) != len(set(client.ownerId for client in clients)):
-            raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Client not found or you don't have access to it")
+            raise HTTPException(
+                status.HTTP_401_UNAUTHORIZED,
+                "Client not found or you don't have access to it"
+            )
 
         return clients
 
@@ -76,29 +91,44 @@ async def get_clients(
     ]
 ClientsFromQuery = Annotated[list[Client], Depends(get_clients)]
 
+class PaginationWithClientsParams(PaginationParams, ClientsParams):
+    pass
+
 @router.get("/problems", response_model=PaginatedDataResponse[list[Problem]])
-async def get_trigger_alerts(filter_query: Annotated[PaginationParams, Query()], clients: ClientsFromQuery, db: Database):
-    offset = (filter_query.page - 1) * filter_query.limit
+async def get_trigger_alerts(
+    query: Annotated[PaginationWithClientsParams, Query()],
+    user_id: JwtUserId,
+    clerk: ClerkSdk,
+    db: Database
+):
+    clients = await get_clients(query, user_id, clerk, db)
+    offset = (query.page - 1) * query.limit
     cursor = db[Problem.Meta.collection_name()].find(
         {fields(Problem).clientId: {"$in": [client.id for client in clients if client.id is not None]}},
         sort=[(fields(Problem).updatedAt, DESCENDING), (fields(Problem).createdAt, DESCENDING)],
         skip=offset,
-        limit=filter_query.limit
+        limit=query.limit
     )
     results = [Problem(**doc) async for doc in cursor]
-    return PaginatedDataResponse[list[Problem]](data=results, page=filter_query.page, limit=filter_query.limit)
+    return PaginatedDataResponse[list[Problem]](data=results, page=query.page, limit=query.limit)
 
 @router.get("/services", response_model=PaginatedDataResponse[list[Service]])
-async def get_service_alerts(filter_query: Annotated[PaginationParams, Query()], clients: ClientsFromQuery, db: Database):
-    offset = (filter_query.page - 1) * filter_query.limit
+async def get_service_alerts(
+    query: Annotated[PaginationWithClientsParams, Query()],
+    user_id: JwtUserId,
+    clerk: ClerkSdk,
+    db: Database
+):
+    clients = await get_clients(query, user_id, clerk, db)
+    offset = (query.page - 1) * query.limit
     cursor = db[Service.Meta.collection_name()].find(
         {fields(Service).clientId: {"$in": [client.id for client in clients if client.id is not None]}},
         sort=[(fields(Service).updatedAt, DESCENDING), (fields(Service).createdAt, DESCENDING)],
         skip=offset,
-        limit=filter_query.limit
+        limit=query.limit
     )
     results = [Service(**doc) async for doc in cursor]
-    return PaginatedDataResponse[list[Service]](data=results, page=filter_query.page, limit=filter_query.limit)
+    return PaginatedDataResponse[list[Service]](data=results, page=query.page, limit=query.limit)
 
 @router.get("/problems/count", response_model=DataResponse[StatCounts])
 async def get_trigger_alerts_count(clients: ClientsFromQuery, db: Database):
@@ -128,19 +158,29 @@ async def get_trigger_alerts_count(clients: ClientsFromQuery, db: Database):
         problemsInLastMonth=problemsInLastMonth
     ))
 
+class TimePeriodWithClientsParams(TimePeriodParams, ClientsParams):
+    pass
+
 IntervalSeconds = {'hour': 3600, 'day': 86400, 'week': 604800, 'month': 2592000}
 @router.get("/problems/trends", response_model=DataResponse[list[StatTrends]])
-async def get_trigger_alert_trends(search_query: Annotated[TimePeriodParams, Query()], clients: ClientsFromQuery, db: Database):
+async def get_trigger_alert_trends(
+    query: Annotated[TimePeriodWithClientsParams, Query()],
+    user_id: JwtUserId,
+    clerk: ClerkSdk,
+    db: Database
+):
+    clients = await get_clients(query, user_id, clerk, db)
+
     # Get specific time periods
     bins: list[tuple[datetime, datetime]] = []
-    intervalStr = "days" if search_query.interval == "month" else search_query.interval + "s"
-    intervalDiff = 30 if search_query.interval == "month" else 1
-    num_periods = ceil((search_query.end.timestamp() - search_query.start.timestamp()) / IntervalSeconds[search_query.interval])
+    intervalStr = "days" if query.interval == "month" else query.interval + "s"
+    intervalDiff = 30 if query.interval == "month" else 1
+    num_periods = ceil((query.end.timestamp() - query.start.timestamp()) / IntervalSeconds[query.interval])
     for i in range(num_periods):
-        bin_start = search_query.start + timedelta(**{intervalStr: i * intervalDiff})
+        bin_start = query.start + timedelta(**{intervalStr: i * intervalDiff})
         bin_end = bin_start + timedelta(**{intervalStr: intervalDiff})
-        if bin_end > search_query.end:
-            bins.append((bin_start, search_query.end))
+        if bin_end > query.end:
+            bins.append((bin_start, query.end))
             break
         bins.append((bin_start, bin_end))
 

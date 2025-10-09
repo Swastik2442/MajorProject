@@ -15,7 +15,7 @@ def get_api_key(
         return api_key_header
     if api_key_cookie:
         return api_key_cookie
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="API key not provided")
+    raise HTTPException(status.HTTP_401_UNAUTHORIZED, "API key not provided")
 
 def get_api_key_hash(
     api_key: str = Depends(get_api_key)
