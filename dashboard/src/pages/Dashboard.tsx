@@ -2,11 +2,11 @@
 import { useState } from "react";
 import { useOrganization } from "@clerk/clerk-react";
 import DashboardComponent from "@/components/dashboard";
-import ClientSelect, { type ClientParam } from "@/components/dashboard/ClientSelect";
+import { ClientSelect, CreateClientButton, type TClientSelectParam } from "@/components/client";
 
 export default function Dashboard() {
   const { organization } = useOrganization();
-  const [selectedClient, setSelectedClient] = useState<ClientParam>(null);
+  const [selectedClient, setSelectedClient] = useState<TClientSelectParam>(null);
 
   return (
     <div>
@@ -19,11 +19,14 @@ export default function Dashboard() {
               : `Dashboard - ${selectedClient.name}`
           }
         </h1>
-        <ClientSelect
-          org_id={organization?.id ?? null}
-          selectedClient={selectedClient}
-          setSelectedClient={setSelectedClient}
-        />
+        <div className="flex justify-between items-center gap-4">
+          <ClientSelect
+            org_id={organization?.id ?? null}
+            selectedClient={selectedClient}
+            setSelectedClient={setSelectedClient}
+          />
+          {organization && <CreateClientButton ownerId={organization.id} />}
+        </div>
       </div>
       <DashboardComponent
         client_id={Array.isArray(selectedClient) ? selectedClient.map(c => c._id) : (selectedClient?._id ?? null)}

@@ -3,16 +3,16 @@ import type { TClientListItem } from "@/schemas/api";
 import { apiService } from "@/services/api";
 import { MultiSelect } from "@/components/ui/multi-select";
 
-export type ClientParam = TClientListItem | TClientListItem[] | null;
+export type TClientSelectParam = TClientListItem | TClientListItem[] | null;
 
-export default function ClientSelect({
+export function ClientSelect({
     org_id,
     selectedClient,
     setSelectedClient
 }: {
     org_id: string | null;
-    selectedClient: ClientParam;
-    setSelectedClient: (c: ClientParam) => void;
+    selectedClient: TClientSelectParam;
+    setSelectedClient: (c: TClientSelectParam) => void;
 }) {
   const { data } = useQuery({
     queryKey: ["clients", org_id],
