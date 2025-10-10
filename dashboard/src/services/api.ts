@@ -2,8 +2,9 @@ import axios from "axios";
 import type {
   ApiService,
   TDataResponseClient,
+  TDataResponseClientListItem,
   TDataResponseStr,
-  TPaginatedClientDataResponse,
+  TPaginatedClientListItemDataResponse,
   TPaginatedProblemDataResponse,
   TPaginatedServiceDataResponse,
   TResponse,
@@ -100,7 +101,7 @@ export const apiService: ApiService = {
 
   listClients: async (page = 1, limit = 20, owner_id) => {
     try {
-      const response = await api.get<TPaginatedClientDataResponse>('/clients', { params: { page, limit, owner_id } });
+      const response = await api.get<TPaginatedClientListItemDataResponse>('/clients', { params: { page, limit, owner_id } });
       return response.data;
     } catch (err) {
       console.error('API error:', err);
@@ -110,7 +111,7 @@ export const apiService: ApiService = {
 
   getClient: async (client_id) => {
     try {
-      const response = await api.get<TDataResponseClient>(`/clients/${client_id}`);
+      const response = await api.get<TDataResponseClientListItem>(`/clients/${client_id}`);
       return response.data;
     } catch (err) {
       console.error('API error:', err);
