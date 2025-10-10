@@ -24,3 +24,6 @@ class ClientCreate(BaseModel):
 class ClientUpdate(BaseModel):
     name: str | None = Field(default_factory=none, title="Client Name", min_length=3, max_length=100)
     description: str | None = Field(default_factory=none, title="Client Description")
+
+class ClientListItem(BaseInterface, ClientCreate):
+    pass

@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from pymongo import DESCENDING
 
 from src.exceptions import HTTPException as CustomHTTPException
-from src.models import Client, ClientCreate, ClientUpdate
+from src.models import Client, ClientCreate, ClientListItem, ClientUpdate
 from src.models.utils import fields, now, to_doc
 from src.services.auth import ClerkSdk, JwtUserId, generate_api_key, get_api_key_hash
 from src.services.db import Database
@@ -21,10 +21,6 @@ router = APIRouter(
     prefix="/clients",
     tags=["clients"],
 )
-
-class ClientWithPerms(BaseModel):
-    client: Client
-    hasEditPerms: bool = False
 
 async def is_org_admin(
     org_id: str,
@@ -40,16 +36,23 @@ async def is_org_admin(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Org not found")
     return org.data[0].role == "admin"
 
+class ClientWithPerms(BaseModel):
+    client: ClientListItem
+    hasEditPerms: bool = False
+
 async def find_client_by_id(
     client_id: str,
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database
 ) -> ClientWithPerms:
-    client = await db[Client.Meta.collection_name()].find_one({"_id": client_id})
+    client = await db[Client.Meta.collection_name()].find_one(
+        {"_id": client_id},
+        {fields(Client).apiKey: False}
+    )
     if client is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Client not found")
-    client = Client(**client)
+    client = ClientListItem(**client)
 
     isAdmin = await is_org_admin(client.ownerId, user_id, clerk)
 
@@ -95,7 +98,7 @@ class PaginationWithOwnerId(PaginationParams):
 
 @router.get(
     "/",
-    response_model=PaginatedDataResponse[list[Client]],
+    response_model=PaginatedDataResponse[list[ClientListItem]],
     responses={404: {"model": CustomHTTPException}}
 )
 async def list_clients(
@@ -103,15 +106,16 @@ async def list_clients(
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database
-) -> PaginatedDataResponse[list[Client]]:
+) -> PaginatedDataResponse[list[ClientListItem]]:
     offset = (query.page - 1) * query.limit
     if query.owner_id is None:
         orgs = await clerk.organizations.list_async(user_id=[user_id], limit=50)
         if orgs is None or len(orgs.data) == 0:
-            return PaginatedDataResponse[list[Client]](data=[], page=query.page, limit=query.limit)
+            return PaginatedDataResponse[list[ClientListItem]](data=[], page=query.page, limit=query.limit)
 
         clients = await db[Client.Meta.collection_name()].find(
             {fields(Client).ownerId: {"$in": [org.id for org in orgs.data]}},
+            {fields(Client).apiKey: False},
             sort=[(fields(Client).updatedAt, DESCENDING), (fields(Client).createdAt, DESCENDING)],
             skip=offset,
             limit=query.limit
@@ -121,21 +125,22 @@ async def list_clients(
 
         clients = await db[Client.Meta.collection_name()].find(
             {fields(Client).ownerId: query.owner_id},
+            {fields(Client).apiKey: False},
             sort=[(fields(Client).updatedAt, DESCENDING), (fields(Client).createdAt, DESCENDING)],
             skip=offset,
             limit=query.limit
         ).to_list()
 
-    clients = [Client(**client) for client in clients]
-    return PaginatedDataResponse[list[Client]](data=clients, page=query.page, limit=query.limit)
+    clients = [ClientListItem(**client) for client in clients]
+    return PaginatedDataResponse[list[ClientListItem]](data=clients, page=query.page, limit=query.limit)
 
 @router.get(
     "/{client_id}",
-    response_model=DataResponse[Client],
+    response_model=DataResponse[ClientListItem],
     responses={404: {"model": CustomHTTPException}}
 )
 def get_client(findResult: ClientFromId):
-    return DataResponse[Client](data=findResult.client)
+    return DataResponse[ClientListItem](data=findResult.client)
 
 @router.put(
     "/{client_id}/regenerate_api_key",

@@ -18,6 +18,15 @@ export const ClientCreateSchema = z.object({
   description: z.string().nullable().optional(),
 });
 
+export const ClientListItemSchema = z.object({
+  _id: z.string().nullable().optional(),
+  createdAt: z.iso.datetime().optional(),
+  updatedAt: z.iso.datetime().optional(),
+  ownerId: z.string(),
+  name: z.string().min(3).max(100),
+  description: z.string().nullable().optional(),
+});
+
 export const ClientUpdateSchema = z.object({
   name: z.string().min(3).max(100).nullable().optional(),
   description: z.string().nullable().optional(),
@@ -156,7 +165,9 @@ export type TStatTrends = z.infer<typeof StatTrendsSchema>;
 
 export type TClient = z.infer<typeof ClientSchema>;
 export type TClientCreate = z.infer<typeof ClientCreateSchema>;
+export type TClientListItem = z.infer<typeof ClientListItemSchema>;
 export type TClientUpdate = z.infer<typeof ClientUpdateSchema>;
+export type TClientsParams = z.infer<typeof ClientsParamsSchema>;
 export type TRequestValidationError = z.infer<typeof RequestValidationErrorSchema>;
 export type TResponse = z.infer<typeof ResponseSchema>;
 
@@ -181,8 +192,11 @@ export type TStatHealthScoresDataResponse = z.infer<typeof StatHealthScoresDataR
 export const DataResponseClientSchema = DataResponseSchema(ClientSchema);
 export type TDataResponseClient = z.infer<typeof DataResponseClientSchema>;
 
-export const PaginatedClientDataResponseSchema = PaginatedDataResponseSchema(ClientSchema);
-export type TPaginatedClientDataResponse = z.infer<typeof PaginatedClientDataResponseSchema>;
+export const PaginatedClientListItemDataResponseSchema = PaginatedDataResponseSchema(z.array(ClientListItemSchema));
+export type TPaginatedClientListItemDataResponse = z.infer<typeof PaginatedClientListItemDataResponseSchema>;
+
+export const DataResponseClientListItemSchema = DataResponseSchema(ClientListItemSchema);
+export type TDataResponseClientListItem = z.infer<typeof DataResponseClientListItemSchema>;
 
 export const DataResponseStrSchema = z.object({
   status: z.enum(["success", "error"]),
@@ -226,8 +240,8 @@ export interface ApiService {
     page?: number,
     limit?: number,
     owner_id?: string | null
-  ) => Promise<TPaginatedClientDataResponse | null>;
-  getClient: (client_id: string) => Promise<TDataResponseClient | null>;
+  ) => Promise<TPaginatedClientListItemDataResponse | null>;
+  getClient: (client_id: string) => Promise<TDataResponseClientListItem | null>;
   updateClient: (client_id: string, update: TClientUpdate) => Promise<TResponse | null>;
   deleteClient: (client_id: string) => Promise<TResponse | null>;
   regenerateClientApiKey: (client_id: string) => Promise<TDataResponseStr | null>;
