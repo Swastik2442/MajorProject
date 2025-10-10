@@ -19,12 +19,12 @@ export const ClientCreateSchema = z.object({
 });
 
 export const ClientListItemSchema = z.object({
-  _id: z.string().nullable().optional(),
-  createdAt: z.iso.datetime().optional(),
-  updatedAt: z.iso.datetime().optional(),
+  _id: z.string(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
   ownerId: z.string(),
   name: z.string().min(3).max(100),
-  description: z.string().nullable().optional(),
+  description: z.string().nullable(),
 });
 
 export const ClientUpdateSchema = z.object({
@@ -192,7 +192,7 @@ export type TStatHealthScoresDataResponse = z.infer<typeof StatHealthScoresDataR
 export const DataResponseClientSchema = DataResponseSchema(ClientSchema);
 export type TDataResponseClient = z.infer<typeof DataResponseClientSchema>;
 
-export const PaginatedClientListItemDataResponseSchema = PaginatedDataResponseSchema(z.array(ClientListItemSchema));
+export const PaginatedClientListItemDataResponseSchema = PaginatedDataResponseSchema(ClientListItemSchema);
 export type TPaginatedClientListItemDataResponse = z.infer<typeof PaginatedClientListItemDataResponseSchema>;
 
 export const DataResponseClientListItemSchema = DataResponseSchema(ClientListItemSchema);

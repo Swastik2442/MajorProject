@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { BarChart, Bar, ResponsiveContainer } from "recharts";
+import type { TClientsParams } from "../../schemas/api";
 import { apiService } from "../../services/api";
 
-export default function HostScorecards() {
+export default function HostScorecards({ client_id = null, org_id = null }: TClientsParams) {
   const { data } = useQuery({
-    queryKey: ["hostHealthScores"],
-    queryFn: apiService.fetchHostsHealthScores,
+    queryKey: ["hostHealthScores", client_id, org_id],
+    queryFn: () => apiService.fetchHostsHealthScores(client_id, org_id),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
   const hosts = data?.data ?? [];

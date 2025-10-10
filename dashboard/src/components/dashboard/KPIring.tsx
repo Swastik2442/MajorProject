@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { PieChart, Pie, Cell } from "recharts";
+import type { TClientsParams } from "../../schemas/api";
 import { apiService } from "../../services/api";
 
-export default function KPIring() {
+export default function KPIring({ client_id = null, org_id = null }: TClientsParams) {
   const { data: actual } = useQuery({
-    queryKey: ["problemsCount"],
-    queryFn: apiService.fetchProblemsCount,
+    queryKey: ["problemsCount", client_id, org_id],
+    queryFn: () => apiService.fetchProblemsCount(client_id, org_id),
     staleTime: 15 * 60 * 1000, // 15 minutes
   });
 

@@ -9,16 +9,19 @@ import {
   Legend,
   CartesianGrid,
 } from "recharts";
+import type { TClientsParams } from "../../schemas/api";
 import { apiService } from "../../services/api";
 
-export default function TrendsChart() {
+export default function TrendsChart({ client_id = null, org_id = null }: TClientsParams) {
   const { data } = useQuery({
-    queryKey: ["problemTrends"],
+    queryKey: ["problemTrends", client_id, org_id],
     queryFn: () =>
       apiService.fetchProblemsTrends(
         new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
         new Date().toISOString(),
-        "hour"
+        "hour",
+        client_id,
+        org_id
       ),
     staleTime: 60 * 60 * 1000,
   });
