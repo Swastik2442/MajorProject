@@ -30,7 +30,11 @@ export default function Dashboard() {
       </div>
       <DashboardComponent
         client_id={Array.isArray(selectedClient) ? selectedClient.map(c => c._id) : (selectedClient?._id ?? null)}
-        org_id={organization?.id ?? null}
+        org_id={ // If no client is selected, pass org_id to show org-wide data
+          (selectedClient === null || (Array.isArray(selectedClient) && selectedClient.length == 0))
+          ? (organization?.id ?? null)
+          : null
+        }
       />
     </div>
   );

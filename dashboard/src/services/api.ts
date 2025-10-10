@@ -91,7 +91,7 @@ export const apiService: ApiService = {
 
   createClient: async (data) => {
     try {
-      const response = await api.post<TDataResponseClient>('/clients', { data });
+      const response = await api.post<TDataResponseClient>('/clients', { ...data });
       return response.data;
     } catch (err) {
       console.error('API error:', err);
@@ -121,7 +121,7 @@ export const apiService: ApiService = {
 
   updateClient: async (client_id, data) => {
     try {
-      const response = await api.put<TResponse>(`/clients/${client_id}`, { data });
+      const response = await api.put<TResponse>(`/clients/${client_id}`, { ...data });
       return response.data;
     } catch (err) {
       console.error('API error:', err);
@@ -151,7 +151,7 @@ export const apiService: ApiService = {
 
   changeClientOwner: async (client_id, new_owner_id) => {
     try {
-      const response = await api.put<TResponse>(`/clients/${client_id}/change-owner`, { data: { new_owner_id } });
+      const response = await api.put<TResponse>(`/clients/${client_id}/change-owner`, { new_owner_id });
       return response.data;
     } catch (err) {
       console.error('API error:', err);

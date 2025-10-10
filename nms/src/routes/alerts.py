@@ -4,10 +4,14 @@ from datetime import datetime, timedelta
 from math import ceil
 from typing import Annotated
 
+from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pymongo import DESCENDING
 
-from src.models import Client, Problem, Service
+from src.models import Client, ClientListItem, Problem, Service
+from src.models.utils import fields, now
+from src.services.auth import ClerkSdk, JwtUserId
+from src.services.db import Database
 from src.schemas import (
     ClientsParams,
     DataResponse,
@@ -18,9 +22,6 @@ from src.schemas import (
     StatTrends,
     TimePeriodParams
 )
-from src.services.auth import ClerkSdk, JwtUserId
-from src.services.db import Database
-from src.models.utils import fields, now
 
 router = APIRouter(
     prefix="/alerts",
@@ -32,7 +33,7 @@ async def get_clients(
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database
-) -> list[Client]:
+) -> list[ClientListItem]:
     # Get all Clients in the Org
     if clients_query.org_id is not None:
         orgs = await clerk.organizations.list_async(
@@ -47,32 +48,36 @@ async def get_clients(
             )
 
         return [
-            Client(**doc) async for doc in db[Client.Meta.collection_name()].find({
-                fields(Client).ownerId: orgs.data[0].id
-            })
+            ClientListItem(**doc) async for doc in db[Client.Meta.collection_name()].find(
+                {fields(Client).ownerId: orgs.data[0].id},
+                {fields(Client).apiKey: False}
+            )
         ]
 
     # Get specific Clients by ID(s)
     if clients_query.client_id is not None:
-        if isinstance(clients_query.client_id, str):
-            client = await db[Client.Meta.collection_name()].find_one({
-                fields(Client).id: clients_query.client_id
-            })
+        if isinstance(clients_query.client_id, str): # Single ID
+            client = await db[Client.Meta.collection_name()].find_one(
+                {"_id": ObjectId(clients_query.client_id)},
+                {fields(Client).apiKey: False}
+            )
             if client is None:
                 raise HTTPException(status.HTTP_404_NOT_FOUND, "Client not found")
-            clients = [Client(**client)]
-        else:
+            clients = [ClientListItem(**client)]
+        else:                                        # List of IDs
             clients = [
-                Client(**doc) async for doc in db[Client.Meta.collection_name()].find({
-                    fields(Client).id: {"$in": clients_query.client_id}
-                })
+                ClientListItem(**doc) async for doc in db[Client.Meta.collection_name()].find(
+                    {"_id": {"$in": [ObjectId(cid) for cid in clients_query.client_id]}},
+                    {fields(Client).apiKey: False}
+                )
             ]
 
+        # Ensure user has access to all requested Clients
         orgs = await clerk.organizations.list_async(
             organization_id=[client.ownerId for client in clients],
             user_id=[user_id]
         )
-        if orgs is None or len(orgs.data) != len(set(client.ownerId for client in clients)):
+        if orgs is None or orgs.total_count != len(set(client.ownerId for client in clients)):
             raise HTTPException(
                 status.HTTP_401_UNAUTHORIZED,
                 "Client not found or you don't have access to it"
@@ -85,11 +90,12 @@ async def get_clients(
     if orgs is None or len(orgs.data) == 0:
         return []
     return [
-        Client(**doc) async for doc in db[Client.Meta.collection_name()].find({
-            fields(Client).ownerId: {"$in": [org.id for org in orgs.data]}
-        })
+        ClientListItem(**doc) async for doc in db[Client.Meta.collection_name()].find(
+            {fields(Client).ownerId: {"$in": [org.id for org in orgs.data]}},
+            {fields(Client).apiKey: False}
+        )
     ]
-ClientsFromQuery = Annotated[list[Client], Depends(get_clients)]
+ClientsFromQuery = Annotated[list[ClientListItem], Depends(get_clients)]
 
 class PaginationWithClientsParams(PaginationParams, ClientsParams):
     pass
@@ -132,7 +138,7 @@ async def get_service_alerts(
 
 @router.get("/problems/count", response_model=DataResponse[StatCounts])
 async def get_trigger_alerts_count(clients: ClientsFromQuery, db: Database):
-    curr = now().timestamp()
+    curr = now()
     clientIds = [client.id for client in clients if client.id is not None]
     activeProblems = await db[Problem.Meta.collection_name()].count_documents({
         fields(Problem).clientId: {"$in": clientIds},
@@ -140,15 +146,15 @@ async def get_trigger_alerts_count(clients: ClientsFromQuery, db: Database):
     })
     problemsInLast24Hours = await db[Problem.Meta.collection_name()].count_documents({
         fields(Problem).clientId: {"$in": clientIds},
-        fields(Problem).createdAt: {"$gte": (curr - 86400)}  # type: ignore
+        fields(Problem).createdAt: {"$gte": curr - timedelta(days=1)} # type: ignore
     })
     problemsInLastWeek = await db[Problem.Meta.collection_name()].count_documents({
         fields(Problem).clientId: {"$in": clientIds},
-        fields(Problem).createdAt: {"$gte": (curr - 604800)}  # type: ignore
+        fields(Problem).createdAt: {"$gte": curr - timedelta(weeks=1)} # type: ignore
     })
     problemsInLastMonth = await db[Problem.Meta.collection_name()].count_documents({
         fields(Problem).clientId: {"$in": clientIds},
-        fields(Problem).createdAt: {"$gte": (curr - 2592000)}  # type: ignore
+        fields(Problem).createdAt: {"$gte": curr - timedelta(days=30)} # type: ignore
     })
 
     return DataResponse[StatCounts](data=StatCounts(

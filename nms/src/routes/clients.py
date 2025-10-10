@@ -3,6 +3,7 @@
 import logging
 from typing import Annotated
 
+from bson import ObjectId
 from fastapi import APIRouter, Depends, Query, status
 from fastapi.exceptions import HTTPException
 from pydantic import BaseModel
@@ -34,7 +35,7 @@ async def is_org_admin(
     )
     if org is None or len(org.data) == 0:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Org not found")
-    return org.data[0].role == "admin"
+    return org.data[0].role == "org:admin"
 
 class ClientWithPerms(BaseModel):
     client: ClientListItem
@@ -47,7 +48,7 @@ async def find_client_by_id(
     db: Database
 ) -> ClientWithPerms:
     client = await db[Client.Meta.collection_name()].find_one(
-        {"_id": client_id},
+        {"_id": ObjectId(client_id)},
         {fields(Client).apiKey: False}
     )
     if client is None:
@@ -87,6 +88,7 @@ async def create_client(
     new_client.id = (await db[Client.Meta.collection_name()].insert_one(
         to_doc(new_client)
     )).inserted_id
+    new_client.apiKey = api_key # Return the plain API key only on creation
     return DataResponse[Client](data=new_client)
 
 class PaginationWithOwnerId(PaginationParams):

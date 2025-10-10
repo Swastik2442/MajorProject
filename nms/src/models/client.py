@@ -3,7 +3,7 @@
 from pydantic import BaseModel, Field
 
 from .base import BaseInterface
-from .utils import PyObjectId, none
+from .utils import none
 
 class Client(BaseInterface):
     class Meta(BaseInterface.Meta):
@@ -11,13 +11,13 @@ class Client(BaseInterface):
         def collection_name(cls) -> str:
             return "clients"
 
-    ownerId: PyObjectId = Field(title="Owner ID", description="ID of the Org who owns this Client")
+    ownerId: str = Field(title="Owner ID", description="ID of the Org who owns this Client")
     apiKey: str = Field(title="Client API Key", description="API Key for the Client")
     name: str = Field(title="Client Name", min_length=3, max_length=100)
     description: str | None = Field(default_factory=none, title="Client Description")
 
 class ClientCreate(BaseModel):
-    ownerId: PyObjectId = Field(title="Owner ID", description="ID of the Org who owns this Client")
+    ownerId: str = Field(title="Owner ID", description="ID of the Org who owns this Client")
     name: str = Field(title="Client Name", min_length=3, max_length=100)
     description: str | None = Field(default_factory=none, title="Client Description")
 
