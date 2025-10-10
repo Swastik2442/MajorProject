@@ -1,7 +1,13 @@
+import { useState } from "react";
+import { useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
+import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
+import { PlusIcon } from "lucide-react";
 import { ClientCreateSchema } from "@/schemas/api";
+import { apiService } from "@/services/api";
+import { API_KEY_TEMP_STORAGE_KEY } from "@/config";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,19 +22,12 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useMutation } from "@tanstack/react-query";
-import { apiService } from "@/services/api";
-import { PlusIcon } from "lucide-react";
-import { useState } from "react";
-import { useNavigate } from "react-router";
-import { API_KEY_TEMP_STORAGE_KEY } from "@/config";
 
 const formSchema = ClientCreateSchema.pick({ name: true, description: true }).extend({
   description: ClientCreateSchema.shape.description.unwrap().unwrap()
@@ -92,11 +91,8 @@ export function CreateClientDialog({ ownerId, children }: { ownerId: string; chi
                     <FormItem>
                       <FormLabel>Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="shadcn" {...field} />
+                        <Input placeholder="Client" {...field} />
                       </FormControl>
-                      <FormDescription>
-                        Client Name
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -112,9 +108,6 @@ export function CreateClientDialog({ ownerId, children }: { ownerId: string; chi
                       <FormControl>
                         <Input placeholder="XYZ Corporation" {...field} />
                       </FormControl>
-                      <FormDescription>
-                        Client Description
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
