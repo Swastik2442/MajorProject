@@ -1,7 +1,5 @@
 // src/pages/Dashboard.tsx
 import { useEffect, useState } from "react";
-import { dark } from "@clerk/themes";
-import { OrganizationSwitcher, UserButton } from "@clerk/clerk-react";
 import AlertBanner from "../components/dashboard/AlertBanner";
 import StatusCards from "../components/dashboard/StatusCards";
 import ActivityStream from "../components/dashboard/ActivityStream";
@@ -21,29 +19,10 @@ export default function Dashboard() {
 
   return (
     <div
-      className={`min-h-screen w-full bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white p-6 transition-all duration-500 ease-out transform ${
+      className={`bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white transition-all duration-500 ease-out transform ${
         mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
       }`}
     >
-      {/* Page Title */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold leading-tight">
-          Unified Operations & Predictive Insight Dashboard
-        </h1>
-        <div className="flex items-center justify-between space-x-4">
-          <OrganizationSwitcher
-            hidePersonal={true}
-            afterCreateOrganizationUrl={(org) => `org/${org.id}`}
-            afterLeaveOrganizationUrl='/'
-            afterSelectOrganizationUrl={(org) => `org/${org.id}`}
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            appearance={{ theme: dark }}
-          />
-          {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
-          <UserButton appearance={{ theme: dark }} />
-        </div>
-      </div>
-
       {/* Alert Banner */}
       <AlertBanner text="SQL Injection on DB-SRV01 - High" />
 

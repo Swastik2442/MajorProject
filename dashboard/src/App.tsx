@@ -1,9 +1,10 @@
-import { createBrowserRouter, Outlet } from "react-router";
+import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ClerkProvider, SignedIn, SignedOut } from "@clerk/clerk-react";
 import PrivateRoutes from "./components/PrivateRoutes";
 import RootErrorBoundary from "./components/RootErrorBoundary";
+import AppLayout from "./layouts/AppLayout";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -14,13 +15,14 @@ import "./globals.css";
 
 const router = createBrowserRouter([
   {
-    element: <Outlet />,
+    path: "/login",
+    element: <Login />,
+    errorElement: <RootErrorBoundary />,
+  },
+  {
+    element: <AppLayout />,
     errorElement: <RootErrorBoundary />,
     children: [
-      {
-        path: "/login",
-        element: <Login />,
-      },
       {
         path: "/",
         element: (<>
@@ -58,7 +60,7 @@ if (!CLERK_PUBLISHABLE_KEY) {
 
 export default function App() {
   return (
-    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} afterSignOutUrl="/login">
+    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} afterSignOutUrl="/">
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
       </QueryClientProvider>

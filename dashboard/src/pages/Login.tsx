@@ -1,7 +1,7 @@
 import { Navigate } from "react-router";
-import { SignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
-import NetworkBackground from "../components/NetworkBackground.js";
-import { dark } from "@clerk/themes";
+import { SignedIn, SignedOut } from "@clerk/clerk-react";
+import NetworkBackground from "../components/NetworkBackground";
+import { SignIn } from "../components/clerk";
 
 export default function Login() {
   return (
@@ -11,8 +11,7 @@ export default function Login() {
         <Navigate to="/" replace />
       </SignedIn>
       <SignedOut>
-        {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
-        <SignIn appearance={{ theme: dark }} />
+        <SignIn />
       </SignedOut>
     </div>
   );
