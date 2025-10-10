@@ -140,9 +140,14 @@ async def get_service_alerts(
 async def get_trigger_alerts_count(clients: ClientsFromQuery, db: Database):
     curr = now()
     clientIds = [client.id for client in clients if client.id is not None]
-    activeProblems = await db[Problem.Meta.collection_name()].count_documents({
+    totalActiveProblems = await db[Problem.Meta.collection_name()].count_documents({
         fields(Problem).clientId: {"$in": clientIds},
         fields(Problem).status: {"$ne": "Recovered"}
+    })
+    activeProblemsInLast24Hours = await db[Problem.Meta.collection_name()].count_documents({
+        fields(Problem).clientId: {"$in": clientIds},
+        fields(Problem).status: {"$ne": "Recovered"},
+        fields(Problem).createdAt: {"$gte": curr - timedelta(days=1)} # type: ignore
     })
     problemsInLast24Hours = await db[Problem.Meta.collection_name()].count_documents({
         fields(Problem).clientId: {"$in": clientIds},
@@ -158,7 +163,8 @@ async def get_trigger_alerts_count(clients: ClientsFromQuery, db: Database):
     })
 
     return DataResponse[StatCounts](data=StatCounts(
-        activeProblems=activeProblems,
+        totalActiveProblems=totalActiveProblems,
+        activeProblemsInLast24Hours=activeProblemsInLast24Hours,
         problemsInLast24Hours=problemsInLast24Hours,
         problemsInLastWeek=problemsInLastWeek,
         problemsInLastMonth=problemsInLastMonth
@@ -245,58 +251,77 @@ async def get_trigger_alert_trends(
 async def get_hosts_health_scores(clients: ClientsFromQuery, db: Database):
     # Aggregate problem severity counts per host
     pipeline = [
+        # Get relevant problems for the clients
         {"$match": {
-            fields(Service).clientId: {"$in": [client.id for client in clients if client.id is not None]},
-            fields(Problem).status: {"$ne": "Recovered"}}
-        },
+            fields(Service).clientId: {"$in": [c.id for c in clients if c.id is not None]}
+        }},
+
+        # Get relevant fields only
+        {"$project": {
+            fields(Problem).hostname: 1,
+            fields(Problem).severity: 1,
+            fields(Problem).status: 1
+        }},
+
+        # Group all problems by hostname
         {"$group": {
             "_id": "$" + fields(Problem).hostname,
-            "totalProblems": {"$sum": 1},
-            "notClassified": {"$sum": {"$cond": [{"$eq": ["$" + fields(Problem).severity, "Not classified"]}, 1, 0]}},
-            "information": {"$sum": {"$cond": [{"$eq": ["$" + fields(Problem).severity, "Information"]}, 1, 0]}},
-            "warning": {"$sum": {"$cond": [{"$eq": ["$" + fields(Problem).severity, "Warning"]}, 1, 0]}},
-            "average": {"$sum": {"$cond": [{"$eq": ["$" + fields(Problem).severity, "Average"]}, 1, 0]}},
-            "high": {"$sum": {"$cond": [{"$eq": ["$" + fields(Problem).severity, "High"]}, 1, 0]}},
-            "disaster": {"$sum": {"$cond": [{"$eq": ["$" + fields(Problem).severity, "Disaster"]}, 1, 0]}},
+            "totalProblems": {"$sum": {"$cond": [{"$ne": ["$" + fields(Problem).status, "Recovered"]}, 1, 0]}},
+            "notClassified": {"$sum": {"$cond": [{"$and": [
+                {"$eq": ["$" + fields(Problem).severity, "Not classified"]},
+                {"$ne": ["$" + fields(Problem).status, "Recovered"] }
+            ]}, 1, 0]}},
+            "information": {"$sum": {"$cond": [{"$and": [
+                {"$eq": ["$" + fields(Problem).severity, "Information"]},
+                {"$ne": ["$" + fields(Problem).status, "Recovered"]}]
+            }, 1, 0]}},
+            "warning": {"$sum": {"$cond": [{"$and": [
+                { "$eq": ["$" + fields(Problem).severity, "Warning"] },
+                { "$ne": ["$" + fields(Problem).status, "Recovered"] }
+            ]}, 1, 0]}},
+            "average": {"$sum": {"$cond": [{"$and": [
+                {"$eq": ["$" + fields(Problem).severity, "Average"]},
+                {"$ne": ["$" + fields(Problem).status, "Recovered"]}
+            ]}, 1, 0]}},
+            "high": {"$sum": {"$cond": [{"$and": [
+                {"$eq": ["$" + fields(Problem).severity, "High"]},
+                {"$ne": ["$" + fields(Problem).status, "Recovered"]}
+            ]}, 1, 0]}},
+            "disaster": {"$sum": {"$cond": [{"$and": [
+                { "$eq": ["$" + fields(Problem).severity, "Disaster"]},
+                { "$ne": ["$" + fields(Problem).status, "Recovered"] }
+            ]}, 1, 0]}}
         }},
-        {"$project": {
-            "totalProblems": 1,
-            "notClassified": 1,
-            "information": 1,
-            "warning": 1,
-            "average": 1,
-            "high": 1,
-            "disaster": 1,
-            "healthScore": {
-                "$cond": [
-                    {"$eq": ["$totalProblems", 0]},
-                    100,
-                    {"$max": [0, { # max(0, 100 - (100 * (weighted_score / (50 * total_problems))))
-                        "$subtract": [
+
+        # Compute healthScore
+        {"$addFields": {
+            "healthScore": {"$cond": [
+                {"$eq": ["$totalProblems", 0]},
+                100,
+                {"$max": [ # max(0, 100 - (100 * (weighted_score / (50 * total_problems))))
+                    0,
+                    {"$subtract": [
+                        100,
+                        {"$multiply": [
                             100,
-                            {"$multiply": [
-                                100,
-                                {
-                                    "$divide": [
-                                        {"$add": [
-                                            {"$multiply": ["$notClassified", 1]},
-                                            {"$multiply": ["$information", 3]},
-                                            {"$multiply": ["$warning", 5]},
-                                            {"$multiply": ["$average", 10]},
-                                            {"$multiply": ["$high", 20]},
-                                            {"$multiply": ["$disaster", 50]},
-                                        ]},
-                                        { "$multiply": ["$totalProblems", 50] }
-                                    ]
-                                }
+                            {"$divide": [
+                                {"$add": [
+                                    {"$multiply": ["$notClassified", 1]},
+                                    {"$multiply": ["$information", 3]},
+                                    {"$multiply": ["$warning", 5]},
+                                    {"$multiply": ["$average", 10]},
+                                    {"$multiply": ["$high", 20]},
+                                    {"$multiply": ["$disaster", 50]}
+                                ]},
+                                {"$multiply": ["$totalProblems", 50]}
                             ]}
-                        ]
-                    }]}
-                ]
-            }
-        }},
-        {"$sort": {"healthScore": -1}}
+                        ]}
+                    ]}
+                ]}
+            ]}
+        }}
     ]
+
     cursor = await db[Problem.Meta.collection_name()].aggregate(pipeline)
     results = [StatHealthScores(**doc) async for doc in cursor]
     return DataResponse[list[StatHealthScores]](data=results)

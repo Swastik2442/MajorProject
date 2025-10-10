@@ -10,12 +10,12 @@ export default function KPIring({ client_id = null, org_id = null }: TClientsPar
     staleTime: 15 * 60 * 1000, // 15 minutes
   });
 
-  const counts = actual?.data ?? { activeProblems: 0, problemsInLast24Hours: 0 };
+  const counts = actual?.data ?? { activeProblemsInLast24Hours: 0, problemsInLast24Hours: 0 };
 
   // Safe percent calculation (avoid misleading 100% when denominator = 0)
   const resolvedCount = Math.max(
     0,
-    counts.problemsInLast24Hours - counts.activeProblems
+    counts.problemsInLast24Hours - counts.activeProblemsInLast24Hours
   );
   const denominator = counts.problemsInLast24Hours || 1;
   const percent = Math.round((resolvedCount / denominator) * 100);

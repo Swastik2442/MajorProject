@@ -47,7 +47,8 @@ class PaginatedDataResponse(DataResponse, PaginationParams, Generic[TData]):
     data: TData | None = Field(default_factory=none)
 
 class StatCounts(BaseModel):
-    activeProblems: int = Field(ge=0)
+    totalActiveProblems: int = Field(ge=0)
+    activeProblemsInLast24Hours: int = Field(ge=0)
     problemsInLast24Hours: int = Field(ge=0)
     problemsInLastWeek: int = Field(ge=0)
     problemsInLastMonth: int = Field(ge=0)

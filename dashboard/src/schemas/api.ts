@@ -115,7 +115,8 @@ export const ServiceSchema = z.object({
 });
 
 export const StatCountsSchema = z.object({
-  activeProblems: z.number().int().min(0),
+  totalActiveProblems: z.number().int().min(0),
+  activeProblemsInLast24Hours: z.number().int().min(0),
   problemsInLast24Hours: z.number().int().min(0),
   problemsInLastWeek: z.number().int().min(0),
   problemsInLastMonth: z.number().int().min(0),

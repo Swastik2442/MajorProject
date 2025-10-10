@@ -10,7 +10,7 @@ export default function StatusCards({ client_id = null, org_id = null }: TClient
   });
 
   const counts = data?.data ?? {
-    activeProblems: 0,
+    totalActiveProblems: 0,
     problemsInLast24Hours: 0,
     problemsInLastWeek: 0,
     problemsInLastMonth: 0,
@@ -24,7 +24,7 @@ export default function StatusCards({ client_id = null, org_id = null }: TClient
           Current Status
         </div>
         <div className="mt-2 text-5xl font-extrabold text-red-500">
-          {counts.activeProblems}
+          {counts.totalActiveProblems}
         </div>
         <div className="mt-1 text-sm text-gray-300">
           Total Active Problems
