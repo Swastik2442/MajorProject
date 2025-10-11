@@ -1,8 +1,13 @@
 import axios from "axios";
 import type {
   ApiService,
+  TDataResponseClient,
+  TDataResponseClientListItem,
+  TDataResponseStr,
+  TPaginatedClientListItemDataResponse,
   TPaginatedProblemDataResponse,
   TPaginatedServiceDataResponse,
+  TResponse,
   TStatCountsDataResponse,
   TStatHealthScoresDataResponse,
   TStatTrendsDataResponse
@@ -31,9 +36,9 @@ api.interceptors.request.use(async (config) => {
 });
 
 export const apiService: ApiService = {
-  fetchProblems: async (page = 1, limit = 20) => {
+  fetchProblems: async (page = 1, limit = 20, client_id, org_id) => {
     try {
-      const response = await api.get<TPaginatedProblemDataResponse>('/alerts/problems', { params: { page, limit } });
+      const response = await api.get<TPaginatedProblemDataResponse>('/alerts/problems', { params: { client_id, org_id, page, limit } });
       return response.data;
     } catch (err) {
       console.error('API error:', err);
@@ -41,9 +46,9 @@ export const apiService: ApiService = {
     }
   },
 
-  fetchServiceAlerts: async (page = 1, limit = 20) => {
+  fetchServiceAlerts: async (page = 1, limit = 20, client_id, org_id) => {
     try {
-      const response = await api.get<TPaginatedServiceDataResponse>('/alerts/services', { params: { page, limit } });
+      const response = await api.get<TPaginatedServiceDataResponse>('/alerts/services', { params: { client_id, org_id, page, limit } });
       return response.data;
     } catch (err) {
       console.error('API error:', err);
@@ -51,9 +56,9 @@ export const apiService: ApiService = {
     }
   },
 
-  fetchProblemsCount: async () => {
+  fetchProblemsCount: async (client_id, org_id) => {
     try {
-      const response = await api.get<TStatCountsDataResponse>('/alerts/problems/count');
+      const response = await api.get<TStatCountsDataResponse>('/alerts/problems/count', { params: { client_id, org_id } });
       return response.data;
     } catch (err) {
       console.error('API error:', err);
@@ -61,9 +66,9 @@ export const apiService: ApiService = {
     }
   },
 
-  fetchProblemsTrends: async (start, end, interval) => {
+  fetchProblemsTrends: async (start, end, interval, client_id, org_id) => {
     try {
-      const params: Record<string, string> = { start };
+      const params: Record<string, string | string[] | null | undefined> = { start, client_id, org_id };
       if (end) params.end = end;
       if (interval) params.interval = interval;
       const response = await api.get<TStatTrendsDataResponse>('/alerts/problems/trends', { params });
@@ -74,9 +79,79 @@ export const apiService: ApiService = {
     }
   },
 
-  fetchHostsHealthScores: async () => {
+  fetchHostsHealthScores: async (client_id, org_id) => {
     try {
-      const response = await api.get<TStatHealthScoresDataResponse>('/alerts/hosts/health');
+      const response = await api.get<TStatHealthScoresDataResponse>('/alerts/hosts/health', { params: { client_id, org_id } });
+      return response.data;
+    } catch (err) {
+      console.error('API error:', err);
+      return null;
+    }
+  },
+
+  createClient: async (data) => {
+    try {
+      const response = await api.post<TDataResponseClient>('/clients', { ...data });
+      return response.data;
+    } catch (err) {
+      console.error('API error:', err);
+      return null;
+    }
+  },
+
+  listClients: async (page = 1, limit = 20, owner_id) => {
+    try {
+      const response = await api.get<TPaginatedClientListItemDataResponse>('/clients', { params: { page, limit, owner_id } });
+      return response.data;
+    } catch (err) {
+      console.error('API error:', err);
+      return null;
+    }
+  },
+
+  getClient: async (client_id) => {
+    try {
+      const response = await api.get<TDataResponseClientListItem>(`/clients/${client_id}`);
+      return response.data;
+    } catch (err) {
+      console.error('API error:', err);
+      return null;
+    }
+  },
+
+  updateClient: async (client_id, data) => {
+    try {
+      const response = await api.put<TResponse>(`/clients/${client_id}`, { ...data });
+      return response.data;
+    } catch (err) {
+      console.error('API error:', err);
+      return null;
+    }
+  },
+
+  deleteClient: async (client_id) => {
+    try {
+      const response = await api.delete<TResponse>(`/clients/${client_id}`);
+      return response.data;
+    } catch (err) {
+      console.error('API error:', err);
+      return null;
+    }
+  },
+
+  regenerateClientApiKey: async (client_id) => {
+    try {
+      const response = await api.put<TDataResponseStr>(`/clients/${client_id}/regenerate-api-key`);
+      return response.data;
+    } catch (err) {
+      console.error('API error:', err);
+      return null;
+    }
+  },
+
+  changeClientOwner: async (client_id, new_owner_id) => {
+    try {
+      const response = await api.put<TResponse>(`/clients/${client_id}/change-owner`, { new_owner_id });
       return response.data;
     } catch (err) {
       console.error('API error:', err);

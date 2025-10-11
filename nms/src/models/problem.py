@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 
 from src.templates.models import Severity
 from .base import BaseInterface
-from .utils import MyDatetime, none, now
+from .utils import MyDatetime, PyObjectId, none, now
 
 class Update(BaseModel):
     action: str = Field()
@@ -18,6 +18,7 @@ class Problem(BaseInterface):
         def collection_name(cls) -> str:
             return "problems"
 
+    clientId: PyObjectId = Field(title="Client ID", description="ID of the Client who reported this Problem")
     zid: str = Field(title="Zabbix Event ID")
     name: str = Field(title="Zabbix Event Name")
     startedAt: MyDatetime = Field()

@@ -5,8 +5,11 @@ export default function NetworkBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current!;
-    const ctx = canvas.getContext("2d")!;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
@@ -29,6 +32,7 @@ export default function NetworkBackground() {
 
     let lastFrame = 0;
     function animate(time: number) {
+      if (!ctx) return;
       const delta = time - lastFrame;
       if (delta < 16) {
         requestAnimationFrame(animate);
@@ -68,7 +72,7 @@ export default function NetworkBackground() {
           const distSq = dx * dx + dy * dy;
           if (distSq < maxDistance * maxDistance) {
             const alpha = 1 - Math.sqrt(distSq) / maxDistance;
-            ctx.strokeStyle = `rgba(0, 255, 255, ${alpha * 0.3})`;
+            ctx.strokeStyle = `rgba(0, 255, 255, ${(alpha * 0.3).toString()})`;
             ctx.lineWidth = 0.4;
             ctx.beginPath();
             ctx.moveTo(dotA.x, dotA.y);

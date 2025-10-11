@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { LineChart, Line, ResponsiveContainer } from "recharts";
+import type { TClientsParams } from "../../schemas/api";
 import { apiService } from "../../services/api";
 import LoadingSpinner from "./LoadingSpinner";
 
@@ -22,10 +23,10 @@ function MiniSpark({ data = [] }: { data: { v: number }[] }) {
   );
 }
 
-export default function ActivityStream() {
+export default function ActivityStream({ client_id = null, org_id = null }: TClientsParams) {
   const { data, isError, error, isPending } = useQuery({
-    queryKey: ["problems"],
-    queryFn: () => apiService.fetchProblems(1, 8),
+    queryKey: ["problems", client_id, org_id],
+    queryFn: () => apiService.fetchProblems(1, 8, client_id, org_id),
   });
 
   if (isPending) {

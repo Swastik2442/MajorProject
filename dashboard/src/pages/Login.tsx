@@ -1,6 +1,7 @@
 import { Navigate } from "react-router";
-import { SignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
-import NetworkBackground from "../components/NetworkBackground.js";
+import { SignedIn, SignedOut } from "@clerk/clerk-react";
+import NetworkBackground from "../components/NetworkBackground";
+import { SignIn } from "../components/clerk";
 
 export default function Login() {
   return (

@@ -5,12 +5,12 @@ try {
     var to = params.To;
     var subject = params.Subject;
     var message = params.Message;
+    var apiKey = params.API_KEY;
 
     var req = new HttpRequest();
 
-    // Optional: Add headers if needed
     req.addHeader('Content-Type: application/json');
-    // req.addHeader('Authorization: Bearer ' + params.token);
+    req.addHeader('X-API-Key: ' + apiKey);
 
     var payload = {
         "to": to,

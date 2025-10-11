@@ -1,15 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
+import type { TClientsParams } from "../../schemas/api";
 import { apiService } from "../../services/api";
 
-export default function StatusCards() {
+export default function StatusCards({ client_id = null, org_id = null }: TClientsParams) {
   const { data } = useQuery({
-    queryKey: ["problemsCount"],
-    queryFn: apiService.fetchProblemsCount,
+    queryKey: ["problemsCount", client_id, org_id],
+    queryFn: () => apiService.fetchProblemsCount(client_id, org_id),
     staleTime: 15 * 60 * 1000, // 15 minutes
   });
 
   const counts = data?.data ?? {
-    activeProblems: 0,
+    totalActiveProblems: 0,
     problemsInLast24Hours: 0,
     problemsInLastWeek: 0,
     problemsInLastMonth: 0,
@@ -23,7 +24,7 @@ export default function StatusCards() {
           Current Status
         </div>
         <div className="mt-2 text-5xl font-extrabold text-red-500">
-          {counts.activeProblems}
+          {counts.totalActiveProblems}
         </div>
         <div className="mt-1 text-sm text-gray-300">
           Total Active Problems

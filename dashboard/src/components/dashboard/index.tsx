@@ -1,0 +1,52 @@
+import { useEffect, useState } from "react";
+import type { TClientsParams } from "../../schemas/api";
+import AlertBanner from "./AlertBanner";
+import StatusCards from "./StatusCards";
+import ActivityStream from "./ActivityStream";
+import SeverityMatrix from "./SeverityMatrix";
+import TrendsChart from "./TrendsChart";
+import HostScorecards from "./HostScorecards";
+import KPIring from "./KPIring";
+
+export default function Dashboard({ client_id = null, org_id = null }: TClientsParams) {
+  const [mounted, setMounted] = useState(false);
+
+  // small mount animation to avoid a flash
+  useEffect(() => {
+    const t = setTimeout(() => {setMounted(true);}, 40);
+    return () => {clearTimeout(t)};
+  }, []);
+
+  return (
+    <div
+      className={`bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white transition-all duration-500 ease-out transform ${
+        mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+      }`}
+    >
+      {/* Alert Banner */}
+      <AlertBanner text="SQL Injection on DB-SRV01 - High" />
+
+      {/* Main Grid */}
+      <div className="grid grid-cols-12 gap-6">
+        {/* Left Side */}
+        <div className="col-span-12 lg:col-span-8 space-y-6">
+          {/* Status Cards */}
+          <StatusCards client_id={client_id} org_id={org_id} />
+
+          {/* Activity Stream */}
+          <ActivityStream client_id={client_id} org_id={org_id} />
+
+          {/* Host Scorecard (bottom left) */}
+          <HostScorecards client_id={client_id} org_id={org_id} />
+        </div>
+
+        {/* Right Side */}
+        <div className="col-span-12 lg:col-span-4 space-y-6">
+          <SeverityMatrix />
+          <TrendsChart client_id={client_id} org_id={org_id} />
+          <KPIring client_id={client_id} org_id={org_id} />
+        </div>
+      </div>
+    </div>
+  );
+}

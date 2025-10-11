@@ -4,21 +4,9 @@ from typing import Literal
 
 from zabbix_utils import ZabbixAPI
 
-templates_dir = os.path.join(os.path.dirname(__file__), '..', 'src', 'templates')
-_json_files_content: dict[str, str] = {}
-for filename in os.listdir(templates_dir):
-    if filename.endswith('.json'):
-        with open(os.path.join(templates_dir, filename), 'r', encoding='utf-8') as f:
-            var_name = os.path.splitext(filename)[0].replace('-', '_') + '_json'
-            content = f.read().strip()
-            _json_files_content[var_name] = content.replace('\n', '').replace(' ', '')
+from data import getWebhookScript, json_files_content
 
-def _getWebhookScript() -> str:
-    with open(os.path.join(os.path.dirname(__file__), "webhook-script.js"), 'r', encoding='utf-8') as f:
-        whScript = f.read().strip()
-    return whScript
-
-def createMediaType(zapi: ZabbixAPI, apiUrl: str, mediaTypeId: str | None = None) -> str | None:
+def createMediaType(zapi: ZabbixAPI, apiUrl: str, apiKey: str, mediaTypeId: str | None = None) -> str | None:
     params = {
         "type": "4",
         "name": "Post to API",
@@ -26,46 +14,47 @@ def createMediaType(zapi: ZabbixAPI, apiUrl: str, mediaTypeId: str | None = None
             {"name": "Message", "value": "{ALERT.MESSAGE}"},
             {"name": "Subject", "value": "{ALERT.SUBJECT}"},
             {"name": "To", "value": "{ALERT.SENDTO}"},
-            {"name": "URL","value": apiUrl}
+            {"name": "URL","value": apiUrl},
+            {"name": "API_KEY", "value": apiKey}
         ],
-        "script": _getWebhookScript(),
+        "script": getWebhookScript(),
         "status": "0",
         "message_templates": [
             {
                 "eventsource": "0",
                 "recovery": "0",
                 "subject": "Problem: {EVENT.NAME}",
-                "message": _json_files_content["problem_json"]
+                "message": json_files_content["problem_json"]
             },
             {
                 "eventsource": "0",
                 "recovery": "1",
                 "subject": "Resolved in {EVENT.DURATION}: {EVENT.NAME}",
-                "message": _json_files_content["problem_recovery_json"]
+                "message": json_files_content["problem_recovery_json"]
             },
             {
                 "eventsource": "0",
                 "recovery": "2",
                 "subject": "Updated problem in {EVENT.AGE}: {EVENT.NAME}",
-                "message": _json_files_content["problem_update_json"]
+                "message": json_files_content["problem_update_json"]
             },
             {
                 "eventsource": "4",
                 "recovery": "0",
                 "subject": "Service \"{SERVICE.NAME}\" problem: {EVENT.NAME}",
-                "message": _json_files_content["service_json"]
+                "message": json_files_content["service_json"]
             },
             {
                 "eventsource": "4",
                 "recovery": "1",
                 "subject": "Service \"{SERVICE.NAME}\" resolved in {EVENT.DURATION}: {EVENT.NAME}",
-                "message": _json_files_content["service_recovery_json"]
+                "message": json_files_content["service_recovery_json"]
             },
             {
                 "eventsource": "4",
                 "recovery": "2",
                 "subject": "Changed \"{SERVICE.NAME}\" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}",
-                "message": _json_files_content["service_update_json"]
+                "message": json_files_content["service_update_json"]
             }
         ]
     }
@@ -128,9 +117,10 @@ if __name__ == "__main__":
 
     userId = str(int(input("Enter the ID of the User for whom the Triggers have to be added: ")))
     apiUrl = input("Enter the URL for the API: ").strip()
+    apiKey = input("Enter the API Key for the API: ").strip()
 
     # Create Media Type
-    mediaTypeId = createMediaType(zapi, apiUrl)
+    mediaTypeId = createMediaType(zapi, apiUrl, apiKey)
     assert mediaTypeId is not None
     print("\nCreated Media Type with ID:", mediaTypeId)
 

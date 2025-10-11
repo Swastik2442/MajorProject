@@ -1,26 +1,38 @@
-from typing import TypeVar, Generic, Literal
+from typing import Self, TypeVar, Generic, Literal
 
-from pydantic import BaseModel, ValidationInfo, Field, field_validator
+from fastapi import Query
+from pydantic import BaseModel, Field, model_validator
 
 from src.models.utils import MyDatetime, none, now
 
 class PaginationParams(BaseModel):
-    page: int = Field(1, ge=1)
-    limit: int = Field(20, ge=1, le=100)
+    page: int = Query(1, ge=1)
+    limit: int = Query(20, ge=1, le=100)
 
 class TimePeriodParams(BaseModel):
-    start: MyDatetime = Field(description="Start Time")
-    end: MyDatetime = Field(default_factory=now, description="End Time")
-    interval: Literal['hour', 'day', 'week', 'month'] = Field(default_factory=lambda: 'day', description="Time interval for aggregation")
+    start: MyDatetime = Query(description="Start Time")
+    end: MyDatetime = Query(default_factory=now, description="End Time")
+    interval: Literal['hour', 'day', 'week', 'month'] = Query(default_factory=lambda: 'day', description="Time interval for aggregation")
 
-    @field_validator('end', mode='after')
-    @classmethod
-    def check_end_time(cls, value: MyDatetime, info: ValidationInfo) -> MyDatetime:
-        if value <= info.data['start']:
+    @model_validator(mode='after')
+    def check_end_time(self) -> Self:
+        if self.end <= self.start:
             raise ValueError('End time must be after start time')
-        if value > now():
+        if self.end > now():
             raise ValueError('End time must not be in future')
-        return value
+        return self
+
+class ClientsParams(BaseModel):
+    client_id: str | list[str] | None = Query(
+        default_factory=none,
+        title="Client ID(s)",
+        description="ID(s) of the Client(s)"
+    )
+    org_id: str | None = Query(
+        default_factory=none,
+        title="Org ID",
+        description="ID of the Org whose Clients are to be fetched"
+    )
 
 class Response(BaseModel):
     status: Literal["success", "error"] = Field(default_factory=lambda: "success")
@@ -35,7 +47,8 @@ class PaginatedDataResponse(DataResponse, PaginationParams, Generic[TData]):
     data: TData | None = Field(default_factory=none)
 
 class StatCounts(BaseModel):
-    activeProblems: int = Field(ge=0)
+    totalActiveProblems: int = Field(ge=0)
+    activeProblemsInLast24Hours: int = Field(ge=0)
     problemsInLast24Hours: int = Field(ge=0)
     problemsInLastWeek: int = Field(ge=0)
     problemsInLastMonth: int = Field(ge=0)

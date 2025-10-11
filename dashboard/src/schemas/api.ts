@@ -2,6 +2,65 @@ import { z } from "zod";
 
 // --- Zod Schemas generated from OpenAPI ---
 
+export const ClientSchema = z.object({
+  _id: z.string().nullable().optional(),
+  createdAt: z.iso.datetime().optional(),
+  updatedAt: z.iso.datetime().optional(),
+  ownerId: z.string(),
+  apiKey: z.string(),
+  name: z.string().min(3).max(100),
+  description: z.string().nullable().optional(),
+});
+
+export const ClientCreateSchema = z.object({
+  ownerId: z.string(),
+  name: z.string().min(3).max(100),
+  description: z.string().nullable().optional(),
+});
+
+export const ClientListItemSchema = z.object({
+  _id: z.string(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+  ownerId: z.string(),
+  name: z.string().min(3).max(100),
+  description: z.string().nullable(),
+});
+
+export const ClientUpdateSchema = z.object({
+  name: z.string().min(3).max(100).nullable().optional(),
+  description: z.string().nullable().optional(),
+});
+
+export const ClientsParamsSchema = z.object({
+  client_id: z.union([
+    z.string(),
+    z.array(z.string()),
+    z.null(),
+  ]).optional(),
+  org_id: z.union([
+    z.string(),
+    z.null(),
+  ]).optional(),
+});
+
+export const ErrorDetailsSchema = z.object({
+  type: z.string(),
+  loc: z.array(z.union([z.string(), z.number()])),
+  msg: z.string(),
+});
+
+export const RequestValidationErrorSchema = z.object({
+  status: z.enum(["success", "error"]),
+  message: z.string().nullable().optional(),
+  errors: z.array(ErrorDetailsSchema),
+});
+
+export const ResponseSchema = z.object({
+  status: z.enum(["success", "error"]),
+  message: z.string().nullable().optional(),
+});
+
 export const UpdateSchema = z.object({
   action: z.string(),
   timestamp: z.iso.datetime(),
@@ -56,7 +115,8 @@ export const ServiceSchema = z.object({
 });
 
 export const StatCountsSchema = z.object({
-  activeProblems: z.number().int().min(0),
+  totalActiveProblems: z.number().int().min(0),
+  activeProblemsInLast24Hours: z.number().int().min(0),
   problemsInLast24Hours: z.number().int().min(0),
   problemsInLastWeek: z.number().int().min(0),
   problemsInLastMonth: z.number().int().min(0),
@@ -104,6 +164,14 @@ export type TStatCounts = z.infer<typeof StatCountsSchema>;
 export type TStatHealthScores = z.infer<typeof StatHealthScoresSchema>;
 export type TStatTrends = z.infer<typeof StatTrendsSchema>;
 
+export type TClient = z.infer<typeof ClientSchema>;
+export type TClientCreate = z.infer<typeof ClientCreateSchema>;
+export type TClientListItem = z.infer<typeof ClientListItemSchema>;
+export type TClientUpdate = z.infer<typeof ClientUpdateSchema>;
+export type TClientsParams = z.infer<typeof ClientsParamsSchema>;
+export type TRequestValidationError = z.infer<typeof RequestValidationErrorSchema>;
+export type TResponse = z.infer<typeof ResponseSchema>;
+
 // --- API Service Interface and Types ---
 
 export const PaginatedProblemDataResponseSchema = PaginatedDataResponseSchema(ProblemSchema);
@@ -121,14 +189,62 @@ export type TStatTrendsDataResponse = z.infer<typeof StatTrendsDataResponseSchem
 export const StatHealthScoresDataResponseSchema = DataResponseSchema(z.array(StatHealthScoresSchema));
 export type TStatHealthScoresDataResponse = z.infer<typeof StatHealthScoresDataResponseSchema>;
 
+// Additional DataResponse types
+export const DataResponseClientSchema = DataResponseSchema(ClientSchema);
+export type TDataResponseClient = z.infer<typeof DataResponseClientSchema>;
+
+export const PaginatedClientListItemDataResponseSchema = PaginatedDataResponseSchema(ClientListItemSchema);
+export type TPaginatedClientListItemDataResponse = z.infer<typeof PaginatedClientListItemDataResponseSchema>;
+
+export const DataResponseClientListItemSchema = DataResponseSchema(ClientListItemSchema);
+export type TDataResponseClientListItem = z.infer<typeof DataResponseClientListItemSchema>;
+
+export const DataResponseStrSchema = z.object({
+  status: z.enum(["success", "error"]),
+  message: z.string().nullable().optional(),
+  data: z.string().nullable(),
+});
+export type TDataResponseStr = z.infer<typeof DataResponseStrSchema>;
+
 export interface ApiService {
-  fetchProblems: (page?: number, limit?: number) => Promise<TPaginatedProblemDataResponse | null>;
-  fetchServiceAlerts: (page?: number, limit?: number) => Promise<TPaginatedServiceDataResponse | null>;
-  fetchProblemsCount: () => Promise<TStatCountsDataResponse | null>;
+  fetchProblems: (
+    page?: number,
+    limit?: number,
+    client_id?: string | string[] | null,
+    org_id?: string | null,
+  ) => Promise<TPaginatedProblemDataResponse | null>;
+  fetchServiceAlerts: (
+    page?: number,
+    limit?: number,
+    client_id?: string | string[] | null,
+    org_id?: string | null,
+  ) => Promise<TPaginatedServiceDataResponse | null>;
+  fetchProblemsCount: (
+    client_id?: string | string[] | null,
+    org_id?: string | null
+  ) => Promise<TStatCountsDataResponse | null>;
   fetchProblemsTrends: (
     start: string,
     end?: string,
-    interval?: "hour" | "day" | "week" | "month"
+    interval?: "hour" | "day" | "week" | "month",
+    client_id?: string | string[] | null,
+    org_id?: string | null,
   ) => Promise<TStatTrendsDataResponse | null>;
-  fetchHostsHealthScores: () => Promise<TStatHealthScoresDataResponse | null>;
+  fetchHostsHealthScores: (
+    client_id?: string | string[] | null,
+    org_id?: string | null
+  ) => Promise<TStatHealthScoresDataResponse | null>;
+
+  // Client endpoints
+  createClient: (client: TClientCreate) => Promise<TDataResponseClient | null>;
+  listClients: (
+    page?: number,
+    limit?: number,
+    owner_id?: string | null
+  ) => Promise<TPaginatedClientListItemDataResponse | null>;
+  getClient: (client_id: string) => Promise<TDataResponseClientListItem | null>;
+  updateClient: (client_id: string, update: TClientUpdate) => Promise<TResponse | null>;
+  deleteClient: (client_id: string) => Promise<TResponse | null>;
+  regenerateClientApiKey: (client_id: string) => Promise<TDataResponseStr | null>;
+  changeClientOwner: (client_id: string, new_owner_id: string) => Promise<TResponse | null>;
 }

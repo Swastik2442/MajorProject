@@ -1,6 +1,6 @@
-from typing import Any
+from typing import Annotated, Any
 
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException, Depends, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
 
@@ -19,7 +19,7 @@ def _decode_token(token: str) -> dict[str, Any]:
             issuer=config.CLERK_ISSUER
         )
     except jwt.exceptions.PyJWTError as e:
-        raise HTTPException(status_code=401, detail="Invalid token") from e
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid token") from e
 
 def protect_route(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict[str, Any]:
     token = credentials.credentials
@@ -28,5 +28,6 @@ def protect_route(credentials: HTTPAuthorizationCredentials = Depends(security))
 def get_user_id(payload: dict[str, Any] = Depends(protect_route)) -> str:
     user_id = payload.get('sub', None)
     if user_id is None:
-        raise HTTPException(status_code=401, detail="User ID not found in token")
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User ID not found in token")
     return user_id
+JwtUserId = Annotated[str, Depends(get_user_id)]
