@@ -12,7 +12,7 @@ from .init_collections import init_collections
 
 logger = getLogger(__name__)
 
-db_client = AsyncMongoClient(str(config.MONGO_CONNECTION_URI), connect=False)
+db_client = AsyncMongoClient(str(config.MONGO_CONNECTION_URI).replace(f":27017", ""), connect=False)
 db = db_client[config.DB_NAME]
 
 def get_db_client() -> AsyncMongoClient[Any]: return db_client
