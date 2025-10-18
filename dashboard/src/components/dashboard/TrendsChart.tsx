@@ -9,8 +9,8 @@ import {
   Legend,
   CartesianGrid,
 } from "recharts";
-import type { TClientsParams } from "../../schemas/api";
-import { apiService } from "../../services/api";
+import type { TClientsParams } from "@/schemas/api";
+import { apiService } from "@/services/api";
 
 export default function TrendsChart({ client_id = null, org_id = null }: TClientsParams) {
   const { data } = useQuery({
@@ -18,7 +18,7 @@ export default function TrendsChart({ client_id = null, org_id = null }: TClient
     queryFn: () =>
       apiService.fetchProblemsTrends(
         new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-        new Date().toISOString(),
+        undefined,
         "hour",
         client_id,
         org_id
@@ -35,10 +35,10 @@ export default function TrendsChart({ client_id = null, org_id = null }: TClient
   }));
 
   return (
-    <div className="bg-gray-900 rounded-xl shadow-md p-5 border border-gray-700">
+    <div className="bg-card rounded-xl shadow-md p-5 border">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-sm font-semibold tracking-wider text-gray-300 uppercase">
+        <h2 className="text-sm font-semibold tracking-wider text-primary uppercase">
           Problem Trends (Last 24 Hours)
         </h2>
       </div>
@@ -47,24 +47,24 @@ export default function TrendsChart({ client_id = null, org_id = null }: TClient
       <div className="w-full h-[260px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={trends}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--muted)" />
             <XAxis
               dataKey="timestamp"
-              stroke="#9ca3af"
+              stroke="var(--ring)"
               tick={{ fontSize: 10 }}
               minTickGap={20}
             />
             <YAxis
-              stroke="#9ca3af"
+              stroke="var(--ring)"
               tick={{ fontSize: 10 }}
+              domain={[0, 'auto']}
               allowDecimals={false}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "#111827",
-                border: "1px solid #374151",
+                backgroundColor: "var(--card)",
+                border: "1px solid var(--ring)",
                 borderRadius: "0.5rem",
-                color: "#f9fafb",
                 fontSize: "0.8rem",
               }}
             />
@@ -72,14 +72,13 @@ export default function TrendsChart({ client_id = null, org_id = null }: TClient
               wrapperStyle={{
                 paddingTop: "10px",
                 fontSize: "0.75rem",
-                color: "#d1d5db",
               }}
             />
             <Line
               type="monotone"
               dataKey="new"
               name="New Problems"
-              stroke="#3b82f6"
+              stroke="var(--chart-1)"
               strokeWidth={2}
               dot={false}
             />
@@ -87,7 +86,7 @@ export default function TrendsChart({ client_id = null, org_id = null }: TClient
               type="monotone"
               dataKey="active"
               name="Active Problems"
-              stroke="#10b981"
+              stroke="var(--chart-2)"
               strokeWidth={2}
               dot={false}
             />
@@ -95,7 +94,7 @@ export default function TrendsChart({ client_id = null, org_id = null }: TClient
               type="monotone"
               dataKey="resolved"
               name="Resolved Problems"
-              stroke="#f59e0b"
+              stroke="var(--chart-3)"
               strokeWidth={2}
               dot={false}
             />

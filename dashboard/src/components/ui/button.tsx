@@ -51,7 +51,6 @@ function Button({
   return (
     <Comp
       data-slot="button"
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />

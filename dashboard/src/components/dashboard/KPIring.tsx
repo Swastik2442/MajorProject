@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { PieChart, Pie, Cell } from "recharts";
-import type { TClientsParams } from "../../schemas/api";
-import { apiService } from "../../services/api";
+import type { TClientsParams } from "@/schemas/api";
+import { apiService } from "@/services/api";
 
 export default function KPIring({ client_id = null, org_id = null }: TClientsParams) {
   const { data: actual } = useQuery({
@@ -21,14 +21,13 @@ export default function KPIring({ client_id = null, org_id = null }: TClientsPar
   const percent = Math.round((resolvedCount / denominator) * 100);
 
   const data = [
-    { name: "Resolved", value: percent },
-    { name: "Open", value: 100 - percent },
+    { name: "Resolved", colour: "var(--chart-2)", value: percent },
+    { name: "Open", colour: "var(--chart-3)", value: 100 - percent },
   ];
-  const COLORS = ["#10b981", "#e5e7eb"];
 
   return (
     <div className="card flex flex-col items-center justify-center p-4">
-      <div className="relative" style={{ width: 140, height: 140 }}>
+      <div className="relative size-[140px]">
         <PieChart width={140} height={140}>
           <Pie
             data={data}
@@ -39,23 +38,23 @@ export default function KPIring({ client_id = null, org_id = null }: TClientsPar
             endAngle={-270}
             stroke="none"
           >
-            {data.map((_, i) => (
-              <Cell key={i} fill={COLORS[i % COLORS.length]} />
+            {data.map((v, i) => (
+              <Cell key={i} fill={v.colour} />
             ))}
           </Pie>
         </PieChart>
 
         {/* Center Label */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-2xl font-bold text-gray-900">{percent}%</span>
-          <span className="text-xs text-gray-500">Resolved</span>
+          <span className="text-2xl font-bold">{percent}%</span>
+          <span className="text-xs text-muted-foreground">Resolved</span>
         </div>
       </div>
 
       {/* Optional subtitle */}
-      <div className="mt-3 text-sm text-gray-400">
+      <div className="mt-3 text-sm text-ring">
         In last 24 hours:{" "}
-        <span className="font-medium text-gray-600">
+        <span className="font-medium text-muted-foreground">
           {counts.problemsInLast24Hours}
         </span>
       </div>

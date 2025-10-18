@@ -12,7 +12,7 @@ function MiniSpark({ data = [] }: { data: { v: number }[] }) {
           <Line
             type="monotone"
             dataKey="v"
-            stroke="#22c55e" // green for activity trend
+            stroke="var(--chart-2)"
             strokeWidth={2}
             dot={false}
             strokeLinecap="round"
@@ -48,13 +48,13 @@ export default function ActivityStream({ client_id = null, org_id = null }: TCli
   const items = data?.data ?? [];
 
   return (
-    <div className="bg-gray-900 rounded-xl shadow-md p-5 border border-gray-700">
+    <div className="bg-card rounded-xl shadow-md p-5 border">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-semibold tracking-wider text-gray-300 uppercase">
+        <h2 className="text-sm font-semibold tracking-wider text-primary uppercase">
           Problem Activity Stream
         </h2>
-        <span className="text-xs text-gray-500">Latest</span>
+        <span className="text-xs text-muted-foreground">Latest</span>
       </div>
 
       {/* Items */}
@@ -62,7 +62,7 @@ export default function ActivityStream({ client_id = null, org_id = null }: TCli
         {items.map((it) => (
           <div
             key={it.zid}
-            className="flex items-center justify-between gap-4 bg-gray-800 rounded-lg px-3 py-2 hover:bg-gray-700 transition"
+            className="flex items-center justify-between gap-4 bg-background rounded-lg px-3 py-2 hover:bg-background/50 transition"
           >
             {/* Left side: severity + text */}
             <div className="flex items-start gap-3">
@@ -76,11 +76,11 @@ export default function ActivityStream({ client_id = null, org_id = null }: TCli
                 }`}
               />
               <div>
-                <div className="text-sm font-medium text-gray-200">
+                <div className="text-sm font-medium text-foreground/90">
                   {it.name}
                 </div>
-                <div className="text-xs text-gray-400 mt-0.5">
-                  {it.hostname} ·{" "}
+                <div className="text-xs text-muted-foreground mt-0.5">
+                  {it.hostname}{" · "}
                   {new Date(it.startedAt).toLocaleString()}
                 </div>
               </div>
@@ -91,7 +91,7 @@ export default function ActivityStream({ client_id = null, org_id = null }: TCli
               <MiniSpark
                 data={[0, 1, 0, 2, 1, 0].map((v) => ({ v }))}
               />
-              <span className="text-xs text-gray-400 text-right">
+              <span className="text-xs text-muted-foreground text-right">
                 {it.duration}
               </span>
             </div>

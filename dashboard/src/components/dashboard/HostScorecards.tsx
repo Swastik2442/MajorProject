@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { BarChart, Bar, ResponsiveContainer } from "recharts";
-import type { TClientsParams } from "../../schemas/api";
-import { apiService } from "../../services/api";
+import type { TClientsParams } from "@/schemas/api";
+import { apiService } from "@/services/api";
 
 export default function HostScorecards({ client_id = null, org_id = null }: TClientsParams) {
   const { data } = useQuery({
@@ -13,17 +13,17 @@ export default function HostScorecards({ client_id = null, org_id = null }: TCli
 
   return (
     <div className="card">
-      <div className="font-semibold mb-4">HOST HEALTH SCORECARDS</div>
+      <div className="font-semibold mb-4 text-primary uppercase">Host Health Scorecards</div>
       <div className="grid grid-cols-2 gap-4">
         {hosts.slice(0, 4).map((h) => (
-          <div key={h._id} className="bg-[#0b1420] p-3 rounded-xl border border-gray-800">
+          <div key={h._id} className="bg-card p-3 rounded-xl border">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm text-gray-300">{h._id}</div>
+                <div className="text-sm text-foreground/75">{h._id}</div>
                 <div className="text-2xl font-bold">{Math.round(h.healthScore)}</div>
-                <div className="small-muted">Score</div>
+                <div className="text-sm text-muted-foreground">Score</div>
               </div>
-              <div style={{ width: 140, height: 60 }}>
+              <div className="w-[140px] h-[60px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={[h]}>
                     <Bar dataKey="notClassified" fill="#3b82f6" />

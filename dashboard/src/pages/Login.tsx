@@ -5,7 +5,7 @@ import { SignIn } from "../components/clerk";
 
 export default function Login() {
   return (
-    <div className="flex items-center justify-center min-h-screen font-sans relative overflow-hidden bg-[#0a0f1c]">
+    <div className="flex items-center justify-center min-h-screen font-sans relative overflow-hidden">
       <NetworkBackground />
       <SignedIn>
         <Navigate to="/" replace />

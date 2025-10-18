@@ -8,7 +8,13 @@ export default function OrganizationSwitcher() {
       afterCreateOrganizationUrl={(org) => `org/${org.id}`}
       afterLeaveOrganizationUrl='/'
       afterSelectOrganizationUrl={(org) => `org/${org.id}`}
-      appearance={{ theme: dark }}
+      appearance={{
+        theme: dark,
+        variables: {
+          colorBackground: "var(--card)",
+          colorInput: "transparent"
+        }
+      }}
     />
   )
 }

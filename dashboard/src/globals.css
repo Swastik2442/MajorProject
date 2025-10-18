@@ -4,26 +4,21 @@
 @custom-variant light (&:is(.light *));
 
 :root {
-  --color-dash-bg: #0b1217;
-  --color-card-bg: #0f1720;
-  --color-muted: #9ca3af;
-  --color-accent-red: #ef4444;
-  --color-accent-green: #10b981;
-  --color-accent-yellow: #f59e0b;
   --radius: 0.625rem;
-  --background: oklch(0.145 0 0);
+  --background: oklch(0.2795 0.0368 260.03);
+  --background-darker: oklch(0.2077 0.0398 265.75);
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
+  --card: oklch(0.21 0.034 264.665);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
+  --popover: oklch(0.255 0.034 264.665);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
+  --secondary: oklch(0.31 0.034 264.665);
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
+  --muted: oklch(0.31 0.034 264.665);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
+  --accent: oklch(0.31 0.034 264.665);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
@@ -38,7 +33,7 @@
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent: oklch(0.31 0.034 264.665);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
@@ -60,6 +55,7 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --color-background: var(--background);
+  --color-background-darker: var(--background-darker);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -94,6 +90,7 @@
 
 .light {
   --background: oklch(1 0 0);
+  --background-darker: oklch(0.922 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);

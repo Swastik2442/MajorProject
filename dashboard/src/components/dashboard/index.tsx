@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { TClientsParams } from "../../schemas/api";
+import type { TClientsParams } from "@/schemas/api";
 import AlertBanner from "./AlertBanner";
 import StatusCards from "./StatusCards";
 import ActivityStream from "./ActivityStream";
@@ -19,7 +19,7 @@ export default function Dashboard({ client_id = null, org_id = null }: TClientsP
 
   return (
     <div
-      className={`bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white transition-all duration-500 ease-out transform ${
+      className={`transition-all duration-500 ease-out transform ${
         mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
       }`}
     >
@@ -42,8 +42,8 @@ export default function Dashboard({ client_id = null, org_id = null }: TClientsP
 
         {/* Right Side */}
         <div className="col-span-12 lg:col-span-4 space-y-6">
-          <SeverityMatrix />
           <TrendsChart client_id={client_id} org_id={org_id} />
+          <SeverityMatrix />
           <KPIring client_id={client_id} org_id={org_id} />
         </div>
       </div>

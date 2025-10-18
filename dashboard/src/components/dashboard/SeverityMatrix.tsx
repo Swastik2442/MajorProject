@@ -8,7 +8,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import type { TSeveritySchema } from "../../schemas/others";
+import type { TSeveritySchema } from "@/schemas/others";
 
 type SeverityMatrixData = {
   category: string;
@@ -16,16 +16,16 @@ type SeverityMatrixData = {
 
 export default function SeverityMatrix({ data = [] }: { data?: SeverityMatrixData[] }) {
   return (
-    <div className="bg-gray-900 rounded-xl shadow-md p-5 border border-gray-700">
+    <div className="bg-card rounded-xl shadow-md p-5 border">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-sm font-semibold tracking-wider text-gray-300 uppercase">
+        <h2 className="text-sm font-semibold tracking-wider text-primary uppercase">
           Problem Severity Matrix
         </h2>
       </div>
 
       {/* Chart */}
-      <div style={{ width: "100%", height: 240 }}>
+      <div className="w-full h-[240px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={data}

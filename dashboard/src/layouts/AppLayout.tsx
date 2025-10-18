@@ -4,9 +4,9 @@ import { OrganizationSwitcher, UserButton, SignInButton } from "../components/cl
 
 export default function AppLayout() {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-background-darker to-background">
       {/* Header */}
-      <header className="flex justify-between items-center px-6 py-3 bg-gray-900/80 text-white shadow backdrop-blur-sm">
+      <header className="flex justify-between items-center px-6 py-3 bg-background-darker shadow backdrop-blur-sm">
         <h1 className="text-lg font-semibold">NMS</h1>
         <SignedIn>
           <div className="flex items-center justify-between space-x-4">
