@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { Trash2Icon } from "lucide-react";
 import { apiService } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,13 +24,13 @@ export function DeleteClientDialog({
 }) {
   const [open, setOpen] = useState(false);
 
-  const { mutate, isError, error } = useMutation({
+  const { mutate, isPending, isError, error } = useMutation({
     mutationKey: ["client", "delete"],
     mutationFn: () => apiService.deleteClient(clientId),
-    onSuccess: () => setOpen(false)
+    onSuccess: () => {setOpen(false)}
   });
 
-  const handleDelete = () => mutate();
+  const handleDelete = () => {mutate()};
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -55,7 +56,7 @@ export function DeleteClientDialog({
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={handleDelete} disabled={isPending}>
             Delete
           </Button>
         </DialogFooter>
@@ -64,7 +65,10 @@ export function DeleteClientDialog({
   );
 }
 
-// ✅ Wrapper for index.tsx import compatibility
 export function DeleteClientButton({ clientId }: { clientId: string }) {
-  return <DeleteClientDialog clientId={clientId} />;
+  return (
+    <DeleteClientDialog clientId={clientId}>
+      <Button title="Delete Client" variant="ghost" size="icon"><Trash2Icon /></Button>
+    </DeleteClientDialog>
+  );
 }

@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { WebhookIcon } from "lucide-react";
 import { apiService } from "@/services/api";
 import { Button } from "@/components/ui/button";
+import { CopyButton } from "@/components/ui/copy-button";
 import {
   Dialog,
   DialogClose,
@@ -23,7 +25,7 @@ export function RegenApiKeyDialog({
   const [open, setOpen] = useState(false);
   const [apiKey, setApiKey] = useState<string | null>(null);
 
-  const { mutate, isError, error } = useMutation({
+  const { mutate, isPending, isError, error } = useMutation({
     mutationKey: ["client", "regen-api-key"],
     mutationFn: () => apiService.regenerateClientApiKey(clientId),
     onSuccess: (data) => {
@@ -31,7 +33,7 @@ export function RegenApiKeyDialog({
     }
   });
 
-  const handleRegen = () => mutate();
+  const handleRegen = () => {mutate()};
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -56,8 +58,15 @@ export function RegenApiKeyDialog({
             </p>
           )}
           {apiKey && (
-            <div className="bg-muted p-2 rounded-md break-all text-sm">
-              <strong>New API Key:</strong> {apiKey}
+            <div className="flex flex-col gap-2 break-all text-sm">
+              <strong>New API Key:</strong>
+              <div className="bg-muted p-2 rounded-md relative group">
+                <code>{apiKey}</code>
+                <CopyButton
+                  text={apiKey}
+                  className="absolute right-1 top-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                />
+              </div>
             </div>
           )}
         </div>
@@ -66,14 +75,17 @@ export function RegenApiKeyDialog({
           <DialogClose asChild>
             <Button variant="outline">Close</Button>
           </DialogClose>
-          <Button onClick={handleRegen}>Regenerate</Button>
+          <Button onClick={handleRegen} disabled={isPending}>Regenerate</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
 
-// ✅ Wrapper for compatibility with index.tsx
 export function RegenApiKeyButton({ clientId }: { clientId: string }) {
-  return <RegenApiKeyDialog clientId={clientId} />;
+  return (
+    <RegenApiKeyDialog clientId={clientId}>
+      <Button title="Regenerate API Key" variant="ghost" size="icon"><WebhookIcon /></Button>
+    </RegenApiKeyDialog>
+  );
 }

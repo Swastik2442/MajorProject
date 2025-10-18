@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { EditIcon } from "lucide-react";
 import { apiService } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,11 +38,11 @@ export function ChangeOwnerDialog({
   children?: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
-  const { mutate, isError, error } = useMutation({
+  const { mutate, isPending, isError, error } = useMutation({
     mutationKey: ["client", "change-owner"],
     mutationFn: (values: { clientId: string; newOwnerId: string }) =>
       apiService.changeClientOwner(values.clientId, values.newOwnerId),
-    onSuccess: () => setOpen(false)
+    onSuccess: () => {setOpen(false)}
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -49,8 +50,9 @@ export function ChangeOwnerDialog({
     defaultValues: { newOwnerId: "" }
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) =>
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
     mutate({ clientId, ...values });
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -69,7 +71,7 @@ export function ChangeOwnerDialog({
           <form
             onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
             className="space-y-6"
-          >
+          > {/* TODO: Replace with Select Dropdown from the Orgs in which the current user is Admin */}
             <FormField
               control={form.control}
               name="newOwnerId"
@@ -94,7 +96,7 @@ export function ChangeOwnerDialog({
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
-              <Button type="submit">Change</Button>
+              <Button type="submit" disabled={isPending}>Change</Button>
             </DialogFooter>
           </form>
         </Form>
@@ -103,7 +105,10 @@ export function ChangeOwnerDialog({
   );
 }
 
-// ✅ Wrapper for compatibility with index.tsx
 export function ChangeOwnerButton({ clientId }: { clientId: string }) {
-  return <ChangeOwnerDialog clientId={clientId} />;
+  return (
+    <ChangeOwnerDialog clientId={clientId}>
+      <Button title="Change Owner" variant="ghost" size="icon"><EditIcon /></Button>
+    </ChangeOwnerDialog>
+  );
 }

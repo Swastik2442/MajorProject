@@ -79,13 +79,7 @@ export const apiService: ApiService = {
 
   fetchProblemsTrends: async (start, end, interval, client_id, org_id) => {
     try {
-      const params: Record<string, string | string[] | null | undefined> = {
-        start,
-        client_id,
-        org_id,
-      };
-      if (end) params.end = end;
-      if (interval) params.interval = interval;
+      const params = { start, end, interval, client_id, org_id };
       const response = await api.get<TStatTrendsDataResponse>(
         "/alerts/problems/trends",
         { params }
@@ -168,11 +162,10 @@ export const apiService: ApiService = {
     }
   },
 
-  // ✅ KEEP OLD NAME AS YOU REQUESTED
   regenerateClientApiKey: async (client_id) => {
     try {
       const response = await api.put<TDataResponseStr>(
-        `/clients/${client_id}/regenerate-api-key`
+        `/clients/${client_id}/regenerate_api_key`
       );
       return response.data;
     } catch (err) {
@@ -184,7 +177,7 @@ export const apiService: ApiService = {
   changeClientOwner: async (client_id, new_owner_id) => {
     try {
       const response = await api.put<TResponse>(
-        `/clients/${client_id}/change-owner`,
+        `/clients/${client_id}/change_owner`,
         { new_owner_id }
       );
       return response.data;

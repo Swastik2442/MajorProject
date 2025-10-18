@@ -1,13 +1,17 @@
-import { Outlet } from "react-router";
+import { Outlet, useNavigate } from "react-router";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
-import { OrganizationSwitcher, UserButton, SignInButton } from "../components/clerk";
+import { OrganizationSwitcher, UserButton, SignInButton } from "@/components/clerk";
 
 export default function AppLayout() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-background-darker to-background">
       {/* Header */}
       <header className="flex justify-between items-center px-6 py-3 bg-background-darker shadow backdrop-blur-sm">
-        <h1 className="text-lg font-semibold">NMS</h1>
+        <h1 className="text-lg font-semibold cursor-pointer" onClick={() => {void navigate("/")}}>
+          {import.meta.env.VITE_APP_TITLE ?? "NMS"}
+        </h1>
         <SignedIn>
           <div className="flex items-center justify-between space-x-4">
             <OrganizationSwitcher />

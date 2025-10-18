@@ -37,7 +37,7 @@ export function CreateClientDialog({ ownerId, children }: { ownerId: string; chi
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
-  const { mutate, error, isError } = useMutation({
+  const { mutate, isPending, error, isError } = useMutation({
     mutationKey: ['client', 'new'],
     mutationFn: apiService.createClient,
     onSuccess: (data) => {
@@ -123,7 +123,7 @@ export function CreateClientDialog({ ownerId, children }: { ownerId: string; chi
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
-              <Button type="submit">Create</Button>
+              <Button type="submit" disabled={isPending}>Create</Button>
             </DialogFooter>
           </form>
         </Form>
@@ -135,7 +135,7 @@ export function CreateClientDialog({ ownerId, children }: { ownerId: string; chi
 export function CreateClientButton({ ownerId }: { ownerId: string }) {
   return (
     <CreateClientDialog ownerId={ownerId}>
-      <Button variant="ghost" size="icon"><PlusIcon /></Button>
+      <Button title="Create new Client" variant="ghost" size="icon"><PlusIcon /></Button>
     </CreateClientDialog>
   )
 }

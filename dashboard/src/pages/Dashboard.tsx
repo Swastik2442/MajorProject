@@ -2,7 +2,14 @@
 import { useState } from "react";
 import { useOrganization } from "@clerk/clerk-react";
 import DashboardComponent from "@/components/dashboard";
-import { ClientSelect, CreateClientButton, type TClientSelectParam } from "@/components/client";
+import {
+  ClientSelect,
+  CreateClientButton,
+  ChangeOwnerButton,
+  DeleteClientButton,
+  RegenApiKeyButton,
+  type TClientSelectParam
+} from "@/components/client";
 
 export default function Dashboard() {
   const { organization } = useOrganization();
@@ -19,7 +26,17 @@ export default function Dashboard() {
               : `Dashboard - ${selectedClient.name}`
           }
         </h1>
-        <div className="flex justify-between items-center gap-4">
+        <div className="flex justify-between items-center gap-2">
+          {selectedClient && !Array.isArray(selectedClient) && (<>
+            <RegenApiKeyButton clientId={selectedClient._id} />
+            <ChangeOwnerButton clientId={selectedClient._id} />
+            <DeleteClientButton clientId={selectedClient._id} />
+          </>)}
+          {Array.isArray(selectedClient) && selectedClient.length == 0 && (<>
+            <RegenApiKeyButton clientId={selectedClient[0]._id} />
+            <ChangeOwnerButton clientId={selectedClient[0]._id} />
+            <DeleteClientButton clientId={selectedClient[0]._id} />
+          </>)}
           <ClientSelect
             org_id={organization?.id ?? null}
             selectedClient={selectedClient}
@@ -29,7 +46,11 @@ export default function Dashboard() {
         </div>
       </div>
       <DashboardComponent
-        client_id={Array.isArray(selectedClient) ? selectedClient.map(c => c._id) : (selectedClient?._id ?? null)}
+        client_id={
+          Array.isArray(selectedClient)
+          ? selectedClient.map(c => c._id)
+          : (selectedClient?._id ?? null)
+        }
         org_id={ // If no client is selected, pass org_id to show org-wide data
           (selectedClient === null || (Array.isArray(selectedClient) && selectedClient.length == 0))
           ? (organization?.id ?? null)
