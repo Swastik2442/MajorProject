@@ -11,11 +11,13 @@ class PaginationParams(BaseModel):
 
 class TimePeriodParams(BaseModel):
     start: MyDatetime = Query(description="Start Time")
-    end: MyDatetime = Query(default_factory=now, description="End Time")
+    end: MyDatetime | None = Query(default_factory=none, description="End Time")
     interval: Literal['hour', 'day', 'week', 'month'] = Query(default_factory=lambda: 'day', description="Time interval for aggregation")
 
     @model_validator(mode='after')
     def check_end_time(self) -> Self:
+        if self.end is None:
+            return self
         if self.end <= self.start:
             raise ValueError('End time must be after start time')
         if self.end > now():

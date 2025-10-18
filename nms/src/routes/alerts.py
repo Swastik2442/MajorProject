@@ -183,6 +183,9 @@ async def get_trigger_alert_trends(
 ):
     clients = await get_clients(query, user_id, clerk, db)
 
+    if query.end is None:
+        query.end = now()
+
     # Get specific time periods
     bins: list[tuple[datetime, datetime]] = []
     intervalStr = "days" if query.interval == "month" else query.interval + "s"
