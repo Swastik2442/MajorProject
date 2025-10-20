@@ -29,7 +29,7 @@ export function RegenApiKeyDialog({
     mutationKey: ["client", "regen-api-key"],
     mutationFn: () => apiService.regenerateClientApiKey(clientId),
     onSuccess: (data) => {
-      if (data && "data" in data) setApiKey(data.data);
+      setApiKey(data.data);
     }
   });
 
