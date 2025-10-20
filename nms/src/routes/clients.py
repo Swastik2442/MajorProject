@@ -4,13 +4,13 @@ import logging
 from typing import Annotated
 
 from bson import ObjectId
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Body, Depends, Query, status
 from fastapi.exceptions import HTTPException
 from pydantic import BaseModel
 from pymongo import DESCENDING
 
 from src.exceptions import HTTPException as CustomHTTPException
-from src.models import Client, ClientCreate, ClientListItem, ClientUpdate
+from src.models import Client, ClientCreate, ClientListItem, ClientUpdate, ClientOwnerUpdate
 from src.models.utils import fields, now, to_doc
 from src.services.auth import ClerkSdk, JwtUserId, generate_api_key, get_api_key_hash
 from src.services.db import Database
@@ -70,7 +70,7 @@ ClientFromId = Annotated[ClientWithPerms, Depends(find_client_by_id)]
     responses={400: {"model": CustomHTTPException}}
 )
 async def create_client(
-    client: ClientCreate,
+    client: Annotated[ClientCreate, Body()],
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database
@@ -177,7 +177,8 @@ async def regenerate_client_api_key(
 )
 async def change_client_owner(
     findResult: ClientFromId,
-    new_owner_id: Annotated[str, Query()],
+    client_update: Annotated[ClientOwnerUpdate, Body()],
+    user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database
 ) -> CustomResponse:
@@ -186,7 +187,10 @@ async def change_client_owner(
             status.HTTP_403_FORBIDDEN,
             "You do not have permission to change the owner of this client"
         )
-    if not await is_org_admin(new_owner_id, findResult.client.ownerId, clerk):
+    if findResult.client.ownerId == client_update.ownerId:
+        return CustomResponse(message="New owner is same as the current owner")
+
+    if not await is_org_admin(client_update.ownerId, user_id, clerk):
         raise HTTPException(
             status.HTTP_403_FORBIDDEN,
             "You do not have permission to add clients to the new organization"
@@ -195,7 +199,7 @@ async def change_client_owner(
     await db[Client.Meta.collection_name()].update_one(
         {"_id": findResult.client.id},
         {"$set": {
-            fields(Client).ownerId: new_owner_id,
+            fields(Client).ownerId: client_update.ownerId,
             fields(Client).updatedAt: now(),
         }}
     )
@@ -208,7 +212,7 @@ async def change_client_owner(
 )
 async def update_client(
     findResult: ClientFromId,
-    client_update: ClientUpdate,
+    client_update: Annotated[ClientUpdate, Body()],
     db: Database
 ) -> CustomResponse:
     if not findResult.hasEditPerms:

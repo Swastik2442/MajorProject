@@ -33,7 +33,7 @@ export const ClientUpdateSchema = z.object({
 });
 
 export const ClientOwnerUpdateSchema = z.object({
-  new_owner_id: z.string(),
+  ownerId: z.string(),
 });
 
 export const ErrorDetailsSchema = z.object({
@@ -245,18 +245,18 @@ export type TPaginationAndOwnerParams = z.infer<typeof PaginationAndOwnerParamsS
 // --- API Service Interface ---
 
 export interface ApiService {
-  fetchProblems: (params: TPaginationAndOrgClientParams) => Promise<TPaginatedProblemDataResponse | null>;
-  fetchServiceAlerts: (params: TPaginationAndOrgClientParams) => Promise<TPaginatedServiceDataResponse | null>;
-  fetchProblemsCount: (params: TClientsParams) => Promise<TStatCountsDataResponse | null>;
-  fetchProblemsTrends: (params: TTimeIntervalAndOrgClientParams) => Promise<TStatTrendsDataResponse | null>;
-  fetchHostsHealthScores: (params: TClientsParams) => Promise<TStatHealthScoresDataResponse | null>;
+  fetchProblems: (params: TPaginationAndOrgClientParams) => Promise<TPaginatedProblemDataResponse>;
+  fetchServiceAlerts: (params: TPaginationAndOrgClientParams) => Promise<TPaginatedServiceDataResponse>;
+  fetchProblemsCount: (params: TClientsParams) => Promise<TStatCountsDataResponse>;
+  fetchProblemsTrends: (params: TTimeIntervalAndOrgClientParams) => Promise<TStatTrendsDataResponse>;
+  fetchHostsHealthScores: (params: TClientsParams) => Promise<TStatHealthScoresDataResponse>;
 
   // Client endpoints
-  createClient: (body: TClientCreate) => Promise<TDataResponseClient | null>;
-  listClients: (params: TPaginationAndOwnerParams) => Promise<TPaginatedClientListItemDataResponse | null>;
-  getClient: (client_id: string) => Promise<TDataResponseClientListItem | null>;
-  updateClient: (client_id: string, body: TClientUpdate) => Promise<TResponse | null>;
-  deleteClient: (client_id: string) => Promise<TResponse | null>;
-  regenerateClientApiKey: (client_id: string) => Promise<TDataResponseStr | null>;
-  changeClientOwner: (client_id: string, body: TClientOwnerUpdate) => Promise<TResponse | null>;
+  createClient: (body: TClientCreate) => Promise<TDataResponseClient>;
+  listClients: (params: TPaginationAndOwnerParams) => Promise<TPaginatedClientListItemDataResponse>;
+  getClient: (client_id: string) => Promise<TDataResponseClientListItem>;
+  updateClient: (client_id: string, body: TClientUpdate) => Promise<TResponse>;
+  deleteClient: (client_id: string) => Promise<TResponse>;
+  regenerateClientApiKey: (client_id: string) => Promise<TDataResponseStr>;
+  changeClientOwner: (client_id: string, body: TClientOwnerUpdate) => Promise<TResponse>;
 }

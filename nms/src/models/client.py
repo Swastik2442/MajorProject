@@ -25,5 +25,8 @@ class ClientUpdate(BaseModel):
     name: str | None = Field(default_factory=none, title="Client Name", min_length=3, max_length=100)
     description: str | None = Field(default_factory=none, title="Client Description")
 
+class ClientOwnerUpdate(BaseModel):
+    ownerId: str = Field(title="Owner ID", description="ID of the Org who owns this Client")
+
 class ClientListItem(BaseInterface, ClientCreate):
     pass

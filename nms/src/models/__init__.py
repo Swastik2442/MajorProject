@@ -1,6 +1,6 @@
 "MongoDB Schema Models"
 
-from .client import Client, ClientCreate, ClientListItem, ClientUpdate
+from .client import Client, ClientCreate, ClientListItem, ClientUpdate, ClientOwnerUpdate
 from .problem import Problem, ProblemUpdate
 from .service import Service, ServiceUpdate
 
@@ -9,6 +9,7 @@ __all__ = [
     "ClientCreate",
     "ClientListItem",
     "ClientUpdate",
+    "ClientOwnerUpdate",
     "Problem",
     "ProblemUpdate",
     "Service",

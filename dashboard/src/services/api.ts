@@ -41,153 +41,96 @@ api.interceptors.request.use(
 
 export const apiService: ApiService = {
   fetchProblems: async (params) => {
-    try {
-      const response = await api.get<TPaginatedProblemDataResponse>(
-        "/alerts/problems",
-        { params }
-      );
-      return response.data;
-    } catch (err) {
-      console.error("API error:", err);
-      return null;
-    }
+    const response = await api.get<TPaginatedProblemDataResponse>(
+      "/alerts/problems",
+      { params }
+    );
+    return response.data;
   },
 
   fetchServiceAlerts: async (params) => {
-    try {
-      const response = await api.get<TPaginatedServiceDataResponse>(
-        "/alerts/services",
-        { params }
-      );
-      return response.data;
-    } catch (err) {
-      console.error("API error:", err);
-      return null;
-    }
+    const response = await api.get<TPaginatedServiceDataResponse>(
+      "/alerts/services",
+      { params }
+    );
+    return response.data;
   },
 
   fetchProblemsCount: async (params) => {
-    try {
-      const response = await api.get<TStatCountsDataResponse>(
-        "/alerts/problems/count",
-        { params }
-      );
-      return response.data;
-    } catch (err) {
-      console.error("API error:", err);
-      return null;
-    }
+    const response = await api.get<TStatCountsDataResponse>(
+      "/alerts/problems/count",
+      { params }
+    );
+    return response.data;
   },
 
   fetchProblemsTrends: async (params) => {
-    try {
-      const response = await api.get<TStatTrendsDataResponse>(
-        "/alerts/problems/trends",
-        { params }
-      );
-      return response.data;
-    } catch (err) {
-      console.error("API error:", err);
-      return null;
-    }
+    const response = await api.get<TStatTrendsDataResponse>(
+      "/alerts/problems/trends",
+      { params }
+    );
+    return response.data;
   },
 
   fetchHostsHealthScores: async (params) => {
-    try {
-      const response = await api.get<TStatHealthScoresDataResponse>(
-        "/alerts/hosts/health",
-        { params }
-      );
-      return response.data;
-    } catch (err) {
-      console.error("API error:", err);
-      return null;
-    }
+    const response = await api.get<TStatHealthScoresDataResponse>(
+      "/alerts/hosts/health",
+      { params }
+    );
+    return response.data;
   },
 
   createClient: async (data) => {
-    try {
-      const response = await api.post<TDataResponseClient>(
-        "/clients",
-        { ...data }
-      );
-      return response.data;
-    } catch (err) {
-      console.error("API error:", err);
-      return null;
-    }
+    const response = await api.post<TDataResponseClient>(
+      "/clients",
+      { ...data }
+    );
+    return response.data;
   },
 
   listClients: async (params) => {
-    try {
-      const response =
-        await api.get<TPaginatedClientListItemDataResponse>(
-          "/clients",
-          { params }
-        );
-      return response.data;
-    } catch (err) {
-      console.error("API error:", err);
-      return null;
-    }
+    const response = await api.get<TPaginatedClientListItemDataResponse>(
+      "/clients",
+      { params }
+    );
+    return response.data;
   },
 
   getClient: async (client_id) => {
-    try {
-      const response =
-        await api.get<TDataResponseClientListItem>(`/clients/${client_id}`);
-      return response.data;
-    } catch (err) {
-      console.error("API error:", err);
-      return null;
-    }
+    const response = await api.get<TDataResponseClientListItem>(
+      `/clients/${client_id}`
+    );
+    return response.data;
   },
 
   updateClient: async (client_id, data) => {
-    try {
-      const response = await api.put<TResponse>(`/clients/${client_id}`, {
-        ...data,
-      });
-      return response.data;
-    } catch (err) {
-      console.error("API error:", err);
-      return null;
-    }
+    const response = await api.put<TResponse>(
+      `/clients/${client_id}`,
+      { ...data }
+    );
+    return response.data;
   },
 
   deleteClient: async (client_id) => {
-    try {
-      const response = await api.delete<TResponse>(`/clients/${client_id}`);
-      return response.data;
-    } catch (err) {
-      console.error("API error:", err);
-      return null;
-    }
+    const response = await api.delete<TResponse>(
+      `/clients/${client_id}`
+    );
+    return response.data;
   },
 
   regenerateClientApiKey: async (client_id) => {
-    try {
-      const response = await api.put<TDataResponseStr>(
-        `/clients/${client_id}/regenerate_api_key`
-      );
-      return response.data;
-    } catch (err) {
-      console.error("API error:", err);
-      return null;
-    }
+    const response = await api.put<TDataResponseStr>(
+      `/clients/${client_id}/regenerate_api_key`
+    );
+    return response.data;
   },
 
   changeClientOwner: async (client_id, data) => {
-    try {
-      const response = await api.put<TResponse>(
-        `/clients/${client_id}/change_owner`,
-        { ...data }
-      );
-      return response.data;
-    } catch (err) {
-      console.error("API error:", err);
-      return null;
-    }
+    const response = await api.put<TResponse>(
+      `/clients/${client_id}/change_owner`,
+      { ...data }
+    );
+    return response.data;
   },
 };
 
