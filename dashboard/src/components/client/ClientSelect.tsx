@@ -42,6 +42,14 @@ export function ClientSelect({
             : [selectedClient._id]
         }
         placeholder="Select Client(s)"
+        emptyIndicator="No such client(s)"
+        animationConfig={{
+          badgeAnimation: "bounce",
+          popoverAnimation: "scale",
+          optionHoverAnimation: "highlight",
+          duration: 150
+        }}
+        modalPopover={true}
       />
     </div>
   );

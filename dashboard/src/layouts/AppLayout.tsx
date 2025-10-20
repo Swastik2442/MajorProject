@@ -9,7 +9,12 @@ export default function AppLayout({ children }: { children?: React.ReactNode }) 
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-background-darker to-background">
       {/* Header */}
       <header className="flex justify-between items-center px-6 py-3 bg-background-darker shadow backdrop-blur-sm">
-        <h1 className="text-lg font-semibold cursor-pointer" onClick={() => {void navigate("/")}}>
+        <h1
+          className="text-lg font-semibold cursor-pointer"
+          onClick={() => {
+            void navigate("/", { replace: true, preventScrollReset: true });
+          }}
+        >
           {import.meta.env.VITE_APP_TITLE ?? "NMS"}
         </h1>
         <SignedIn>

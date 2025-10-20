@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useOrganization } from "@clerk/clerk-react";
 import { EditIcon } from "lucide-react";
 import { ClientOwnerUpdateSchema, type TClientOwnerUpdate } from "@/schemas/api";
 import { apiService } from "@/services/api";
+import { OrganizationSelect } from "@/components/clerk";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,7 +27,6 @@ import {
   FormLabel,
   FormMessage
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 
 export function ChangeOwnerDialog({
   clientId,
@@ -33,17 +35,28 @@ export function ChangeOwnerDialog({
   clientId: string;
   children?: React.ReactNode;
 }) {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+
+  const { organization, isLoaded } = useOrganization();
 
   const { mutate, isPending, isError, error } = useMutation({
     mutationKey: ["client", clientId, "change-owner"],
     mutationFn: (update: TClientOwnerUpdate) => apiService.changeClientOwner(clientId, update),
-    onSuccess: () => {setOpen(false)}
+    onSuccess: () => {
+      setOpen(false);
+      form.reset();
+      void navigate(0);
+    },
+    onError: (error) => {
+      if (import.meta.env.DEV)
+        console.error("Error updating client owner:", error);
+    }
   });
 
   const form = useForm<TClientOwnerUpdate>({
     resolver: zodResolver(ClientOwnerUpdateSchema),
-    defaultValues: { new_owner_id: "" }
+    defaultValues: { ownerId: isLoaded ? organization?.id : undefined }
   });
   const onSubmit = (values: TClientOwnerUpdate) => {
     mutate(values);
@@ -66,15 +79,21 @@ export function ChangeOwnerDialog({
           <form
             onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
             className="space-y-6"
-          > {/* TODO: Replace with Select Dropdown from the Orgs in which the current user is Admin */}
+          >
             <FormField
               control={form.control}
-              name="new_owner_id"
+              name="ownerId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>New Owner ID</FormLabel>
+                  <FormLabel>New Owner</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter new owner ID" {...field} />
+                    <OrganizationSelect
+                      className="w-full"
+                      placeholder="Select new Owner"
+                      filter={(v) => v.role === "org:admin"}
+                      onValueChange={field.onChange}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

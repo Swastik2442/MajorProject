@@ -52,7 +52,8 @@ export function CreateClientDialog({ ownerId, children }: { ownerId: string; chi
       void navigate('/client/new');
     },
     onError: (error) => {
-      console.error("Error creating client:", error);
+      if (import.meta.env.DEV)
+        console.error("Error creating client:", error);
     }
   });
 
