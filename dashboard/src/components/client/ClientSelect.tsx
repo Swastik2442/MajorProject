@@ -16,7 +16,7 @@ export function ClientSelect({
 }) {
   const { data } = useQuery({
     queryKey: ["clients", org_id],
-    queryFn: () => apiService.listClients(1, 10, org_id)
+    queryFn: () => apiService.listClients({ owner_id: org_id, page: 1, limit: 10 })
   });
   const clients = data?.data ?? [];
 

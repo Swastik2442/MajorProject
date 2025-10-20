@@ -24,6 +24,7 @@ const api = axios.create({
 api.interceptors.request.use(
   async (config) => {
     // @ts-expect-error Clerk token outside React
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     const token: string = await window.Clerk.session.getToken();
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
@@ -32,17 +33,18 @@ api.interceptors.request.use(
     const errorMessage =
       typeof error === "string"
         ? error
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         : (error as { message?: string })?.message ?? "Request error";
     return Promise.reject(new Error(errorMessage));
   }
 );
 
 export const apiService: ApiService = {
-  fetchProblems: async (page = 1, limit = 20, client_id, org_id) => {
+  fetchProblems: async (params) => {
     try {
       const response = await api.get<TPaginatedProblemDataResponse>(
         "/alerts/problems",
-        { params: { client_id, org_id, page, limit } }
+        { params }
       );
       return response.data;
     } catch (err) {
@@ -51,11 +53,11 @@ export const apiService: ApiService = {
     }
   },
 
-  fetchServiceAlerts: async (page = 1, limit = 20, client_id, org_id) => {
+  fetchServiceAlerts: async (params) => {
     try {
       const response = await api.get<TPaginatedServiceDataResponse>(
         "/alerts/services",
-        { params: { client_id, org_id, page, limit } }
+        { params }
       );
       return response.data;
     } catch (err) {
@@ -64,11 +66,11 @@ export const apiService: ApiService = {
     }
   },
 
-  fetchProblemsCount: async (client_id, org_id) => {
+  fetchProblemsCount: async (params) => {
     try {
       const response = await api.get<TStatCountsDataResponse>(
         "/alerts/problems/count",
-        { params: { client_id, org_id } }
+        { params }
       );
       return response.data;
     } catch (err) {
@@ -77,9 +79,8 @@ export const apiService: ApiService = {
     }
   },
 
-  fetchProblemsTrends: async (start, end, interval, client_id, org_id) => {
+  fetchProblemsTrends: async (params) => {
     try {
-      const params = { start, end, interval, client_id, org_id };
       const response = await api.get<TStatTrendsDataResponse>(
         "/alerts/problems/trends",
         { params }
@@ -91,11 +92,11 @@ export const apiService: ApiService = {
     }
   },
 
-  fetchHostsHealthScores: async (client_id, org_id) => {
+  fetchHostsHealthScores: async (params) => {
     try {
       const response = await api.get<TStatHealthScoresDataResponse>(
         "/alerts/hosts/health",
-        { params: { client_id, org_id } }
+        { params }
       );
       return response.data;
     } catch (err) {
@@ -106,9 +107,10 @@ export const apiService: ApiService = {
 
   createClient: async (data) => {
     try {
-      const response = await api.post<TDataResponseClient>("/clients", {
-        ...data,
-      });
+      const response = await api.post<TDataResponseClient>(
+        "/clients",
+        { ...data }
+      );
       return response.data;
     } catch (err) {
       console.error("API error:", err);
@@ -116,12 +118,13 @@ export const apiService: ApiService = {
     }
   },
 
-  listClients: async (page = 1, limit = 20, owner_id) => {
+  listClients: async (params) => {
     try {
       const response =
-        await api.get<TPaginatedClientListItemDataResponse>("/clients", {
-          params: { page, limit, owner_id },
-        });
+        await api.get<TPaginatedClientListItemDataResponse>(
+          "/clients",
+          { params }
+        );
       return response.data;
     } catch (err) {
       console.error("API error:", err);
@@ -174,11 +177,11 @@ export const apiService: ApiService = {
     }
   },
 
-  changeClientOwner: async (client_id, new_owner_id) => {
+  changeClientOwner: async (client_id, data) => {
     try {
       const response = await api.put<TResponse>(
         `/clients/${client_id}/change_owner`,
-        { new_owner_id }
+        { ...data }
       );
       return response.data;
     } catch (err) {

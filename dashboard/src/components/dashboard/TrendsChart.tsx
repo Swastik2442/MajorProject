@@ -16,13 +16,12 @@ export default function TrendsChart({ client_id = null, org_id = null }: TClient
   const { data } = useQuery({
     queryKey: ["problemTrends", client_id, org_id],
     queryFn: () =>
-      apiService.fetchProblemsTrends(
-        new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-        undefined,
-        "hour",
+      apiService.fetchProblemsTrends({
         client_id,
-        org_id
-      ),
+        org_id,
+        start: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        interval: "hour"
+    }),
     staleTime: 60 * 60 * 1000,
   });
 

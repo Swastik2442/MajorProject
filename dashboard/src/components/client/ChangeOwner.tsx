@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { EditIcon } from "lucide-react";
+import { ClientOwnerUpdateSchema, type TClientOwnerUpdate } from "@/schemas/api";
 import { apiService } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,10 +26,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-const formSchema = z.object({
-  newOwnerId: z.string().min(1, "New owner ID is required")
-});
-
 export function ChangeOwnerDialog({
   clientId,
   children
@@ -38,20 +34,19 @@ export function ChangeOwnerDialog({
   children?: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+
   const { mutate, isPending, isError, error } = useMutation({
-    mutationKey: ["client", "change-owner"],
-    mutationFn: (values: { clientId: string; newOwnerId: string }) =>
-      apiService.changeClientOwner(values.clientId, values.newOwnerId),
+    mutationKey: ["client", clientId, "change-owner"],
+    mutationFn: (update: TClientOwnerUpdate) => apiService.changeClientOwner(clientId, update),
     onSuccess: () => {setOpen(false)}
   });
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { newOwnerId: "" }
+  const form = useForm<TClientOwnerUpdate>({
+    resolver: zodResolver(ClientOwnerUpdateSchema),
+    defaultValues: { new_owner_id: "" }
   });
-
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    mutate({ clientId, ...values });
+  const onSubmit = (values: TClientOwnerUpdate) => {
+    mutate(values);
   };
 
   return (
@@ -74,7 +69,7 @@ export function ChangeOwnerDialog({
           > {/* TODO: Replace with Select Dropdown from the Orgs in which the current user is Admin */}
             <FormField
               control={form.control}
-              name="newOwnerId"
+              name="new_owner_id"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>New Owner ID</FormLabel>

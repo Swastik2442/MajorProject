@@ -32,16 +32,8 @@ export const ClientUpdateSchema = z.object({
   description: z.string().nullable().optional(),
 });
 
-export const ClientsParamsSchema = z.object({
-  client_id: z.union([
-    z.string(),
-    z.array(z.string()),
-    z.null(),
-  ]).optional(),
-  org_id: z.union([
-    z.string(),
-    z.null(),
-  ]).optional(),
+export const ClientOwnerUpdateSchema = z.object({
+  new_owner_id: z.string(),
 });
 
 export const ErrorDetailsSchema = z.object({
@@ -157,7 +149,46 @@ export const PaginatedDataResponseSchema = <T extends z.ZodType>(itemSchema: T) 
     data: z.array(itemSchema).nullable(),
   });
 
-// Inferred Types:
+export const IdSchema = z.string().min(1);
+
+export const ClientParamSchema = z.object({
+  client_id: IdSchema,
+});
+
+export const ClientsParamsSchema = z.object({
+  client_id: z.union([
+    IdSchema,
+    z.array(IdSchema),
+    z.null(),
+  ]).optional(),
+  org_id: z.union([
+    IdSchema,
+    z.null(),
+  ]).optional(),
+});
+
+export const PaginationParamsSchema = z.object({
+  page: z.number().int().min(1).default(1).optional(),
+  limit: z.number().int().min(1).max(100).default(20).optional(),
+});
+
+export const TimeIntervalParamsSchema = z.object({
+  start: z.iso.datetime(),
+  end: z.iso.datetime().optional(),
+  interval: z.enum(["hour", "day", "week", "month"]).optional(),
+});
+
+export const TimeIntervalAndOrgClientParamsSchema = TimeIntervalParamsSchema.extend(ClientsParamsSchema.shape);
+export const PaginationAndOrgClientParamsSchema = PaginationParamsSchema.extend(ClientsParamsSchema.shape);
+export const PaginationAndOwnerParamsSchema = PaginationParamsSchema.extend({
+  owner_id: z.union([
+    IdSchema,
+    z.null(),
+  ]).optional(),
+});
+
+// --- Inferred Types ---
+
 export type TProblem = z.infer<typeof ProblemSchema>;
 export type TService = z.infer<typeof ServiceSchema>;
 export type TStatCounts = z.infer<typeof StatCountsSchema>;
@@ -168,11 +199,11 @@ export type TClient = z.infer<typeof ClientSchema>;
 export type TClientCreate = z.infer<typeof ClientCreateSchema>;
 export type TClientListItem = z.infer<typeof ClientListItemSchema>;
 export type TClientUpdate = z.infer<typeof ClientUpdateSchema>;
-export type TClientsParams = z.infer<typeof ClientsParamsSchema>;
+export type TClientOwnerUpdate = z.infer<typeof ClientOwnerUpdateSchema>;
 export type TRequestValidationError = z.infer<typeof RequestValidationErrorSchema>;
 export type TResponse = z.infer<typeof ResponseSchema>;
 
-// --- API Service Interface and Types ---
+// --- DataResponse types ---
 
 export const PaginatedProblemDataResponseSchema = PaginatedDataResponseSchema(ProblemSchema);
 export type TPaginatedProblemDataResponse = z.infer<typeof PaginatedProblemDataResponseSchema>;
@@ -189,7 +220,6 @@ export type TStatTrendsDataResponse = z.infer<typeof StatTrendsDataResponseSchem
 export const StatHealthScoresDataResponseSchema = DataResponseSchema(z.array(StatHealthScoresSchema));
 export type TStatHealthScoresDataResponse = z.infer<typeof StatHealthScoresDataResponseSchema>;
 
-// Additional DataResponse types
 export const DataResponseClientSchema = DataResponseSchema(ClientSchema);
 export type TDataResponseClient = z.infer<typeof DataResponseClientSchema>;
 
@@ -199,52 +229,34 @@ export type TPaginatedClientListItemDataResponse = z.infer<typeof PaginatedClien
 export const DataResponseClientListItemSchema = DataResponseSchema(ClientListItemSchema);
 export type TDataResponseClientListItem = z.infer<typeof DataResponseClientListItemSchema>;
 
-export const DataResponseStrSchema = z.object({
-  status: z.enum(["success", "error"]),
-  message: z.string().nullable().optional(),
-  data: z.string().nullable(),
-});
+export const DataResponseStrSchema = DataResponseSchema(z.string());
 export type TDataResponseStr = z.infer<typeof DataResponseStrSchema>;
 
+// --- API Parameters Types ---
+
+export type TClientParam = z.infer<typeof ClientParamSchema>;
+export type TClientsParams = z.infer<typeof ClientsParamsSchema>;
+export type TPaginationParams = z.infer<typeof PaginationParamsSchema>;
+export type TTimeIntervalParams = z.infer<typeof TimeIntervalParamsSchema>;
+export type TTimeIntervalAndOrgClientParams = z.infer<typeof TimeIntervalAndOrgClientParamsSchema>;
+export type TPaginationAndOrgClientParams = z.infer<typeof PaginationAndOrgClientParamsSchema>;
+export type TPaginationAndOwnerParams = z.infer<typeof PaginationAndOwnerParamsSchema>;
+
+// --- API Service Interface ---
+
 export interface ApiService {
-  fetchProblems: (
-    page?: number,
-    limit?: number,
-    client_id?: string | string[] | null,
-    org_id?: string | null,
-  ) => Promise<TPaginatedProblemDataResponse | null>;
-  fetchServiceAlerts: (
-    page?: number,
-    limit?: number,
-    client_id?: string | string[] | null,
-    org_id?: string | null,
-  ) => Promise<TPaginatedServiceDataResponse | null>;
-  fetchProblemsCount: (
-    client_id?: string | string[] | null,
-    org_id?: string | null
-  ) => Promise<TStatCountsDataResponse | null>;
-  fetchProblemsTrends: (
-    start: string,
-    end?: string,
-    interval?: "hour" | "day" | "week" | "month",
-    client_id?: string | string[] | null,
-    org_id?: string | null,
-  ) => Promise<TStatTrendsDataResponse | null>;
-  fetchHostsHealthScores: (
-    client_id?: string | string[] | null,
-    org_id?: string | null
-  ) => Promise<TStatHealthScoresDataResponse | null>;
+  fetchProblems: (params: TPaginationAndOrgClientParams) => Promise<TPaginatedProblemDataResponse | null>;
+  fetchServiceAlerts: (params: TPaginationAndOrgClientParams) => Promise<TPaginatedServiceDataResponse | null>;
+  fetchProblemsCount: (params: TClientsParams) => Promise<TStatCountsDataResponse | null>;
+  fetchProblemsTrends: (params: TTimeIntervalAndOrgClientParams) => Promise<TStatTrendsDataResponse | null>;
+  fetchHostsHealthScores: (params: TClientsParams) => Promise<TStatHealthScoresDataResponse | null>;
 
   // Client endpoints
-  createClient: (client: TClientCreate) => Promise<TDataResponseClient | null>;
-  listClients: (
-    page?: number,
-    limit?: number,
-    owner_id?: string | null
-  ) => Promise<TPaginatedClientListItemDataResponse | null>;
+  createClient: (body: TClientCreate) => Promise<TDataResponseClient | null>;
+  listClients: (params: TPaginationAndOwnerParams) => Promise<TPaginatedClientListItemDataResponse | null>;
   getClient: (client_id: string) => Promise<TDataResponseClientListItem | null>;
-  updateClient: (client_id: string, update: TClientUpdate) => Promise<TResponse | null>;
+  updateClient: (client_id: string, body: TClientUpdate) => Promise<TResponse | null>;
   deleteClient: (client_id: string) => Promise<TResponse | null>;
   regenerateClientApiKey: (client_id: string) => Promise<TDataResponseStr | null>;
-  changeClientOwner: (client_id: string, new_owner_id: string) => Promise<TResponse | null>;
+  changeClientOwner: (client_id: string, body: TClientOwnerUpdate) => Promise<TResponse | null>;
 }

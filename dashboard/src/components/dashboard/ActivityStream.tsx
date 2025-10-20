@@ -26,7 +26,7 @@ function MiniSpark({ data = [] }: { data: { v: number }[] }) {
 export default function ActivityStream({ client_id = null, org_id = null }: TClientsParams) {
   const { data, isError, error, isPending } = useQuery({
     queryKey: ["problems", client_id, org_id],
-    queryFn: () => apiService.fetchProblems(1, 8, client_id, org_id),
+    queryFn: () => apiService.fetchProblems({ client_id, org_id, page: 1, limit: 8 }),
   });
 
   if (isPending) {
