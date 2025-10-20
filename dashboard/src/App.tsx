@@ -18,16 +18,23 @@ const router = createBrowserRouter([
     errorElement: <RootErrorBoundary />,
   },
   {
+    path: "/",
+    element: (<>
+      <SignedIn>
+        <AppLayout>
+          <Dashboard />
+        </AppLayout>
+      </SignedIn>
+      <SignedOut>
+        <Home />
+      </SignedOut>
+    </>),
+    errorElement: <RootErrorBoundary />,
+  },
+  {
     element: <AppLayout />,
     errorElement: <RootErrorBoundary />,
     children: [
-      {
-        path: "/",
-        element: (<>
-          <SignedIn><Dashboard /></SignedIn>
-          <SignedOut><Home /></SignedOut>
-        </>),
-      },
       {
         element: <PrivateRoutes />,
         children: [

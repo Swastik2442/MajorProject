@@ -1,30 +1,7 @@
-// Home.tsx
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { Link } from "react-router";
+import useTypingEffect from "@/hooks/typingEffect";
 
-// Typing effect hook
-const useTypingEffect = (
-  text: string,
-  speed: number = 70,
-  start: boolean = true
-) => {
-  const [displayed, setDisplayed] = useState("");
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    if (!start) return; // only start when allowed
-    if (index < text.length) {
-      const timeout = setTimeout(() => {
-        setDisplayed((prev) => prev + text.charAt(index));
-        setIndex((prev) => prev + 1);
-      }, speed);
-      return () => clearTimeout(timeout);
-    }
-  }, [index, text, speed, start]);
-
-  return displayed;
-};
-
-// Background animation
 const BackgroundGraphics = () => (
   <div className="absolute inset-0 overflow-hidden z-0">
     <svg
@@ -51,8 +28,8 @@ const BackgroundGraphics = () => (
       {[200, 400, 600, 800].map((y, i) => (
         <path
           key={i}
-          d={`M-50 ${y} C200 ${y - 100}, 400 ${y + 100}, 700 ${y}
-              C1000 ${y - 100}, 1300 ${y + 100}, 1970 ${y}`}
+          d={`M-50 ${y.toString()} C200 ${(y - 100).toString()}, 400 ${(y + 100).toString()}, 700 ${y.toString()}
+              C1000 ${(y - 100).toString()}, 1300 ${(y + 100).toString()}, 1970 ${y.toString()}`}
           stroke="url(#grad)"
           strokeWidth="2"
           opacity="0.25"
@@ -79,40 +56,42 @@ const BackgroundGraphics = () => (
   </div>
 );
 
-// Main Component
+const HEADLINE_1 = "Unified Network Intelligence";
+const HEADLINE_2 = "at Your Fingertips";
+
 export default function Home() {
   const [startSecond, setStartSecond] = useState(false);
 
-  const headline1 = useTypingEffect("Unified Network Intelligence", 80, true);
-  const headline2 = useTypingEffect("at Your Fingertips", 80, startSecond);
+  const headline1 = useTypingEffect(HEADLINE_1, 80, true);
+  const headline2 = useTypingEffect(HEADLINE_2, 80, startSecond);
 
   useEffect(() => {
-    if (headline1.length === "Unified Network Intelligence".length) {
-      const timeout = setTimeout(() => setStartSecond(true), 500);
-      return () => clearTimeout(timeout);
+    if (headline1.length === HEADLINE_1.length) {
+      const timeout = setTimeout(() => {setStartSecond(true)}, 100);
+      return () => {clearTimeout(timeout)};
     }
   }, [headline1]);
 
-  const typingDone =
-    headline1.length === "Unified Network Intelligence".length &&
-    headline2.length === "at Your Fingertips".length;
+  const typing1Done = headline1.length === HEADLINE_1.length;
+  const typing2Done = headline2.length === HEADLINE_2.length;
 
   return (
     <div className="relative min-h-screen text-white bg-[#060b22] flex flex-col overflow-hidden">
       <BackgroundGraphics />
 
-      {/* Header */}
-     
       {/* Hero */}
       <main className="relative z-10 flex-grow flex flex-col items-center justify-center text-center px-6">
         <h1 className="text-5xl md:text-6xl font-extrabold leading-tight tracking-wide mb-6">
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-blue-400 to-indigo-500">
             {headline1}
           </span>
+          {!typing1Done && (
+            <span className="animate-caret-blink inline-block w-[2px] h-12 bg-white ml-2" />
+          )}
           <br />
           <span className="text-blue-300">{headline2}</span>
-          {!typingDone && (
-            <span className="animate-blink inline-block w-[2px] h-8 bg-white ml-2 align-middle" />
+          {typing1Done && !typing2Done && (
+            <span className="animate-caret-blink inline-block w-[2px] h-12 bg-white ml-2" />
           )}
         </h1>
 
@@ -123,14 +102,14 @@ export default function Home() {
         </p>
 
         <div className="flex flex-wrap justify-center gap-5">
-          <a
-            href="/login"
+          <Link
+            to="/login"
             className="group relative inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-cyan-400 to-blue-600 p-[1px] text-sm font-semibold focus:outline-none focus:ring-4 focus:ring-cyan-800"
           >
             <span className="relative px-8 py-3 transition-all bg-[#060b22] rounded-md group-hover:bg-transparent group-hover:text-white">
               Get Started
             </span>
-          </a>
+          </Link>
           <button className="px-8 py-3 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all backdrop-blur-md border border-white/10">
             Learn More
           </button>
@@ -139,21 +118,12 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="relative z-10 py-5 text-center text-gray-500 text-sm border-t border-white/10 bg-white/5 backdrop-blur-sm">
+        <p>&copy; {new Date().getFullYear()} {import.meta.env.VITE_APP_TITLE ?? "NMS"}</p>
         <p>
-          © {new Date().getFullYear()} NMS Dashboard — Powered by{" "}
-          <span className="text-cyan-400 font-medium">XYZ</span>
+          <span>by </span>
+          <span className="text-cyan-500 font-medium">Rajat Paliwal, Swastik Kulshreshtha & Utkarsh Tailor</span>
         </p>
       </footer>
-
-      <style>{`
-        @keyframes blink {
-          0%, 50%, 100% { opacity: 1; }
-          25%, 75% { opacity: 0; }
-        }
-        .animate-blink {
-          animation: blink 1s infinite;
-        }
-      `}</style>
     </div>
   );
 }

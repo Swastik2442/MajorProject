@@ -2,7 +2,7 @@ import { Outlet, useNavigate } from "react-router";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import { OrganizationSwitcher, UserButton, SignInButton } from "@/components/clerk";
 
-export default function AppLayout() {
+export default function AppLayout({ children }: { children?: React.ReactNode }) {
   const navigate = useNavigate();
 
   return (
@@ -28,6 +28,7 @@ export default function AppLayout() {
         {/* Ensure outlet content stretches full height */}
         <div className="min-h-full w-full">
           <Outlet />
+          {children}
         </div>
       </main>
     </div>
