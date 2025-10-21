@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { PieChart, Pie, Cell } from "recharts";
+import { motion } from "framer-motion";
 import type { TClientsParams } from "@/schemas/api";
 import { apiService } from "@/services/api";
 
@@ -26,7 +27,13 @@ export default function KPIring({ client_id = null, org_id = null }: TClientsPar
   ];
 
   return (
-    <div className="card flex flex-col items-center justify-center p-4">
+    <motion.div
+      initial={{ opacity: 0.0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.1, duration: 0.8, ease: "easeInOut" }}
+      viewport={{ once: true }}
+      className="card flex flex-col items-center justify-center p-4"
+    >
       <div className="relative size-[140px]">
         <PieChart width={140} height={140}>
           <Pie
@@ -58,6 +65,6 @@ export default function KPIring({ client_id = null, org_id = null }: TClientsPar
           {counts.problemsInLast24Hours}
         </span>
       </div>
-    </div>
+    </motion.div>
   );
 }

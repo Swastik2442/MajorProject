@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { BarChart, Bar, ResponsiveContainer } from "recharts";
+import { motion } from "framer-motion";
 import type { TClientsParams } from "@/schemas/api";
 import { apiService } from "@/services/api";
 
@@ -16,7 +17,14 @@ export default function HostScorecards({ client_id = null, org_id = null }: TCli
       <div className="font-semibold mb-4 text-primary uppercase">Host Health Scorecards</div>
       <div className="grid grid-cols-2 gap-4">
         {hosts.slice(0, 4).map((h) => (
-          <div key={h._id} className="bg-card p-3 rounded-xl border">
+          <motion.div
+            key={h._id}
+            initial={{ opacity: 0.0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.8, ease: "easeInOut" }}
+            viewport={{ once: true }}
+            className="bg-card p-3 rounded-xl border"
+          >
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm text-foreground/75">{h._id}</div>
@@ -36,7 +44,7 @@ export default function HostScorecards({ client_id = null, org_id = null }: TCli
                 </ResponsiveContainer>
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>

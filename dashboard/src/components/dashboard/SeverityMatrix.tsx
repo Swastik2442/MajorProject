@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import type { TSeveritySchema } from "@/schemas/others";
+import { motion } from "framer-motion";
 
 type SeverityMatrixData = {
   category: string;
@@ -16,7 +17,13 @@ type SeverityMatrixData = {
 
 export default function SeverityMatrix({ data = [] }: { data?: SeverityMatrixData[] }) {
   return (
-    <div className="bg-card rounded-xl shadow-md p-5 border">
+    <motion.div
+      initial={{ opacity: 0.0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.1, duration: 0.8, ease: "easeInOut" }}
+      viewport={{ once: true }}
+      className="bg-card rounded-xl shadow-md p-5 border"
+    >
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-sm font-semibold tracking-wider text-primary uppercase">
@@ -65,6 +72,6 @@ export default function SeverityMatrix({ data = [] }: { data?: SeverityMatrixDat
           </BarChart>
         </ResponsiveContainer>
       </div>
-    </div>
+    </motion.div>
   );
 }

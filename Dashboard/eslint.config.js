@@ -18,6 +18,14 @@ export default defineConfig([
       reactRefresh.configs.vite,
       ...pluginQuery.configs['flat/recommended']
     ],
+    rules: {
+      "@typescript-eslint/restrict-template-expressions": {
+        "allowNumber": true,
+        "allowBoolean": true,
+        "allowNullish": true,
+        "allowRegExp": true
+      },
+    },
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,

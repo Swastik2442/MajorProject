@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import type { TClientsParams } from "@/schemas/api";
 import { apiService } from "@/services/api";
 
@@ -19,7 +20,13 @@ export default function StatusCards({ client_id = null, org_id = null }: TClient
   return (
     <div className="grid grid-cols-2 gap-6">
       {/* Active Problems */}
-      <div className="bg-card rounded-xl shadow-md p-5 border">
+      <motion.div
+        initial={{ opacity: 0.0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.8, ease: "easeInOut" }}
+        viewport={{ once: true }}
+        className="bg-card rounded-xl shadow-md p-5 border"
+      >
         <div className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
           Current Status
         </div>
@@ -29,10 +36,16 @@ export default function StatusCards({ client_id = null, org_id = null }: TClient
         <div className="mt-1 text-sm">
           Total Active Problems
         </div>
-      </div>
+      </motion.div>
 
       {/* Problems Today */}
-      <div className="bg-card rounded-xl shadow-md p-5 border">
+      <motion.div
+        initial={{ opacity: 0.0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.8, ease: "easeInOut" }}
+        viewport={{ once: true }}
+        className="bg-card rounded-xl shadow-md p-5 border"
+      >
         <div className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
           Total
         </div>
@@ -42,10 +55,16 @@ export default function StatusCards({ client_id = null, org_id = null }: TClient
         <div className="mt-1 text-sm">
           Total Problems Today
         </div>
-      </div>
+      </motion.div>
 
       {/* Optional: Problems Last Week */}
-      <div className="bg-card rounded-xl shadow-md p-5 border">
+      <motion.div
+        initial={{ opacity: 0.0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.8, ease: "easeInOut" }}
+        viewport={{ once: true }}
+        className="bg-card rounded-xl shadow-md p-5 border"
+      >
         <div className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
           Last Week
         </div>
@@ -55,10 +74,16 @@ export default function StatusCards({ client_id = null, org_id = null }: TClient
         <div className="mt-1 text-sm">
           Problems in Last 7 Days
         </div>
-      </div>
+      </motion.div>
 
       {/* Optional: Problems Last Month */}
-      <div className="bg-card rounded-xl shadow-md p-5 border">
+      <motion.div
+        initial={{ opacity: 0.0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.8, ease: "easeInOut" }}
+        viewport={{ once: true }}
+        className="bg-card rounded-xl shadow-md p-5 border"
+      >
         <div className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
           Last Month
         </div>
@@ -68,7 +93,7 @@ export default function StatusCards({ client_id = null, org_id = null }: TClient
         <div className="mt-1 text-sm">
           Problems in Last 30 Days
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

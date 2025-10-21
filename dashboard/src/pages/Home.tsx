@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import { motion } from "framer-motion";
 import useTypingEffect from "@/hooks/typingEffect";
 
 const HEADLINE_1 = "Unified Network Intelligence";
@@ -12,8 +13,8 @@ export default function Home() {
 
   useEffect(() => {
     if (headline1.length === HEADLINE_1.length) {
-      const timeout = setTimeout(() => setStartSecond(true), 150);
-      return () => clearTimeout(timeout);
+      const timeout = setTimeout(() => {setStartSecond(true)}, 150);
+      return () => {clearTimeout(timeout)};
     }
   }, [headline1]);
 
@@ -87,8 +88,14 @@ export default function Home() {
       </div>
 
       {/* Glassmorphic card */}
-      <div className="relative bg-[rgba(255,255,255,0.06)] backdrop-blur-xl border border-[rgba(255,255,255,0.08)] 
-        rounded-3xl p-16 w-[92%] max-w-5xl text-center shadow-[0_0_100px_rgba(0,255,180,0.15)] z-10">
+      <motion.div
+        initial={{ opacity: 0.0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.8, ease: "easeInOut" }}
+        viewport={{ once: true }}
+        className="relative bg-[rgba(255,255,255,0.06)] backdrop-blur-xl border border-[rgba(255,255,255,0.08)]
+        rounded-3xl p-16 w-[92%] max-w-5xl text-center shadow-[0_0_100px_rgba(0,255,180,0.15)] z-10"
+      >
         <div className="absolute -z-10 w-[700px] h-[700px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[radial-gradient(circle,rgba(0,200,255,0.25),transparent_70%)] blur-3xl"></div>
 
         {/* Title with typing effect */}
@@ -125,13 +132,13 @@ export default function Home() {
             Learn More
           </button>
         </div>
-      </div>
+      </motion.div>
 
       {/* Footer */}
       <footer className="absolute bottom-6 text-center text-gray-500 text-sm">
-        <p>© 2025 NMS</p>
+        <p>&copy; 2025 NMS</p>
         <p>
-          by{" "}
+          <span>by </span>
           <span className="text-cyan-400 font-medium">
             Rajat Paliwal, Swastik Kulshreshtha & Utkarsh Tailor
           </span>

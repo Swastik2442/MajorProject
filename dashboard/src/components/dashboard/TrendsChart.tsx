@@ -9,6 +9,7 @@ import {
   Legend,
   CartesianGrid,
 } from "recharts";
+import { motion } from "framer-motion";
 import type { TClientsParams } from "@/schemas/api";
 import { apiService } from "@/services/api";
 
@@ -34,7 +35,13 @@ export default function TrendsChart({ client_id = null, org_id = null }: TClient
   }));
 
   return (
-    <div className="bg-card rounded-xl shadow-md p-5 border">
+    <motion.div
+      initial={{ opacity: 0.0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.1, duration: 0.8, ease: "easeInOut" }}
+      viewport={{ once: true }}
+      className="bg-card rounded-xl shadow-md p-5 border"
+    >
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-sm font-semibold tracking-wider text-primary uppercase">
@@ -100,6 +107,6 @@ export default function TrendsChart({ client_id = null, org_id = null }: TClient
           </LineChart>
         </ResponsiveContainer>
       </div>
-    </div>
+    </motion.div>
   );
 }

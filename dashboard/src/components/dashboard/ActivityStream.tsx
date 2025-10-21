@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { LineChart, Line, ResponsiveContainer } from "recharts";
-import type { TClientsParams } from "../../schemas/api";
-import { apiService } from "../../services/api";
-import LoadingSpinner from "./LoadingSpinner";
+import { motion } from "framer-motion";
+import type { TClientsParams } from "@/schemas/api";
+import { apiService } from "@/services/api";
+import { LoadingSpinner } from "@/components/ui/icons";
 
 function MiniSpark({ data = [] }: { data: { v: number }[] }) {
   return (
@@ -31,7 +32,7 @@ export default function ActivityStream({ client_id = null, org_id = null }: TCli
 
   if (isPending) {
     return (
-      <div className="p-8">
+      <div className="p-8 flex justify-center items-center">
         <LoadingSpinner />
       </div>
     );
@@ -48,7 +49,13 @@ export default function ActivityStream({ client_id = null, org_id = null }: TCli
   const items = data?.data ?? [];
 
   return (
-    <div className="bg-card rounded-xl shadow-md p-5 border">
+    <motion.div
+      initial={{ opacity: 0.0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.1, duration: 0.8, ease: "easeInOut" }}
+      viewport={{ once: true }}
+      className="bg-card rounded-xl shadow-md p-5 border"
+    >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-semibold tracking-wider text-primary uppercase">
@@ -98,6 +105,6 @@ export default function ActivityStream({ client_id = null, org_id = null }: TCli
           </div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
