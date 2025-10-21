@@ -1,1 +1,1 @@
-wt new-tab -p "Command Prompt" -d .\nms cmd /k "docker compose up -d && docker compose -f zabbix/docker-compose.yml up -d" ; split-pane -d .\dashboard cmd /k npm run dev
+wt new-tab -p "Command Prompt" -d .\nms cmd /k "docker compose up -d" ; split-pane -d .\dashboard -V cmd /k npm run dev ; mf previous ; split-pane -d .\nms\zabbix -H cmd /k "docker compose up -d && docker compose -f docker-compose2.yml up -d"

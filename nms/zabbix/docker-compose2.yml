@@ -1,0 +1,72 @@
+services:
+  # PostgreSQL Database for Zabbix
+  postgres2:
+    image: postgres:15
+    container_name: zabbix-2-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: zabbix_pass
+      POSTGRES_DB: zabbix
+    volumes:
+      - zabbix_2_pg_data:/var/lib/postgresql/data
+    networks:
+      - zabbix-2-net
+
+  # Zabbix server
+  zabbix-2-server:
+    image: zabbix/zabbix-server-pgsql:alpine-latest
+    container_name: zabbix-2-server
+    restart: unless-stopped
+    environment:
+      DB_SERVER_HOST: postgres2
+      POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: zabbix_pass
+      POSTGRES_DB: zabbix
+    depends_on:
+      - postgres2
+    ports:
+      - "10151:10051"
+    networks:
+      - zabbix-2-net
+
+  # Zabbix web (frontend)
+  zabbix-2-web:
+    image: zabbix/zabbix-web-nginx-pgsql:alpine-latest
+    container_name: zabbix-2-web
+    restart: unless-stopped
+    environment:
+      DB_SERVER_HOST: postgres2
+      POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: zabbix_pass
+      POSTGRES_DB: zabbix
+      ZBX_SERVER_HOST: zabbix-2-server
+      PHP_TZ: Asia/Kolkata
+    depends_on:
+      - postgres2
+      - zabbix-2-server
+    ports:
+      - "8180:8080"
+    networks:
+      - zabbix-2-net
+
+  # Zabbix agent
+  zabbix-2-agent:
+    image: zabbix/zabbix-agent:alpine-latest
+    container_name: zabbix-2-agent
+    restart: unless-stopped
+    environment:
+      ZBX_SERVER_HOST: zabbix-2-server
+      ZBX_HOSTNAME: zabbix-2-agent
+    depends_on:
+      - zabbix-2-server
+    ports:
+      - "10150:10050"
+    networks:
+      - zabbix-2-net
+
+volumes:
+  zabbix_2_pg_data:
+
+networks:
+  zabbix-2-net:

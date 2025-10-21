@@ -3,7 +3,7 @@ import json
 from data import getWebhookScript, json_files_content
 
 apiKey = "<YOUR_API_KEY_HERE>"
-apiUrl = "http://host.docker.internal:5000/zabbix/webhook"
+apiUrl = "<YOUR_API_URL_HERE>"
 
 data = {"zabbix_export": {
     "version": "7.4",
