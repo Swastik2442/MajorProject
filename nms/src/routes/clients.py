@@ -106,16 +106,15 @@ async def list_clients(
     query: Annotated[PaginationWithOwnerId, Query()],
     user_id: JwtUserId,
     clerk: ClerkSdk,
-    db: Database
-):
+    db: Database,
+    response: Response
+) -> PaginatedDataResponse[list[ClientListItem]]:
     offset = (query.page - 1) * query.limit
     if query.owner_id is None:
         orgs = await clerk.organizations.list_async(user_id=[user_id], limit=50)
         if orgs is None or len(orgs.data) == 0:
-            return Response(
-                PaginatedDataResponse[list[ClientListItem]](data=[], page=query.page, limit=query.limit),
-                headers={"Cache-Control": "private, max-age=300"}
-            )
+            response.headers["Cache-Control"] = "private, max-age=300"
+            return PaginatedDataResponse[list[ClientListItem]](data=[], page=query.page, limit=query.limit)
 
         clients = await db[Client.Meta.collection_name()].find(
             {fields(Client).ownerId: {"$in": [org.id for org in orgs.data]}},
@@ -136,21 +135,18 @@ async def list_clients(
         ).to_list()
 
     clients = [ClientListItem(**client) for client in clients]
-    return Response(
-        PaginatedDataResponse[list[ClientListItem]](data=clients, page=query.page, limit=query.limit),
-        headers={"Cache-Control": "private, max-age=300"}
-    )
+
+    response.headers["Cache-Control"] = "private, max-age=300"
+    return PaginatedDataResponse[list[ClientListItem]](data=clients, page=query.page, limit=query.limit)
 
 @router.get(
     "/{client_id}",
     response_model=DataResponse[ClientListItem],
     responses={404: {"model": CustomHTTPException}}
 )
-def get_client(findResult: ClientFromId):
-    return Response(
-        DataResponse[ClientListItem](data=findResult.client),
-        headers={"Cache-Control": "private, max-age=300"}
-    )
+def get_client(findResult: ClientFromId, response: Response) -> DataResponse[ClientListItem]:
+    response.headers["Cache-Control"] = "private, max-age=300"
+    return DataResponse[ClientListItem](data=findResult.client)
 
 @router.put(
     "/{client_id}/regenerate_api_key",

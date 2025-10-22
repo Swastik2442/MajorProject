@@ -107,7 +107,7 @@ async def get_trigger_alerts(
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database
-):
+) -> PaginatedDataResponse[list[Problem]]:
     clients = await get_clients(query, user_id, clerk, db)
     offset = (query.page - 1) * query.limit
     cursor = db[Problem.Meta.collection_name()].find(
@@ -125,7 +125,7 @@ async def get_service_alerts(
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database
-):
+) -> PaginatedDataResponse[list[Service]]:
     clients = await get_clients(query, user_id, clerk, db)
     offset = (query.page - 1) * query.limit
     cursor = db[Service.Meta.collection_name()].find(
@@ -138,7 +138,11 @@ async def get_service_alerts(
     return PaginatedDataResponse[list[Service]](data=results, page=query.page, limit=query.limit)
 
 @router.get("/problems/count", response_model=DataResponse[StatCounts])
-async def get_trigger_alerts_count(clients: ClientsFromQuery, db: Database):
+async def get_trigger_alerts_count(
+    clients: ClientsFromQuery,
+    db: Database,
+    response: Response
+) -> DataResponse[StatCounts]:
     curr = now()
     clientIds = [client.id for client in clients if client.id is not None]
     results = await asyncio.gather(
@@ -165,16 +169,14 @@ async def get_trigger_alerts_count(clients: ClientsFromQuery, db: Database):
         })
     )
 
-    return Response(
-        DataResponse[StatCounts](data=StatCounts(
-            totalActiveProblems=results[0],
-            activeProblemsInLast24Hours=results[1],
-            problemsInLast24Hours=results[2],
-            problemsInLastWeek=results[3],
-            problemsInLastMonth=results[4]
-        )),
-        headers={"Cache-Control": "private, max-age=60"}
-    )
+    response.headers["Cache-Control"] = "private, max-age=60"
+    return DataResponse[StatCounts](data=StatCounts(
+        totalActiveProblems=results[0],
+        activeProblemsInLast24Hours=results[1],
+        problemsInLast24Hours=results[2],
+        problemsInLastWeek=results[3],
+        problemsInLastMonth=results[4]
+    ))
 
 class TimePeriodWithClientsParams(TimePeriodParams, ClientsParams):
     pass
@@ -185,8 +187,9 @@ async def get_trigger_alert_trends(
     query: Annotated[TimePeriodWithClientsParams, Query()],
     user_id: JwtUserId,
     clerk: ClerkSdk,
-    db: Database
-):
+    db: Database,
+    response: Response
+) -> DataResponse[list[StatTrends]]:
     clients = await get_clients(query, user_id, clerk, db)
 
     if query.end is None:
@@ -249,18 +252,20 @@ async def get_trigger_alert_trends(
             ):
                 active_counts[i] += 1
 
-    return Response(
-            DataResponse[list[StatTrends]](data=[StatTrends(
-            timestamp=bins[i][0],
-            new=new_counts[i],
-            resolved=resolved_counts[i],
-            active=active_counts[i]
-        ) for i in range(num_periods)]),
-        headers={"Cache-Control": f"private, max-age={IntervalSeconds[query.interval] // 2}, must-revalidate"}
-    )
+    response.headers["Cache-Control"] = f"private, max-age={IntervalSeconds[query.interval] // 60}, must-revalidate"
+    return DataResponse[list[StatTrends]](data=[StatTrends(
+        timestamp=bins[i][0],
+        new=new_counts[i],
+        resolved=resolved_counts[i],
+        active=active_counts[i]
+    ) for i in range(num_periods)])
 
 @router.get("/hosts/health", response_model=DataResponse[list[StatHealthScores]])
-async def get_hosts_health_scores(clients: ClientsFromQuery, db: Database):
+async def get_hosts_health_scores(
+    clients: ClientsFromQuery,
+    db: Database,
+    response: Response
+) -> DataResponse[list[StatHealthScores]]:
     # Aggregate problem severity counts per host
     pipeline = [
         # Get relevant problems for the clients
@@ -336,7 +341,6 @@ async def get_hosts_health_scores(clients: ClientsFromQuery, db: Database):
 
     cursor = await db[Problem.Meta.collection_name()].aggregate(pipeline)
     results = [StatHealthScores(**doc) async for doc in cursor]
-    return Response(
-        DataResponse[list[StatHealthScores]](data=results),
-        headers={"Cache-Control": "private, max-age=120"}
-    )
+
+    response.headers["Cache-Control"] = "private, max-age=120"
+    return DataResponse[list[StatHealthScores]](data=results)
