@@ -19,9 +19,13 @@ class DatabaseService:
         self._db: AsyncDatabase[Any]
 
     def get_db_client(self) -> AsyncMongoClient[Any]:
+        if not hasattr(self, "_db_client"):
+            raise RuntimeError("Database client not connected")
         return self._db_client
 
     def get_db(self) -> AsyncDatabase[Any]:
+        if not hasattr(self, "_db"):
+            raise RuntimeError("Database client not connected")
         return self._db
 
     async def connect(self, dsn: MongoDsn = config.MONGO_CONNECTION_URI):

@@ -11,9 +11,11 @@ logger = getLogger(__name__)
 
 class RedisService:
     def __init__(self):
-        self._redis_client: redis.Redis | None = None
+        self._redis_client: redis.Redis | None
 
     def get_client(self) -> redis.Redis | None:
+        if not hasattr(self, "_redis_client"):
+            raise RuntimeError("Redis client not initialized")
         return self._redis_client
 
     def connect(self, dsn: RedisDsn | None = config.REDIS_URL):

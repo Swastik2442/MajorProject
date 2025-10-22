@@ -19,6 +19,8 @@ class ClerkService:
         self._clerk_client: Clerk
 
     def get_clerk(self) -> Clerk:
+        if not hasattr(self, "_clerk_client"):
+            raise RuntimeError("Clerk client not connected")
         return self._clerk_client
 
     def connect(self):
