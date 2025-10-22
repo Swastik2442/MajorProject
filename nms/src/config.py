@@ -1,12 +1,13 @@
 "Configuration for the application"
 
-from pydantic import AliasChoices, Field, MongoDsn
+from pydantic import AliasChoices, Field, MongoDsn, RedisDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=('.env', '.env.local'),
         env_file_encoding='utf-8',
+        env_ignore_empty=True,
         extra='ignore',
     )
 
@@ -14,6 +15,11 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices('MONGO_URI', 'MONGO_CONNECTION_URI', 'MONGODB_URI', 'MONGODB_CONNECTION_URI'),
     )
     DB_NAME: str = Field("nms")
+
+    REDIS_URL: RedisDsn | None = Field(
+        default=None,
+        validation_alias=AliasChoices('REDIS_URL', 'REDIS_URI'),
+    )
 
     CLERK_ISSUER: str
     CLERK_JWKS_URL: str

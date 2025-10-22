@@ -11,16 +11,25 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from src.config import config
 from src.exceptions import RequestValidationError as CustomRequestValidationError, http_exception_handler, validation_exception_handler
 from src.routes import alerts_router, clients_router, zabbix_router
-from src.services.db import connect, disconnect
+from src.services.auth.clerk import clerk_service
+from src.services.db import db_service
+from src.services.redis import redis_service
 from src.schemas import Response as CustomResponse
 
+# logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    await connect()
+    await db_service.connect()
+    redis_service.connect()
+    clerk_service.connect()
+
     yield
-    await disconnect()
+
+    await db_service.disconnect()
+    redis_service.disconnect()
+    clerk_service.disconnect()
 
 app = FastAPI(
     title="NMS API",
