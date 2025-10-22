@@ -90,3 +90,4 @@ venv/
 
 # Custom
 src/templates/*.json
+zabbix/*

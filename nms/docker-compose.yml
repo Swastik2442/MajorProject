@@ -22,12 +22,14 @@ services:
     restart: unless-stopped
     environment:
       - MONGO_CONNECTION_URI=mongodb://root:password@db:27017/
+      - CLERK_ISSUER=${CLERK_ISSUER}
+      - CLERK_JWKS_URL=${CLERK_JWKS_URL}
+      - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
     ports:
       - "5000:5000"
     depends_on:
       - mongodb
-    volumes:
-      - ./:/app
 
 volumes:
   mongodb_data:

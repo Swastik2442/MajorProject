@@ -19,4 +19,9 @@ class Settings(BaseSettings):
     CLERK_JWKS_URL: str
     CLERK_SECRET_KEY: str
 
+    ALLOWED_ORIGINS: list[str] = Field(
+        default_factory=lambda: ["http://localhost:5173"],
+        validation_alias=AliasChoices('ALLOWED_ORIGINS', 'ALLOW_ORIGINS', 'CORS_ALLOW_ORIGINS', 'ORIGINS'),
+    )
+
 config = Settings() # type: ignore[call-arg]

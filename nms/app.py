@@ -8,12 +8,12 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from src.config import config
 from src.exceptions import RequestValidationError as CustomRequestValidationError, http_exception_handler, validation_exception_handler
 from src.routes import alerts_router, clients_router, zabbix_router
 from src.services.db import connect, disconnect
 from src.schemas import Response as CustomResponse
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
 
 @asynccontextmanager
@@ -34,10 +34,9 @@ app = FastAPI(
     }
 )
 
-origins = ["http://localhost:5173"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=config.ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
