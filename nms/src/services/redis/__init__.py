@@ -15,7 +15,8 @@ class RedisService:
 
     def get_client(self) -> redis.Redis | None:
         if not hasattr(self, "_redis_client"):
-            raise RuntimeError("Redis client not initialized")
+            logger.warning("Redis client not initialized before access")
+            self.connect()
         return self._redis_client
 
     def connect(self, dsn: RedisDsn | None = config.REDIS_URL):
