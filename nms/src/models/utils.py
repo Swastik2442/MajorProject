@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
 from typing import Annotated, Any, TypeVar, cast, TYPE_CHECKING
+from uuid import uuid4
 from zoneinfo import ZoneInfo
 
 from bson import ObjectId
@@ -16,6 +17,8 @@ def none() -> None:
     return None
 def now() -> datetime:
     return datetime.now(utc_tz)
+def uuid4_hex() -> str:
+    return uuid4().hex
 def to_doc(obj: BaseModel):
     return obj.model_dump(exclude_none=True)
 

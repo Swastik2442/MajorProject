@@ -11,8 +11,8 @@ from pymongo import DESCENDING
 
 from src.exceptions import HTTPException as CustomHTTPException
 from src.models import Client, ClientCreate, ClientListItem, ClientUpdate, ClientOwnerUpdate
-from src.models.utils import fields, now, to_doc
-from src.services.auth import ClerkSdk, JwtUserId, generate_api_key, get_api_key_hash
+from src.models.utils import fields, now, to_doc, uuid4_hex
+from src.services.auth import ClerkSdk, JwtUserId, generate_secret, get_hashed_secret
 from src.services.db import Database
 from src.schemas import DataResponse, PaginatedDataResponse, PaginationParams, Response as CustomResponse
 
@@ -49,7 +49,7 @@ async def find_client_by_id(
 ) -> ClientWithPerms:
     client = await db[Client.Meta.collection_name()].find_one(
         {"_id": ObjectId(client_id)},
-        {fields(Client).apiKey: False}
+        {fields(Client).idForApi: False, fields(Client).secretForApi: False}
     )
     if client is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Client not found")
@@ -65,7 +65,7 @@ ClientFromId = Annotated[ClientWithPerms, Depends(find_client_by_id)]
 
 @router.post(
     "/",
-    response_model=DataResponse[Client],
+    response_model=DataResponse[str],
     status_code=status.HTTP_201_CREATED,
     responses={400: {"model": CustomHTTPException}}
 )
@@ -74,7 +74,7 @@ async def create_client(
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database
-) -> DataResponse[Client]:
+) -> DataResponse[str]:
     if not await is_org_admin(client.ownerId, user_id, clerk):
         raise HTTPException(
             status.HTTP_403_FORBIDDEN,
@@ -82,14 +82,13 @@ async def create_client(
         )
 
     tm = now()
-    api_key = generate_api_key()
-    api_key_hash = get_api_key_hash(api_key)
-    new_client = Client(**client.model_dump(), apiKey=api_key_hash, createdAt=tm, updatedAt=tm)
+    client_secret = generate_secret()
+    hashed_secret = get_hashed_secret(client_secret)
+    new_client = Client(**client.model_dump(), secretForApi=hashed_secret, createdAt=tm, updatedAt=tm)
     new_client.id = (await db[Client.Meta.collection_name()].insert_one(
         to_doc(new_client)
     )).inserted_id
-    new_client.apiKey = api_key # Return the plain API key only on creation
-    return DataResponse[Client](data=new_client)
+    return DataResponse[str](data=f"{new_client.idForApi}:::{client_secret}", message="Client created successfully")
 
 class PaginationWithOwnerId(PaginationParams):
     owner_id: str | None = Query(
@@ -117,7 +116,7 @@ async def list_clients(
 
         clients = await db[Client.Meta.collection_name()].find(
             {fields(Client).ownerId: {"$in": [org.id for org in orgs.data]}},
-            {fields(Client).apiKey: False},
+            {fields(Client).secretForApi: False},
             sort=[(fields(Client).updatedAt, DESCENDING), (fields(Client).createdAt, DESCENDING)],
             skip=offset,
             limit=query.limit
@@ -127,7 +126,7 @@ async def list_clients(
 
         clients = await db[Client.Meta.collection_name()].find(
             {fields(Client).ownerId: query.owner_id},
-            {fields(Client).apiKey: False},
+            {fields(Client).secretForApi: False},
             sort=[(fields(Client).updatedAt, DESCENDING), (fields(Client).createdAt, DESCENDING)],
             skip=offset,
             limit=query.limit
@@ -159,16 +158,18 @@ async def regenerate_client_api_key(
             "You do not have permission to regenerate the API key for this client"
         )
 
-    api_key = generate_api_key()
-    api_key_hash = get_api_key_hash(api_key)
+    id_for_api = uuid4_hex()
+    client_secret = generate_secret()
+    hashed_secret = get_hashed_secret(client_secret)
     await db[Client.Meta.collection_name()].update_one(
         {"_id": findResult.client.id},
         {"$set": {
-            fields(Client).apiKey: api_key_hash,
+            fields(Client).idForApi: id_for_api,
+            fields(Client).secretForApi: hashed_secret,
             fields(Client).updatedAt: now(),
         }}
     )
-    return DataResponse[str](data=api_key, message="API key regenerated successfully")
+    return DataResponse[str](data=f"{id_for_api}:::{client_secret}", message="API key regenerated successfully")
 
 @router.put(
     "/{client_id}/change_owner",

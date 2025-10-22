@@ -50,7 +50,7 @@ async def get_clients(
         return [
             ClientListItem(**doc) async for doc in db[Client.Meta.collection_name()].find(
                 {fields(Client).ownerId: orgs.data[0].id},
-                {fields(Client).apiKey: False}
+                {fields(Client).idForApi: False, fields(Client).secretForApi: False}
             )
         ]
 
@@ -59,7 +59,7 @@ async def get_clients(
         if isinstance(clients_query.client_id, str): # Single ID
             client = await db[Client.Meta.collection_name()].find_one(
                 {"_id": ObjectId(clients_query.client_id)},
-                {fields(Client).apiKey: False}
+                {fields(Client).idForApi: False, fields(Client).secretForApi: False}
             )
             if client is None:
                 raise HTTPException(status.HTTP_404_NOT_FOUND, "Client not found")
@@ -68,7 +68,7 @@ async def get_clients(
             clients = [
                 ClientListItem(**doc) async for doc in db[Client.Meta.collection_name()].find(
                     {"_id": {"$in": [ObjectId(cid) for cid in clients_query.client_id]}},
-                    {fields(Client).apiKey: False}
+                    {fields(Client).idForApi: False, fields(Client).secretForApi: False}
                 )
             ]
 
@@ -92,7 +92,7 @@ async def get_clients(
     return [
         ClientListItem(**doc) async for doc in db[Client.Meta.collection_name()].find(
             {fields(Client).ownerId: {"$in": [org.id for org in orgs.data]}},
-            {fields(Client).apiKey: False}
+            {fields(Client).idForApi: False, fields(Client).secretForApi: False}
         )
     ]
 ClientsFromQuery = Annotated[list[ClientListItem], Depends(get_clients)]

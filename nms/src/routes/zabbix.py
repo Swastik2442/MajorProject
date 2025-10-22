@@ -14,7 +14,7 @@ from src.models import Client, Problem, ProblemUpdate, Service, ServiceUpdate
 from src.models.problem import Update as PUpdate
 from src.models.service import Update as SUpdate
 from src.models.utils import fields, none, to_doc
-from src.services.auth import get_api_key_hash
+from src.services.auth import IdAndSecret, split_api_key, verify_secret
 from src.services.db import Database
 from src.schemas import Response as CustomResponse
 
@@ -25,12 +25,17 @@ router = APIRouter(
     tags=["zabbix"],
 )
 
-async def get_client(db: Database, hashed_api_key: str = Depends(get_api_key_hash)) -> Client:
-    client = await db[Client.Meta.collection_name()].find_one({fields(Client).apiKey: hashed_api_key})
+async def get_client(db: Database, idAndSecret: Annotated[IdAndSecret, Depends(split_api_key)]) -> Client:
+    client = await db[Client.Meta.collection_name()].find_one(
+        {fields(Client).idForApi: idAndSecret.identifier}
+    )
     if client is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Client not found")
-    return Client(**client)
-ClientFromApiKey = Annotated[Client, Depends(get_client)]
+    client = Client(**client)
+
+    if not verify_secret(idAndSecret.secret, client.secretForApi):
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid API Key")
+    return client
 
 class ZabbixAlert(BaseModel):
     "Expected Payload from Zabbix webhook"
@@ -42,7 +47,7 @@ class ZabbixAlert(BaseModel):
 async def receive_alert(
     req: Request,
     alert: ZabbixAlert,
-    client: ClientFromApiKey,
+    client: Annotated[Client, Depends(get_client)],
     db: Database
 ):
     if req.client is None or client.id is None:

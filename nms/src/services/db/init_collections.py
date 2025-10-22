@@ -12,6 +12,9 @@ async def init_collections(db: AsyncDatabase) -> None:
     await db[Client.Meta.collection_name()].create_index([
         (fields(Client).ownerId, ASCENDING)
     ])
+    await db[Client.Meta.collection_name()].create_index([
+        (fields(Client).idForApi, ASCENDING)
+    ], unique=True)
 
     await db[Problem.Meta.collection_name()].create_index([
         (fields(Problem).zid, ASCENDING), (fields(Problem).clientId, ASCENDING)

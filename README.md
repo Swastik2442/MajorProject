@@ -12,7 +12,7 @@ A prototype system that ingests real-time Network Management System (NMS) teleme
 
 ## Tech Stack
 - Network monitoring & ingestion: **Zabbix**, **FastAPI**
-- Storage: **PostgreSQL**
+- Storage: **PostgreSQL**, **MongoDB**
 - Model development: **TensorFlow**, **HuggingFace**
 - Frontend/dashboard: **React** (connects to FastAPI backend)
 

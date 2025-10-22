@@ -3,7 +3,7 @@
 from pydantic import BaseModel, Field
 
 from .base import BaseInterface
-from .utils import none
+from .utils import none, uuid4_hex
 
 class Client(BaseInterface):
     class Meta(BaseInterface.Meta):
@@ -11,8 +11,10 @@ class Client(BaseInterface):
         def collection_name(cls) -> str:
             return "clients"
 
+    idForApi: str = Field(default_factory=uuid4_hex, title="Client ID for API", description="Unique identifier for the Client in API requests")
+    secretForApi: str = Field(title="Client Secret for API", description="Secret Key for the Client")
+
     ownerId: str = Field(title="Owner ID", description="ID of the Org who owns this Client")
-    apiKey: str = Field(title="Client API Key", description="API Key for the Client")
     name: str = Field(title="Client Name", min_length=3, max_length=100)
     description: str | None = Field(default_factory=none, title="Client Description")
 
