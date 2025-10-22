@@ -4,7 +4,7 @@ import logging
 from typing import Annotated
 
 from bson import ObjectId
-from fastapi import APIRouter, Body, Depends, Query, status
+from fastapi import APIRouter, Body, Depends, Query, Response, status
 from fastapi.exceptions import HTTPException
 from pydantic import BaseModel
 from pymongo import DESCENDING
@@ -107,12 +107,15 @@ async def list_clients(
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database
-) -> PaginatedDataResponse[list[ClientListItem]]:
+):
     offset = (query.page - 1) * query.limit
     if query.owner_id is None:
         orgs = await clerk.organizations.list_async(user_id=[user_id], limit=50)
         if orgs is None or len(orgs.data) == 0:
-            return PaginatedDataResponse[list[ClientListItem]](data=[], page=query.page, limit=query.limit)
+            return Response(
+                PaginatedDataResponse[list[ClientListItem]](data=[], page=query.page, limit=query.limit),
+                headers={"Cache-Control": "private, max-age=300"}
+            )
 
         clients = await db[Client.Meta.collection_name()].find(
             {fields(Client).ownerId: {"$in": [org.id for org in orgs.data]}},
@@ -133,7 +136,10 @@ async def list_clients(
         ).to_list()
 
     clients = [ClientListItem(**client) for client in clients]
-    return PaginatedDataResponse[list[ClientListItem]](data=clients, page=query.page, limit=query.limit)
+    return Response(
+        PaginatedDataResponse[list[ClientListItem]](data=clients, page=query.page, limit=query.limit),
+        headers={"Cache-Control": "private, max-age=300"}
+    )
 
 @router.get(
     "/{client_id}",
@@ -141,7 +147,10 @@ async def list_clients(
     responses={404: {"model": CustomHTTPException}}
 )
 def get_client(findResult: ClientFromId):
-    return DataResponse[ClientListItem](data=findResult.client)
+    return Response(
+        DataResponse[ClientListItem](data=findResult.client),
+        headers={"Cache-Control": "private, max-age=300"}
+    )
 
 @router.put(
     "/{client_id}/regenerate_api_key",

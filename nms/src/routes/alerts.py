@@ -1,11 +1,12 @@
 "API Routes for serving Zabbix Alerts"
 
+import asyncio
 from datetime import datetime, timedelta
 from math import ceil
 from typing import Annotated
 
 from bson import ObjectId
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from pymongo import DESCENDING
 
 from src.models import Client, ClientListItem, Problem, Service
@@ -140,35 +141,40 @@ async def get_service_alerts(
 async def get_trigger_alerts_count(clients: ClientsFromQuery, db: Database):
     curr = now()
     clientIds = [client.id for client in clients if client.id is not None]
-    totalActiveProblems = await db[Problem.Meta.collection_name()].count_documents({
-        fields(Problem).clientId: {"$in": clientIds},
-        fields(Problem).status: {"$ne": "Recovered"}
-    })
-    activeProblemsInLast24Hours = await db[Problem.Meta.collection_name()].count_documents({
-        fields(Problem).clientId: {"$in": clientIds},
-        fields(Problem).status: {"$ne": "Recovered"},
-        fields(Problem).createdAt: {"$gte": curr - timedelta(days=1)} # type: ignore
-    })
-    problemsInLast24Hours = await db[Problem.Meta.collection_name()].count_documents({
-        fields(Problem).clientId: {"$in": clientIds},
-        fields(Problem).createdAt: {"$gte": curr - timedelta(days=1)} # type: ignore
-    })
-    problemsInLastWeek = await db[Problem.Meta.collection_name()].count_documents({
-        fields(Problem).clientId: {"$in": clientIds},
-        fields(Problem).createdAt: {"$gte": curr - timedelta(weeks=1)} # type: ignore
-    })
-    problemsInLastMonth = await db[Problem.Meta.collection_name()].count_documents({
-        fields(Problem).clientId: {"$in": clientIds},
-        fields(Problem).createdAt: {"$gte": curr - timedelta(days=30)} # type: ignore
-    })
+    results = await asyncio.gather(
+        db[Problem.Meta.collection_name()].count_documents({
+            fields(Problem).clientId: {"$in": clientIds},
+            fields(Problem).status: {"$ne": "Recovered"}
+        }),
+        db[Problem.Meta.collection_name()].count_documents({
+            fields(Problem).clientId: {"$in": clientIds},
+            fields(Problem).status: {"$ne": "Recovered"},
+            fields(Problem).createdAt: {"$gte": curr - timedelta(days=1)} # type: ignore
+        }),
+        db[Problem.Meta.collection_name()].count_documents({
+            fields(Problem).clientId: {"$in": clientIds},
+            fields(Problem).createdAt: {"$gte": curr - timedelta(days=1)} # type: ignore
+        }),
+        db[Problem.Meta.collection_name()].count_documents({
+            fields(Problem).clientId: {"$in": clientIds},
+            fields(Problem).createdAt: {"$gte": curr - timedelta(weeks=1)} # type: ignore
+        }),
+        db[Problem.Meta.collection_name()].count_documents({
+            fields(Problem).clientId: {"$in": clientIds},
+            fields(Problem).createdAt: {"$gte": curr - timedelta(days=30)} # type: ignore
+        })
+    )
 
-    return DataResponse[StatCounts](data=StatCounts(
-        totalActiveProblems=totalActiveProblems,
-        activeProblemsInLast24Hours=activeProblemsInLast24Hours,
-        problemsInLast24Hours=problemsInLast24Hours,
-        problemsInLastWeek=problemsInLastWeek,
-        problemsInLastMonth=problemsInLastMonth
-    ))
+    return Response(
+        DataResponse[StatCounts](data=StatCounts(
+            totalActiveProblems=results[0],
+            activeProblemsInLast24Hours=results[1],
+            problemsInLast24Hours=results[2],
+            problemsInLastWeek=results[3],
+            problemsInLastMonth=results[4]
+        )),
+        headers={"Cache-Control": "private, max-age=60"}
+    )
 
 class TimePeriodWithClientsParams(TimePeriodParams, ClientsParams):
     pass
@@ -243,12 +249,15 @@ async def get_trigger_alert_trends(
             ):
                 active_counts[i] += 1
 
-    return DataResponse[list[StatTrends]](data=[StatTrends(
-        timestamp=bins[i][0],
-        new=new_counts[i],
-        resolved=resolved_counts[i],
-        active=active_counts[i]
-    ) for i in range(num_periods)])
+    return Response(
+            DataResponse[list[StatTrends]](data=[StatTrends(
+            timestamp=bins[i][0],
+            new=new_counts[i],
+            resolved=resolved_counts[i],
+            active=active_counts[i]
+        ) for i in range(num_periods)]),
+        headers={"Cache-Control": f"private, max-age={IntervalSeconds[query.interval] // 2}, must-revalidate"}
+    )
 
 @router.get("/hosts/health", response_model=DataResponse[list[StatHealthScores]])
 async def get_hosts_health_scores(clients: ClientsFromQuery, db: Database):
@@ -327,4 +336,7 @@ async def get_hosts_health_scores(clients: ClientsFromQuery, db: Database):
 
     cursor = await db[Problem.Meta.collection_name()].aggregate(pipeline)
     results = [StatHealthScores(**doc) async for doc in cursor]
-    return DataResponse[list[StatHealthScores]](data=results)
+    return Response(
+        DataResponse[list[StatHealthScores]](data=results),
+        headers={"Cache-Control": "private, max-age=120"}
+    )
