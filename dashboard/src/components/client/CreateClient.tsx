@@ -41,7 +41,7 @@ export function CreateClientDialog({ ownerId, children }: { ownerId: string; chi
     mutationKey: ['client', 'new'],
     mutationFn: apiService.createClient,
     onSuccess: (data) => {
-      const apiKey = data.data?.apiKey;
+      const apiKey = data.data;
       if (!apiKey) throw new Error("API key not generated");
 
       // Store the API key temporarily in local storage

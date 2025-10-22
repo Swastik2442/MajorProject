@@ -6,8 +6,9 @@ export const ClientSchema = z.object({
   _id: z.string().nullable().optional(),
   createdAt: z.iso.datetime().optional(),
   updatedAt: z.iso.datetime().optional(),
+  idForApi: z.string(),
+  secretForApi: z.string(),
   ownerId: z.string(),
-  apiKey: z.string(),
   name: z.string().min(3).max(100),
   description: z.string().nullable().optional(),
 });
@@ -220,9 +221,6 @@ export type TStatTrendsDataResponse = z.infer<typeof StatTrendsDataResponseSchem
 export const StatHealthScoresDataResponseSchema = DataResponseSchema(z.array(StatHealthScoresSchema));
 export type TStatHealthScoresDataResponse = z.infer<typeof StatHealthScoresDataResponseSchema>;
 
-export const DataResponseClientSchema = DataResponseSchema(ClientSchema);
-export type TDataResponseClient = z.infer<typeof DataResponseClientSchema>;
-
 export const PaginatedClientListItemDataResponseSchema = PaginatedDataResponseSchema(ClientListItemSchema);
 export type TPaginatedClientListItemDataResponse = z.infer<typeof PaginatedClientListItemDataResponseSchema>;
 
@@ -252,7 +250,7 @@ export interface ApiService {
   fetchHostsHealthScores: (params: TClientsParams) => Promise<TStatHealthScoresDataResponse>;
 
   // Client endpoints
-  createClient: (body: TClientCreate) => Promise<TDataResponseClient>;
+  createClient: (body: TClientCreate) => Promise<TDataResponseStr>;
   listClients: (params: TPaginationAndOwnerParams) => Promise<TPaginatedClientListItemDataResponse>;
   getClient: (client_id: string) => Promise<TDataResponseClientListItem>;
   updateClient: (client_id: string, body: TClientUpdate) => Promise<TResponse>;

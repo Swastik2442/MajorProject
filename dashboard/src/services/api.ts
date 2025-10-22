@@ -1,7 +1,6 @@
 import axios from "axios";
 import type {
   ApiService,
-  TDataResponseClient,
   TDataResponseClientListItem,
   TDataResponseStr,
   TPaginatedClientListItemDataResponse,
@@ -81,7 +80,7 @@ export const apiService: ApiService = {
   },
 
   createClient: async (data) => {
-    const response = await api.post<TDataResponseClient>(
+    const response = await api.post<TDataResponseStr>(
       "/clients",
       { ...data }
     );
