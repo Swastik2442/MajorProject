@@ -11,7 +11,7 @@ class Settings(BaseSettings):
         extra='ignore',
     )
 
-    MONGO_CONNECTION_URI: MongoDsn = Field( # type: ignore[valid-type]
+    MONGO_CONNECTION_URI: MongoDsn = Field(
         validation_alias=AliasChoices('MONGO_URI', 'MONGO_CONNECTION_URI', 'MONGODB_URI', 'MONGODB_CONNECTION_URI'),
     )
     DB_NAME: str = Field("nms")
