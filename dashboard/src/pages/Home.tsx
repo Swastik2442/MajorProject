@@ -1,29 +1,13 @@
-// Home.tsx
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
-import useTypingEffect from "@/hooks/typingEffect";
 import {
   Brain,
   Wifi,
-  CloudLightning,
   Lock,
   Gauge,
-  Rocket,
 } from "lucide-react";
-
-/**
- * Single-file Home.tsx
- * - Keeps your hero exactly
- * - Adds seamless second section
- * - Adds lightweight rAF-based background offset (GPU friendly)
- *
- * Requirements:
- * - TailwindCSS present
- * - lucide-react installed (icons)
- *
- * Usage: replace your current Home.tsx with this file.
- */
+import useTypingEffect from "@/hooks/typingEffect";
 
 const HEADLINE_1 = "Unified Network Intelligence";
 const HEADLINE_2 = "at Your Fingertips";
@@ -120,15 +104,13 @@ export default function Home() {
 
       {/* page content container */}
       <div className="relative z-10">
-        {/* === HERO SECTION (kept exactly as you had it) === */}
+        {/* === HERO SECTION === */}
         <section className="relative flex flex-col items-center justify-center min-h-screen w-full">
           {/* Header (left) */}
           <div className="absolute top-6 w-full flex justify-start items-center px-10 z-20">
             <h1 className="text-lg font-semibold text-gray-300 tracking-wide">NMS</h1>
           </div>
 
-          {/* Your original hero lines are visually provided by the fixed background */}
-          {/* Keep hero card unchanged visually — content below is the same */}
           <motion.div
             initial={{ opacity: 0.0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -230,7 +212,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Footer — sits at the bottom naturally */}
+        {/* Footer */}
         <footer className="w-full bg-[#050b16] py-6 text-center text-gray-500 text-sm border-t border-white/10">
           <p>&copy; 2025 NMS</p>
           <p>
@@ -239,15 +221,6 @@ export default function Home() {
           </p>
         </footer>
       </div>
-
-      {/* caret blink style (kept) */}
-      <style>{`
-        @keyframes blink {
-          0%, 50%, 100% { opacity: 1; }
-          25%, 75% { opacity: 0; }
-        }
-        .animate-caret-blink { animation: blink 1s infinite; }
-      `}</style>
     </div>
   );
 }

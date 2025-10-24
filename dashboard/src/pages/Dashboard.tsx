@@ -1,4 +1,3 @@
-// src/pages/Dashboard.tsx
 import { useState } from "react";
 import { useOrganization } from "@clerk/clerk-react";
 import DashboardComponent from "@/components/dashboard";
@@ -27,6 +26,7 @@ export default function Dashboard() {
           }
         </h1>
         <div className="flex justify-between items-center gap-2">
+          {/* Actions for when only a single client is selected */}
           {selectedClient && !Array.isArray(selectedClient) && (<>
             <RegenApiKeyButton clientId={selectedClient._id} />
             <ChangeOwnerButton clientId={selectedClient._id} />
@@ -37,11 +37,13 @@ export default function Dashboard() {
             <ChangeOwnerButton clientId={selectedClient[0]._id} />
             <DeleteClientButton clientId={selectedClient[0]._id} />
           </>)}
+          {/* Client selection dropdown */}
           <ClientSelect
             org_id={organization?.id ?? null}
             selectedClient={selectedClient}
             setSelectedClient={setSelectedClient}
           />
+          {/* Create Client only when some organization is active */}
           {organization && <CreateClientButton ownerId={organization.id} />}
         </div>
       </div>

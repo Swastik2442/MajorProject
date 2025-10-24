@@ -5,9 +5,9 @@ export default function OrganizationSwitcher() {
   return (
     <OriginalOrganizationSwitcher
       hidePersonal={true}
-      afterCreateOrganizationUrl={(org) => `org/${org.id}`}
+      afterCreateOrganizationUrl='/'
       afterLeaveOrganizationUrl='/'
-      afterSelectOrganizationUrl={(org) => `org/${org.id}`}
+      afterSelectOrganizationUrl='/'
       appearance={{
         theme: dark,
         variables: {
