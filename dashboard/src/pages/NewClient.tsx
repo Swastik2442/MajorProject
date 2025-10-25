@@ -3,6 +3,7 @@ import { DownloadIcon } from "lucide-react";
 import { API_KEY_TEMP_STORAGE_KEY } from "@/config";
 import { CopyButton } from "@/components/ui/copy-button";
 import data from "@/zbx-mediatype-template.json";
+import Metadata from "@/components/Metadata";
 
 export function SetupInstructions({ url, apiKey }: { url: string; apiKey: string | null }) {
   data.zabbix_export.media_types[0].parameters[0].value = apiKey ?? "<YOUR_API_KEY_HERE>";
@@ -111,6 +112,7 @@ export default function NewClient() {
 
   return (
     <div className="max-w-5xl mx-auto p-6 bg-card border rounded-xl shadow-md">
+      <Metadata title={`New Client | ${import.meta.env.VITE_APP_TITLE}`} />
       <SetupInstructions url={`${import.meta.env.VITE_API_URL}/zabbix/webhook`} apiKey={apiKey} />
     </div>
   );

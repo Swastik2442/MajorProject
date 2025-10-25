@@ -8,6 +8,7 @@ import {
   Gauge,
 } from "lucide-react";
 import useTypingEffect from "@/hooks/typingEffect";
+import Metadata from "@/components/Metadata";
 
 const HEADLINE_1 = "Unified Network Intelligence";
 const HEADLINE_2 = "at Your Fingertips";
@@ -53,6 +54,7 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen w-full bg-[#050b16] text-white overflow-x-hidden">
+      <Metadata title={import.meta.env.VITE_APP_TITLE} />
       {/* Background layer that spans both sections and is GPU-transformed */}
       <div
         ref={bgRef}

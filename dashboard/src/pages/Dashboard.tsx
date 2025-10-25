@@ -9,22 +9,23 @@ import {
   RegenApiKeyButton,
   type TClientSelectParam
 } from "@/components/client";
+import Metadata from "@/components/Metadata";
 
 export default function Dashboard() {
   const { organization } = useOrganization();
   const [selectedClient, setSelectedClient] = useState<TClientSelectParam>(null);
 
+  const dashboardTitle = selectedClient === null
+    ? "Dashboard"
+    : Array.isArray(selectedClient)
+      ? "Dashboard - Selected Clients"
+      : `Dashboard - ${selectedClient.name}`;
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold leading-tight">
-          {selectedClient === null
-            ? "Dashboard"
-            : Array.isArray(selectedClient)
-              ? "Dashboard - Selected Clients"
-              : `Dashboard - ${selectedClient.name}`
-          }
-        </h1>
+        <Metadata title={`${dashboardTitle} | ${import.meta.env.VITE_APP_TITLE}`} />
+        <h1 className="text-2xl font-bold leading-tight">{dashboardTitle}</h1>
         <div className="flex justify-between items-center gap-2">
           {/* Actions for when only a single client is selected */}
           {selectedClient && !Array.isArray(selectedClient) && (<>
