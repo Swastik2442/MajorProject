@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { SeveritySchema } from "./others";
 
 // --- Zod Schemas generated from OpenAPI ---
 
@@ -55,6 +54,15 @@ export const ResponseSchema = z.object({
   message: z.string().nullable().optional(),
 });
 
+export const SeveritySchema = z.enum([
+  "Not classified",
+  "Information",
+  "Warning",
+  "Average",
+  "High",
+  "Disaster",
+]);
+
 export const UpdateSchema = z.object({
   action: z.string(),
   timestamp: z.iso.datetime(),
@@ -72,14 +80,7 @@ export const ProblemSchema = z.object({
   recoveryAt: z.iso.datetime().nullable().optional(),
   age: z.string().nullable().optional(),
   status: z.string(),
-  severity: z.enum([
-    "Not classified",
-    "Information",
-    "Warning",
-    "Average",
-    "High",
-    "Disaster",
-  ]),
+  severity: SeveritySchema,
   duration: z.string().nullable().optional(),
   hostname: z.string(),
   updates: z.array(UpdateSchema),
@@ -94,14 +95,7 @@ export const ServiceSchema = z.object({
   startedAt: z.iso.datetime(),
   recoveryAt: z.iso.datetime().nullable().optional(),
   age: z.string().nullable().optional(),
-  severity: z.enum([
-    "Not classified",
-    "Information",
-    "Warning",
-    "Average",
-    "High",
-    "Disaster",
-  ]),
+  severity: SeveritySchema,
   duration: z.string().nullable().optional(),
   description: z.string(),
   rootcause: z.string(),
@@ -204,6 +198,7 @@ export const PaginationAndOwnerParamsSchema = PaginationParamsSchema.extend({
 
 // --- Inferred Types ---
 
+export type TSeveritySchema = z.infer<typeof SeveritySchema>;
 export type TProblem = z.infer<typeof ProblemSchema>;
 export type TService = z.infer<typeof ServiceSchema>;
 export type TStatCounts = z.infer<typeof StatCountsSchema>;
