@@ -87,8 +87,6 @@ class StatCounts(BaseModel):
 
 class StatTrends(BaseModel):
     timestamp: MyDatetime
-    new: int = Field(ge=0)
-    resolved: int = Field(ge=0)
     active: int = Field(ge=0)
 
 class StatHealthScores(BaseModel):

@@ -135,38 +135,18 @@ async def get_trigger_alert_trends(
         })
     ]
 
-    new_counts = [0] * num_periods
-    resolved_counts = [0] * num_periods
-    active_counts = [0] * num_periods
-
+    counts = [0] * num_periods
     for p in problems:
-        # New Problems
-        for i, (bin_start, bin_end) in enumerate(bins):
-            if bin_start <= p.startedAt < bin_end:
-                new_counts[i] += 1
-                break
-
-        # Resolved Problems
-        if p.status == "Recovered":
-            assert p.recoveryAt is not None, "recoveryAt must be set when Recovered"
-            for i, (bin_start, bin_end) in enumerate(bins):
-                if bin_start <= p.recoveryAt < bin_end:
-                    resolved_counts[i] += 1
-                    break
-
-        # Active Problems
         for i, (bin_start, bin_end) in enumerate(bins):
             if bin_start >= p.startedAt and (
                 p.status != "Recovered" or (p.recoveryAt is not None and p.recoveryAt >= bin_end)
             ):
-                active_counts[i] += 1
+                counts[i] += 1
 
     response.headers["Cache-Control"] = f"private, max-age={IntervalSeconds[query.interval] // 60}, must-revalidate"
     return DataResponse(data=[StatTrends(
         timestamp=bins[i][0],
-        new=new_counts[i],
-        resolved=resolved_counts[i],
-        active=active_counts[i]
+        active=counts[i]
     ) for i in range(num_periods)])
 
 @router.get("/hosts/health", response_model=DataResponse[Sequence[StatHealthScores]])

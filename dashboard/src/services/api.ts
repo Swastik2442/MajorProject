@@ -72,6 +72,22 @@ export const apiService: ApiService = {
     return response.data;
   },
 
+  fetchServiceAlertsCount: async (params) => {
+    const response = await api.get<TStatCountsDataResponse>(
+      "/alerts/services/count",
+      { params }
+    );
+    return response.data;
+  },
+
+  fetchServiceAlertsTrends: async (params) => {
+    const response = await api.get<TStatTrendsDataResponse>(
+      "/alerts/services/trends",
+      { params }
+    );
+    return response.data;
+  },
+
   fetchHostsHealthScores: async (params) => {
     const response = await api.get<TStatHealthScoresDataResponse>(
       "/alerts/problems/hosts/health",

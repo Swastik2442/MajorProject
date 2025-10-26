@@ -124,8 +124,6 @@ export const StatHealthScoresSchema = z.object({
 
 export const StatTrendsSchema = z.object({
   timestamp: z.iso.datetime(),
-  new: z.number().int().min(0),
-  resolved: z.number().int().min(0),
   active: z.number().int().min(0),
 });
 
@@ -260,6 +258,8 @@ export interface ApiService {
   fetchServiceAlerts: (params: TPaginationAndOrgClientParams) => Promise<TPaginatedServiceDataResponse>;
   fetchProblemsCount: (params: TClientsParams) => Promise<TStatCountsDataResponse>;
   fetchProblemsTrends: (params: TTimeIntervalAndOrgClientParams) => Promise<TStatTrendsDataResponse>;
+  fetchServiceAlertsCount: (params: TClientsParams) => Promise<TStatCountsDataResponse>;
+  fetchServiceAlertsTrends: (params: TTimeIntervalAndOrgClientParams) => Promise<TStatTrendsDataResponse>;
   fetchHostsHealthScores: (params: TClientsParams) => Promise<TStatHealthScoresDataResponse>;
   fetchHostsProblemsCount: (params: TInfiniteTimeIntervalAndOrgClientParams) => Promise<TStatHostsProblemsCountDataResponse>;
 

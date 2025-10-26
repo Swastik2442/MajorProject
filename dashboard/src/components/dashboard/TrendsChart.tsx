@@ -82,25 +82,9 @@ export default function TrendsChart({ client_id = null, org_id = null }: TClient
             />
             <Line
               type="monotone"
-              dataKey="new"
-              name="New Problems"
-              stroke="var(--chart-1)"
-              strokeWidth={2}
-              dot={false}
-            />
-            <Line
-              type="monotone"
               dataKey="active"
               name="Active Problems"
-              stroke="var(--chart-2)"
-              strokeWidth={2}
-              dot={false}
-            />
-            <Line
-              type="monotone"
-              dataKey="resolved"
-              name="Resolved Problems"
-              stroke="var(--chart-3)"
+              stroke="var(--chart-1)"
               strokeWidth={2}
               dot={false}
             />
