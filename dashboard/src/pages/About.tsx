@@ -1,10 +1,8 @@
-// About.tsx
-import { motion } from "framer-motion";
-import { Link } from "react-router";
-import { Brain, Wifi, Lock, Gauge } from "lucide-react";
 import { useEffect, useRef } from "react";
-
-
+import { Link } from "react-router";
+import { motion } from "framer-motion";
+import { Brain, Wifi, Lock, Gauge } from "lucide-react";
+import Metadata from "@/components/Metadata";
 
 export default function About() {
   const bgRef = useRef<HTMLDivElement | null>(null);
@@ -32,6 +30,7 @@ export default function About() {
 
   return (
     <div className="relative min-h-screen w-full bg-[#050b16] text-white overflow-x-hidden">
+      <Metadata />
       {/* Background Layer */}
       <div
         ref={bgRef}
@@ -92,7 +91,7 @@ export default function About() {
         {/* Header */}
         <div className="absolute top-6 left-10">
           <h1 className="text-lg font-semibold text-gray-300 tracking-wide">
-            NMS
+            {import.meta.env.VITE_APP_TITLE}
           </h1>
         </div>
 
@@ -173,7 +172,7 @@ export default function About() {
 
       {/* Footer */}
       <footer className="w-full bg-[#050b16] py-6 text-center text-gray-500 text-sm border-t border-white/10">
-        <p>&copy; 2025 NMS</p>
+        <p>&copy; 2025 {import.meta.env.VITE_APP_TITLE}</p>
         <p>
           <span>by </span>
           <span className="text-cyan-400 font-medium">

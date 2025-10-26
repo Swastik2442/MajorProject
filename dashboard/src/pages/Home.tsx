@@ -51,7 +51,7 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen w-full bg-[#050b16] text-white overflow-x-hidden">
-      <Metadata title={import.meta.env.VITE_APP_TITLE} />
+      <Metadata />
       {/* Background layer that spans both sections and is GPU-transformed */}
       <div
         ref={bgRef}
@@ -113,7 +113,7 @@ export default function Home() {
         <section className="relative flex flex-col items-center justify-center min-h-screen w-full">
           <div className="absolute top-6 w-full flex justify-start items-center px-10 z-20">
             <h1 className="text-lg font-semibold text-gray-300 tracking-wide">
-              NMS
+              {import.meta.env.VITE_APP_TITLE}
             </h1>
           </div>
 
@@ -155,7 +155,6 @@ export default function Home() {
                 </span>
               </Link>
 
-              {/* ✅ Updated "Learn More" to navigate to /about */}
               <Link to="/about">
                 <button className="px-10 py-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all backdrop-blur-md border border-white/10 text-lg">
                   Learn More
@@ -225,7 +224,7 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="w-full bg-[#050b16] py-6 text-center text-gray-500 text-sm border-t border-white/10">
-          <p>&copy; 2025 NMS</p>
+          <p>&copy; 2025 {import.meta.env.VITE_APP_TITLE}</p>
           <p>
             <span>by </span>
             <span className="text-cyan-400 font-medium">

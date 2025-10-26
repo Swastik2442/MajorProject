@@ -3,25 +3,32 @@ import { RouterProvider } from "react-router/dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ClerkProvider, SignedIn, SignedOut } from "@clerk/clerk-react";
 
-import PrivateRoutes from "./components/PrivateRoutes";
-import RootErrorBoundary from "./components/RootErrorBoundary";
-import AppLayout from "./layouts/AppLayout";
+import PrivateRoutes from "@/components/PrivateRoutes";
+import RootErrorBoundary from "@/components/RootErrorBoundary";
+import AppLayout from "@/layouts/AppLayout";
 
-import Home from "./pages/Home";
-import About from "./pages/About"; // ✅ NEW
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import NewClient from "./pages/NewClient";
+import Home from "@/pages/Home";
+import About from "@/pages/About";
+import Login from "@/pages/Login";
+import Dashboard from "@/pages/Dashboard";
+import NewClient from "@/pages/NewClient";
 
-import "./globals.css";
+import "@/globals.css";
 
 const router = createBrowserRouter([
-  // === Public routes (signed out users) ===
+  // === Public routes ===
   {
     path: "/login",
     element: <Login />,
     errorElement: <RootErrorBoundary />,
   },
+  {
+    path: "/about",
+    element: <About />,
+    errorElement: <RootErrorBoundary />,
+  },
+
+  // === Root route for both signed in and signed out users ===
   {
     path: "/",
     element: (
@@ -31,7 +38,6 @@ const router = createBrowserRouter([
             <Dashboard />
           </AppLayout>
         </SignedIn>
-
         <SignedOut>
           <Home />
         </SignedOut>
@@ -39,17 +45,8 @@ const router = createBrowserRouter([
     ),
     errorElement: <RootErrorBoundary />,
   },
-  {
-    path: "/about", // ✅ New public About page
-    element: (
-      <SignedOut>
-        <About />
-      </SignedOut>
-    ),
-    errorElement: <RootErrorBoundary />,
-  },
 
-  // === Authenticated routes (protected) ===
+  // === Authenticated routes ===
   {
     element: <AppLayout />,
     errorElement: <RootErrorBoundary />,

@@ -42,7 +42,7 @@ export default function AppLayout({ children }: { children?: React.ReactNode }) 
 
       {/* Footer */}
       <footer className="text-center text-sm text-muted-foreground py-4 border-t">
-        &copy; {new Date().getFullYear()} {import.meta.env.VITE_APP_TITLE}. All rights reserved.
+        &copy; 2025 {import.meta.env.VITE_APP_TITLE}. All rights reserved.
       </footer>
     </div>
   );
