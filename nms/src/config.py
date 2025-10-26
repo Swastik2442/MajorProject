@@ -1,5 +1,7 @@
 "Configuration for the application"
 
+from collections.abc import Sequence
+
 from pydantic import AliasChoices, Field, MongoDsn, RedisDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -25,7 +27,7 @@ class Settings(BaseSettings):
     CLERK_JWKS_URL: str
     CLERK_SECRET_KEY: str
 
-    ALLOWED_ORIGINS: list[str] = Field(
+    ALLOWED_ORIGINS: Sequence[str] = Field(
         default_factory=lambda: ["http://localhost:5173"],
         validation_alias=AliasChoices('ALLOWED_ORIGINS', 'ALLOW_ORIGINS', 'CORS_ALLOW_ORIGINS', 'ORIGINS'),
     )

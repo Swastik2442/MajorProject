@@ -1,12 +1,13 @@
 "API Routes for handling Client operations"
 
+from collections.abc import Sequence
+from dataclasses import dataclass
 import logging
 from typing import Annotated
 
 from bson import ObjectId
 from fastapi import APIRouter, Body, Depends, Query, Response, status
 from fastapi.exceptions import HTTPException
-from pydantic import BaseModel
 from pymongo import DESCENDING
 
 from src.exceptions import HTTPException as CustomHTTPException
@@ -37,7 +38,8 @@ async def is_org_admin(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Org not found")
     return org.data[0].role == "org:admin"
 
-class ClientWithPerms(BaseModel):
+@dataclass(frozen=True)
+class ClientWithPerms:
     client: ClientListItem
     hasEditPerms: bool = False
 
@@ -88,7 +90,7 @@ async def create_client(
     new_client.id = (await db[Client.Meta.collection_name()].insert_one(
         to_doc(new_client)
     )).inserted_id
-    return DataResponse[str](data=f"{new_client.idForApi}:::{client_secret}", message="Client created successfully")
+    return DataResponse(data=f"{new_client.idForApi}:::{client_secret}", message="Client created successfully")
 
 class PaginationWithOwnerId(PaginationParams):
     owner_id: str | None = Query(
@@ -99,7 +101,7 @@ class PaginationWithOwnerId(PaginationParams):
 
 @router.get(
     "/",
-    response_model=PaginatedDataResponse[list[ClientListItem]],
+    response_model=PaginatedDataResponse[Sequence[ClientListItem]],
     responses={404: {"model": CustomHTTPException}}
 )
 async def list_clients(
@@ -108,13 +110,13 @@ async def list_clients(
     clerk: ClerkSdk,
     db: Database,
     response: Response
-) -> PaginatedDataResponse[list[ClientListItem]]:
+) -> PaginatedDataResponse[Sequence[ClientListItem]]:
     offset = (query.page - 1) * query.limit
     if query.owner_id is None:
         orgs = await clerk.organizations.list_async(user_id=[user_id], limit=50)
         if orgs is None or len(orgs.data) == 0:
             response.headers["Cache-Control"] = "private, max-age=300"
-            return PaginatedDataResponse[list[ClientListItem]](data=[], page=query.page, limit=query.limit)
+            return PaginatedDataResponse(data=[], page=query.page, limit=query.limit)
 
         clients = await db[Client.Meta.collection_name()].find(
             {fields(Client).ownerId: {"$in": [org.id for org in orgs.data]}},
@@ -137,7 +139,7 @@ async def list_clients(
     clients = [ClientListItem(**client) for client in clients]
 
     response.headers["Cache-Control"] = "private, max-age=300"
-    return PaginatedDataResponse[list[ClientListItem]](data=clients, page=query.page, limit=query.limit)
+    return PaginatedDataResponse(data=clients, page=query.page, limit=query.limit)
 
 @router.get(
     "/{client_id}",
@@ -146,7 +148,7 @@ async def list_clients(
 )
 def get_client(findResult: ClientFromId, response: Response) -> DataResponse[ClientListItem]:
     response.headers["Cache-Control"] = "private, max-age=300"
-    return DataResponse[ClientListItem](data=findResult.client)
+    return DataResponse(data=findResult.client)
 
 @router.put(
     "/{client_id}/regenerate_api_key",
@@ -174,7 +176,7 @@ async def regenerate_client_api_key(
             fields(Client).updatedAt: now(),
         }}
     )
-    return DataResponse[str](data=f"{id_for_api}:::{client_secret}", message="API key regenerated successfully")
+    return DataResponse(data=f"{id_for_api}:::{client_secret}", message="API key regenerated successfully")
 
 @router.put(
     "/{client_id}/change_owner",

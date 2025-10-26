@@ -1,5 +1,6 @@
 "Exception Handlers for the API"
 
+from collections.abc import Sequence
 from typing import Literal
 from typing_extensions import TypedDict
 
@@ -15,12 +16,12 @@ from .schemas import Response as CustomResponse
 class RequestValidationError(CustomResponse):
     class ErrorDetails(TypedDict): # Ref: import pydantic_core.ErrorDetails
         type: str
-        loc: tuple[int | str, ...]
+        loc: Sequence[int | str]
         msg: str
 
     status: Literal["success", "error"] = Field(default_factory=lambda: "error", init=False, frozen=True)
     message: str | None = Field(default_factory=lambda: "Validation Error")
-    errors: list[ErrorDetails]
+    errors: Sequence[ErrorDetails]
 
 class HTTPException(CustomResponse):
     status: Literal["success", "error"] = Field(default_factory=lambda: "error", init=False, frozen=True)

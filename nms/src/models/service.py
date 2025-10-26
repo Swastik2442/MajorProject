@@ -1,5 +1,7 @@
 "Service Model Schema"
 
+from collections.abc import Sequence
+
 from pydantic import BaseModel, Field
 
 from src.templates.models import Severity
@@ -28,7 +30,7 @@ class Service(BaseInterface):
     duration: str | None = Field(default_factory=none)
     description: str = Field()
     rootcause: str = Field()
-    updates: list[Update] = Field(default_factory=list)
+    updates: Sequence[Update] = Field(default_factory=list)
 
 class ServiceUpdate(BaseModel):
     updatedAt: MyDatetime = Field(default_factory=now)

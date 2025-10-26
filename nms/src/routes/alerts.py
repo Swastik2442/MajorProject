@@ -1,6 +1,7 @@
 "API Routes for serving Zabbix Alerts"
 
 import asyncio
+from collections.abc import Sequence
 from datetime import datetime, timedelta
 from math import ceil
 from typing import Annotated
@@ -16,10 +17,12 @@ from src.services.db import Database
 from src.schemas import (
     ClientsParams,
     DataResponse,
+    InfiniteTimePeriodParams,
     PaginationParams,
     PaginatedDataResponse,
     StatCounts,
     StatHealthScores,
+    StatHostProblemCount,
     StatTrends,
     TimePeriodParams
 )
@@ -34,7 +37,7 @@ async def get_clients(
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database
-) -> list[ClientListItem]:
+) -> Sequence[ClientListItem]:
     # Get all Clients in the Org
     if clients_query.org_id is not None:
         orgs = await clerk.organizations.list_async(
@@ -96,18 +99,18 @@ async def get_clients(
             {fields(Client).idForApi: False, fields(Client).secretForApi: False}
         )
     ]
-ClientsFromQuery = Annotated[list[ClientListItem], Depends(get_clients)]
+ClientsFromQuery = Annotated[Sequence[ClientListItem], Depends(get_clients)]
 
 class PaginationWithClientsParams(PaginationParams, ClientsParams):
     pass
 
-@router.get("/problems", response_model=PaginatedDataResponse[list[Problem]])
+@router.get("/problems", response_model=PaginatedDataResponse[Sequence[Problem]])
 async def get_trigger_alerts(
     query: Annotated[PaginationWithClientsParams, Query()],
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database
-) -> PaginatedDataResponse[list[Problem]]:
+) -> PaginatedDataResponse[Sequence[Problem]]:
     clients = await get_clients(query, user_id, clerk, db)
     offset = (query.page - 1) * query.limit
     cursor = db[Problem.Meta.collection_name()].find(
@@ -117,15 +120,15 @@ async def get_trigger_alerts(
         limit=query.limit
     )
     results = [Problem(**doc) async for doc in cursor]
-    return PaginatedDataResponse[list[Problem]](data=results, page=query.page, limit=query.limit)
+    return PaginatedDataResponse(data=results, page=query.page, limit=query.limit)
 
-@router.get("/services", response_model=PaginatedDataResponse[list[Service]])
+@router.get("/services", response_model=PaginatedDataResponse[Sequence[Service]])
 async def get_service_alerts(
     query: Annotated[PaginationWithClientsParams, Query()],
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database
-) -> PaginatedDataResponse[list[Service]]:
+) -> PaginatedDataResponse[Sequence[Service]]:
     clients = await get_clients(query, user_id, clerk, db)
     offset = (query.page - 1) * query.limit
     cursor = db[Service.Meta.collection_name()].find(
@@ -135,7 +138,7 @@ async def get_service_alerts(
         limit=query.limit
     )
     results = [Service(**doc) async for doc in cursor]
-    return PaginatedDataResponse[list[Service]](data=results, page=query.page, limit=query.limit)
+    return PaginatedDataResponse(data=results, page=query.page, limit=query.limit)
 
 @router.get("/problems/count", response_model=DataResponse[StatCounts])
 async def get_trigger_alerts_count(
@@ -170,7 +173,7 @@ async def get_trigger_alerts_count(
     )
 
     response.headers["Cache-Control"] = "private, max-age=60"
-    return DataResponse[StatCounts](data=StatCounts(
+    return DataResponse(data=StatCounts(
         totalActiveProblems=results[0],
         activeProblemsInLast24Hours=results[1],
         problemsInLast24Hours=results[2],
@@ -182,14 +185,14 @@ class TimePeriodWithClientsParams(TimePeriodParams, ClientsParams):
     pass
 
 IntervalSeconds = {'hour': 3600, 'day': 86400, 'week': 604800, 'month': 2592000}
-@router.get("/problems/trends", response_model=DataResponse[list[StatTrends]])
+@router.get("/problems/trends", response_model=DataResponse[Sequence[StatTrends]])
 async def get_trigger_alert_trends(
     query: Annotated[TimePeriodWithClientsParams, Query()],
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database,
     response: Response
-) -> DataResponse[list[StatTrends]]:
+) -> DataResponse[Sequence[StatTrends]]:
     clients = await get_clients(query, user_id, clerk, db)
 
     if query.end is None:
@@ -253,19 +256,19 @@ async def get_trigger_alert_trends(
                 active_counts[i] += 1
 
     response.headers["Cache-Control"] = f"private, max-age={IntervalSeconds[query.interval] // 60}, must-revalidate"
-    return DataResponse[list[StatTrends]](data=[StatTrends(
+    return DataResponse(data=[StatTrends(
         timestamp=bins[i][0],
         new=new_counts[i],
         resolved=resolved_counts[i],
         active=active_counts[i]
     ) for i in range(num_periods)])
 
-@router.get("/hosts/health", response_model=DataResponse[list[StatHealthScores]])
+@router.get("/hosts/health", response_model=DataResponse[Sequence[StatHealthScores]])
 async def get_hosts_health_scores(
     clients: ClientsFromQuery,
     db: Database,
     response: Response
-) -> DataResponse[list[StatHealthScores]]:
+) -> DataResponse[Sequence[StatHealthScores]]:
     # Aggregate problem severity counts per host
     pipeline = [
         # Get relevant problems for the clients
@@ -343,4 +346,49 @@ async def get_hosts_health_scores(
     results = [StatHealthScores(**doc) async for doc in cursor]
 
     response.headers["Cache-Control"] = "private, max-age=120"
-    return DataResponse[list[StatHealthScores]](data=results)
+    return DataResponse(data=results)
+
+class InfiniteTimePeriodWithClientsParams(InfiniteTimePeriodParams, ClientsParams):
+    pass
+
+@router.get("/hosts/problems/count", response_model=DataResponse[Sequence[StatHostProblemCount]])
+async def get_hosts_problem_counts(
+    query: Annotated[InfiniteTimePeriodWithClientsParams, Query()],
+    user_id: JwtUserId,
+    clerk: ClerkSdk,
+    db: Database,
+    response: Response
+) -> DataResponse[Sequence[StatHostProblemCount]]:
+    clients = await get_clients(query, user_id, clerk, db)
+
+    pipeline = [
+        # Get relevant problems for the clients
+        {"$match": {
+            fields(Problem).clientId: {"$in": [c.id for c in clients if c.id is not None]},
+            **({fields(Problem).startedAt: {"$gte": query.start}} if query.start is not None else {}),
+            **({fields(Problem).startedAt: {"$lte": query.end}} if query.end is not None else {})
+        }},
+
+        # Get relevant fields only
+        {"$project": {
+            fields(Problem).clientId: 1,
+            fields(Problem).hostname: 1,
+            fields(Problem).severity: 1
+        }},
+
+        # Group by hostname and count
+        {"$group": {
+            "_id": {
+                fields(Problem).clientId: "$" + fields(Problem).clientId,
+                fields(Problem).hostname: "$" + fields(Problem).hostname,
+                fields(Problem).severity: "$" + fields(Problem).severity
+            },
+            "count": {"$sum": 1}
+        }}
+    ]
+
+    cursor = await db[Problem.Meta.collection_name()].aggregate(pipeline)
+    results = [StatHostProblemCount(**doc["_id"], count=doc["count"]) async for doc in cursor]
+
+    response.headers["Cache-Control"] = "private, max-age=60"
+    return DataResponse(data=results)
