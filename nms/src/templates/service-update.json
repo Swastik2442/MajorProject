@@ -3,6 +3,7 @@
   "event": {
     "id": "{EVENT.ID}",
     "name": "{EVENT.NAME}",
+    "status": "{EVENT.STATUS}",
     "update": {
       "severity": "{EVENT.UPDATE.SEVERITY}",
       "date": "{EVENT.UPDATE.DATE}",

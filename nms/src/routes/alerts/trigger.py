@@ -10,7 +10,7 @@ from fastapi import APIRouter, Response, Query
 from pymongo import DESCENDING
 
 from src.middlewares.client import get_clients_from_query, ClientsFromQuery
-from src.models import Problem, Service
+from src.models import Problem
 from src.models.utils import fields, now
 from src.services.auth import ClerkSdk, JwtUserId
 from src.services.db import Database
@@ -123,7 +123,7 @@ async def get_trigger_alert_trends(
     problems = [
         Problem(**doc)
         async for doc in db[Problem.Meta.collection_name()].find({
-            fields(Service).clientId: {"$in": [client.id for client in clients if client.id is not None]},
+            fields(Problem).clientId: {"$in": [client.id for client in clients if client.id is not None]},
             "$or": [
                 {fields(Problem).startedAt: {"$gte": min_time, "$lt": max_time}},
                 {
@@ -179,7 +179,7 @@ async def get_hosts_health_scores(
     pipeline = [
         # Get relevant problems for the clients
         {"$match": {
-            fields(Service).clientId: {"$in": [c.id for c in clients if c.id is not None]}
+            fields(Problem).clientId: {"$in": [c.id for c in clients if c.id is not None]}
         }},
 
         # Get relevant fields only

@@ -32,8 +32,8 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          git config user.name "octocat"
-          git config user.email "octocat@github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           # If there are no changes, exit gracefully
           if git diff --quiet; then

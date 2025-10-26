@@ -81,6 +81,7 @@ async def receive_alert(
                         status="Recovered"
                     )), "$push": {fields(Problem).updates: to_doc(PUpdate( # type: ignore
                         action="Recovered",
+                        message=alert.subject,
                         timestamp=recTime
                     ))}}
                 )
@@ -116,6 +117,8 @@ async def receive_alert(
                 clientId=client.id,
                 zid=data.event.id,
                 name=data.event.name,
+                status="Started",
+                serviceName=data.service.name,
                 description=data.service.description,
                 rootcause=data.service.rootcause,
                 startedAt=datetime.strptime(f"{data.event.date} {data.event.time}", ZABBIX_DATETIME_FORMAT),
@@ -132,6 +135,8 @@ async def receive_alert(
                     clientId=client.id,
                     zid=data.event.id,
                     name=data.event.name,
+                    status="Recovered",
+                    serviceName=data.service.name,
                     description=data.service.description,
                     rootcause="Unknown",
                     startedAt=recTime,
@@ -143,10 +148,12 @@ async def receive_alert(
                     {fields(Problem).zid: data.event.id},
                     {"$set": to_doc(ServiceUpdate(
                         recoveryAt=recTime,
+                        status="Recovered",
                         severity=data.event.severity,
                         duration=data.event.duration
                     )), "$push": {fields(Service).updates: to_doc(SUpdate( # type: ignore
                         action="Recovered",
+                        message=alert.subject,
                         timestamp=recTime
                     ))}}
                 )
@@ -161,6 +168,8 @@ async def receive_alert(
                     clientId=client.id,
                     zid=data.event.id,
                     name=data.event.name,
+                    status=data.event.status,
+                    serviceName=data.service.name,
                     description=data.service.description,
                     rootcause=data.service.rootcause,
                     startedAt=updateTime,
@@ -170,10 +179,12 @@ async def receive_alert(
                 await db[Service.Meta.collection_name()].update_one(
                     {fields(Problem).zid: data.event.id},
                     {"$set": to_doc(ServiceUpdate(
+                        status=data.event.status,
                         severity=data.event.update.severity,
                         age=data.event.age
                     )), "$push": {fields(Service).updates: to_doc(SUpdate( # type: ignore
                         action="Updated",
+                        message=alert.subject,
                         timestamp=updateTime
                     ))}}
                 )

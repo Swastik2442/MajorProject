@@ -28,6 +28,8 @@ class Service(BaseInterface):
     age: str | None = Field(default_factory=none)
     severity: Severity = Field()
     duration: str | None = Field(default_factory=none)
+    status: str = Field()
+    serviceName: str = Field()
     description: str = Field()
     rootcause: str = Field()
     updates: Sequence[Update] = Field(default_factory=list)
@@ -36,6 +38,7 @@ class ServiceUpdate(BaseModel):
     updatedAt: MyDatetime = Field(default_factory=now)
 
     recoveryAt: MyDatetime | None = Field(default_factory=none)
+    status: str | None = Field(default_factory=none)
     severity: Severity = Field()
     duration: str | None = Field(default_factory=none)
     age: str | None = Field(default_factory=none)

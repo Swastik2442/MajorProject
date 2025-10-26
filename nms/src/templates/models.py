@@ -78,6 +78,7 @@ class ServiceEvent(BaseModel):
 class ServiceUpdateEvent(BaseModel):
     id: str
     name: str
+    status: str
     age: str
     update: Update2
 
