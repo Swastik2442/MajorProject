@@ -10,13 +10,14 @@ from fastapi import APIRouter, Response, Query
 from pymongo import DESCENDING
 
 from src.middlewares.client import get_clients_from_query, ClientsFromQuery
-from src.models import Problem
+from src.models import Problem, ProblemDatetimesAndStatus
 from src.models.utils import fields, now
 from src.services.auth import ClerkSdk, JwtUserId
 from src.services.db import Database
 from src.schemas import (
     DataResponse,
     InfiniteTimePeriodWithClientsParams,
+    IntervalSeconds,
     PaginationWithClientsParams,
     PaginatedDataResponse,
     StatCounts,
@@ -90,7 +91,6 @@ async def get_trigger_alerts_count(
         problemsInLastMonth=results[4]
     ))
 
-IntervalSeconds = {'hour': 3600, 'day': 86400, 'week': 604800, 'month': 2592000}
 @router.get("/trends", response_model=DataResponse[Sequence[StatTrends]])
 async def get_trigger_alert_trends(
     query: Annotated[TimePeriodWithClientsParams, Query()],
@@ -121,7 +121,7 @@ async def get_trigger_alert_trends(
     min_time = bins[0][0]
     max_time = bins[-1][1]
     problems = [
-        Problem(**doc)
+        ProblemDatetimesAndStatus(**doc)
         async for doc in db[Problem.Meta.collection_name()].find({
             fields(Problem).clientId: {"$in": [client.id for client in clients if client.id is not None]},
             "$or": [
@@ -132,7 +132,7 @@ async def get_trigger_alert_trends(
                     fields(Problem).recoveryAt: {"$gte": min_time}
                 }
             ]
-        })
+        }, {k: True for k in ProblemDatetimesAndStatus.model_fields.keys()})
     ]
 
     counts = [0] * num_periods

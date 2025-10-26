@@ -7,6 +7,8 @@ from pydantic import BaseModel, Field, model_validator
 from src.models.utils import MyDatetime, PyObjectId, none, now
 from src.templates.models import Severity
 
+IntervalSeconds = {'hour': 3600, 'day': 86400, 'week': 604800, 'month': 2592000}
+
 class PaginationParams(BaseModel):
     page: int = Query(1, ge=1)
     limit: int = Query(20, ge=1, le=100)
@@ -85,9 +87,18 @@ class StatCounts(BaseModel):
     problemsInLastWeek: int = Field(ge=0)
     problemsInLastMonth: int = Field(ge=0)
 
+class StatCommonCounts(BaseModel):
+    problems: StatCounts
+    services: StatCounts
+
 class StatTrends(BaseModel):
     timestamp: MyDatetime
     active: int = Field(ge=0)
+
+class StatCommonTrends(BaseModel):
+    timestamp: MyDatetime
+    activeProblems: int = Field(ge=0)
+    activeServiceOutages: int = Field(ge=0)
 
 class StatHealthScores(BaseModel):
     id: str = Field(alias="_id", title="Zabbix Host ID")

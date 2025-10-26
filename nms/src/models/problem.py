@@ -39,3 +39,8 @@ class ProblemUpdate(BaseModel):
     severity: Severity = Field()
     duration: str | None = Field(default_factory=none)
     status: str = Field()
+
+class ProblemDatetimesAndStatus(BaseModel):
+    startedAt: MyDatetime = Field()
+    recoveryAt: MyDatetime | None = Field(default_factory=none)
+    status: str = Field()

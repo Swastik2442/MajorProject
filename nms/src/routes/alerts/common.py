@@ -10,7 +10,7 @@ from fastapi import APIRouter, Query, Response
 from pymongo import DESCENDING
 
 from src.middlewares.client import get_clients_from_query, ClientsFromQuery
-from src.models import Service, ServiceDatetimesAndStatus
+from src.models import Problem, Service, ProblemDatetimesAndStatus, ServiceDatetimesAndStatus
 from src.models.utils import fields, now
 from src.services.auth import ClerkSdk, JwtUserId
 from src.services.db import Database
@@ -19,43 +19,77 @@ from src.schemas import (
     IntervalSeconds,
     PaginatedDataResponse,
     PaginationWithClientsParams,
+    StatCommonCounts,
+    StatCommonTrends,
     StatCounts,
-    StatTrends,
     TimePeriodWithClientsParams
 )
 
 router = APIRouter(
-    prefix="/services",
-    tags=["service alerts"],
+    prefix="/common",
+    tags=["common alerts"],
 )
 
-@router.get("/", response_model=PaginatedDataResponse[Sequence[Service]])
-async def get_service_alerts(
+@router.get("/", response_model=PaginatedDataResponse[Sequence[Problem | Service]])
+async def get_common_alerts(
     query: Annotated[PaginationWithClientsParams, Query()],
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database
-) -> PaginatedDataResponse[Sequence[Service]]:
+) -> PaginatedDataResponse[Sequence[Problem | Service]]:
     clients = await get_clients_from_query(query, user_id, clerk, db)
     offset = (query.page - 1) * query.limit
-    cursor = db[Service.Meta.collection_name()].find(
+
+    cursorProblem = db[Problem.Meta.collection_name()].find(
+        {fields(Problem).clientId: {"$in": [client.id for client in clients if client.id is not None]}},
+        sort=[(fields(Problem).updatedAt, DESCENDING), (fields(Problem).createdAt, DESCENDING)],
+        skip=offset,
+        limit=query.limit
+    )
+    cursorService = db[Service.Meta.collection_name()].find(
         {fields(Service).clientId: {"$in": [client.id for client in clients if client.id is not None]}},
         sort=[(fields(Service).updatedAt, DESCENDING), (fields(Service).createdAt, DESCENDING)],
         skip=offset,
         limit=query.limit
     )
-    results = [Service(**doc) async for doc in cursor]
+
+    results = [Problem(**doc) async for doc in cursorProblem] + [Service(**doc) async for doc in cursorService]
+    results = sorted(results, key=lambda x: (x.updatedAt, x.createdAt), reverse=True)
+    results = results[:query.limit]
+
     return PaginatedDataResponse(data=results, page=query.page, limit=query.limit)
 
-@router.get("/count", response_model=DataResponse[StatCounts])
-async def get_service_alerts_count(
+@router.get("/count", response_model=DataResponse[StatCommonCounts])
+async def get_common_alerts_count(
     clients: ClientsFromQuery,
     db: Database,
     response: Response
-) -> DataResponse[StatCounts]:
+) -> DataResponse[StatCommonCounts]:
     curr = now()
     clientIds = [client.id for client in clients if client.id is not None]
     results = await asyncio.gather(
+        db[Problem.Meta.collection_name()].count_documents({
+            fields(Problem).clientId: {"$in": clientIds},
+            fields(Problem).status: {"$ne": "Recovered"}
+        }),
+        db[Problem.Meta.collection_name()].count_documents({
+            fields(Problem).clientId: {"$in": clientIds},
+            fields(Problem).status: {"$ne": "Recovered"},
+            fields(Problem).createdAt: {"$gte": curr - timedelta(days=1)} # type: ignore
+        }),
+        db[Problem.Meta.collection_name()].count_documents({
+            fields(Problem).clientId: {"$in": clientIds},
+            fields(Problem).createdAt: {"$gte": curr - timedelta(days=1)} # type: ignore
+        }),
+        db[Problem.Meta.collection_name()].count_documents({
+            fields(Problem).clientId: {"$in": clientIds},
+            fields(Problem).createdAt: {"$gte": curr - timedelta(weeks=1)} # type: ignore
+        }),
+        db[Problem.Meta.collection_name()].count_documents({
+            fields(Problem).clientId: {"$in": clientIds},
+            fields(Problem).createdAt: {"$gte": curr - timedelta(days=30)} # type: ignore
+        }),
+
         db[Service.Meta.collection_name()].count_documents({
             fields(Service).clientId: {"$in": clientIds},
             fields(Service).status: {"$ne": "Recovered"}
@@ -80,22 +114,31 @@ async def get_service_alerts_count(
     )
 
     response.headers["Cache-Control"] = "private, max-age=60"
-    return DataResponse(data=StatCounts(
-        totalActiveProblems=results[0],
-        activeProblemsInLast24Hours=results[1],
-        problemsInLast24Hours=results[2],
-        problemsInLastWeek=results[3],
-        problemsInLastMonth=results[4]
+    return DataResponse(data=StatCommonCounts(
+        problems=StatCounts(
+            totalActiveProblems=results[0],
+            activeProblemsInLast24Hours=results[1],
+            problemsInLast24Hours=results[2],
+            problemsInLastWeek=results[3],
+            problemsInLastMonth=results[4]
+        ),
+        services=StatCounts(
+            totalActiveProblems=results[5],
+            activeProblemsInLast24Hours=results[6],
+            problemsInLast24Hours=results[7],
+            problemsInLastWeek=results[8],
+            problemsInLastMonth=results[9]
+        )
     ))
 
-@router.get("/trends", response_model=DataResponse[Sequence[StatTrends]])
-async def get_service_alert_trends(
+@router.get("/trends", response_model=DataResponse[Sequence[StatCommonTrends]])
+async def get_common_alert_trends(
     query: Annotated[TimePeriodWithClientsParams, Query()],
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database,
     response: Response
-) -> DataResponse[Sequence[StatTrends]]:
+) -> DataResponse[Sequence[StatCommonTrends]]:
     clients = await get_clients_from_query(query, user_id, clerk, db)
 
     if query.end is None:
@@ -118,6 +161,20 @@ async def get_service_alert_trends(
     min_time = bins[0][0]
     max_time = bins[-1][1]
     problems = [
+        ProblemDatetimesAndStatus(**doc)
+        async for doc in db[Problem.Meta.collection_name()].find({
+            fields(Problem).clientId: {"$in": [client.id for client in clients if client.id is not None]},
+            "$or": [
+                {fields(Problem).startedAt: {"$gte": min_time, "$lt": max_time}},
+                {
+                    fields(Problem).startedAt: {"$lt": min_time},
+                    fields(Problem).status: {"$ne": "Recovered"},
+                    fields(Problem).recoveryAt: {"$gte": min_time}
+                }
+            ]
+        }, {k: True for k in ProblemDatetimesAndStatus.model_fields.keys()})
+    ]
+    services = [
         ServiceDatetimesAndStatus(**doc)
         async for doc in db[Service.Meta.collection_name()].find({
             fields(Service).clientId: {"$in": [client.id for client in clients if client.id is not None]},
@@ -132,16 +189,25 @@ async def get_service_alert_trends(
         }, {k: True for k in ServiceDatetimesAndStatus.model_fields.keys()})
     ]
 
-    counts = [0] * num_periods
+    problemCounts = [0] * num_periods
+    serviceCounts = [0] * num_periods
     for p in problems:
         for i, (bin_start, bin_end) in enumerate(bins):
             if bin_start >= p.startedAt and (
                 p.status != "Recovered" or (p.recoveryAt is not None and p.recoveryAt >= bin_end)
             ):
-                counts[i] += 1
+                problemCounts[i] += 1
+
+    for s in services:
+        for i, (bin_start, bin_end) in enumerate(bins):
+            if bin_start >= s.startedAt and (
+                s.status != "Recovered" or (s.recoveryAt is not None and s.recoveryAt >= bin_end)
+            ):
+                serviceCounts[i] += 1
 
     response.headers["Cache-Control"] = f"private, max-age={IntervalSeconds[query.interval] // 60}, must-revalidate"
-    return DataResponse(data=[StatTrends(
+    return DataResponse(data=[StatCommonTrends(
         timestamp=bins[i][0],
-        active=counts[i]
+        activeProblems=problemCounts[i],
+        activeServiceOutages=serviceCounts[i]
     ) for i in range(num_periods)])

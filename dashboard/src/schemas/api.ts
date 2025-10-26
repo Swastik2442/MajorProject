@@ -102,12 +102,19 @@ export const ServiceSchema = z.object({
   updates: z.array(UpdateSchema),
 });
 
+export const ProblemOrServiceSchema = z.union([ProblemSchema, ServiceSchema]);
+
 export const StatCountsSchema = z.object({
   totalActiveProblems: z.number().int().min(0),
   activeProblemsInLast24Hours: z.number().int().min(0),
   problemsInLast24Hours: z.number().int().min(0),
   problemsInLastWeek: z.number().int().min(0),
   problemsInLastMonth: z.number().int().min(0),
+});
+
+export const StatCommonCountsSchema = z.object({
+  problems: StatCountsSchema,
+  serviceAlerts: StatCountsSchema,
 });
 
 export const StatHealthScoresSchema = z.object({
@@ -125,6 +132,12 @@ export const StatHealthScoresSchema = z.object({
 export const StatTrendsSchema = z.object({
   timestamp: z.iso.datetime(),
   active: z.number().int().min(0),
+});
+
+export const StatCommonTrendsSchema = z.object({
+  timestamp: z.iso.datetime(),
+  activeProblems: z.number().int().min(0),
+  activeServiceOutages: z.number().int().min(0),
 });
 
 export const StatHostsProblemsCountSchema = z.object({
@@ -199,9 +212,12 @@ export const PaginationAndOwnerParamsSchema = PaginationParamsSchema.extend({
 export type TSeveritySchema = z.infer<typeof SeveritySchema>;
 export type TProblem = z.infer<typeof ProblemSchema>;
 export type TService = z.infer<typeof ServiceSchema>;
+export type TProblemOrService = z.infer<typeof ProblemOrServiceSchema>;
 export type TStatCounts = z.infer<typeof StatCountsSchema>;
+export type TStatCommonCounts = z.infer<typeof StatCommonCountsSchema>;
 export type TStatHealthScores = z.infer<typeof StatHealthScoresSchema>;
 export type TStatTrends = z.infer<typeof StatTrendsSchema>;
+export type TStatCommonTrends = z.infer<typeof StatCommonTrendsSchema>;
 
 export type TClient = z.infer<typeof ClientSchema>;
 export type TClientCreate = z.infer<typeof ClientCreateSchema>;
@@ -219,11 +235,20 @@ export type TPaginatedProblemDataResponse = z.infer<typeof PaginatedProblemDataR
 export const PaginatedServiceDataResponseSchema = PaginatedDataResponseSchema(ServiceSchema);
 export type TPaginatedServiceDataResponse = z.infer<typeof PaginatedServiceDataResponseSchema>;
 
+export const PaginatedProblemOrServiceDataResponseSchema = PaginatedDataResponseSchema(ProblemOrServiceSchema);
+export type TPaginatedProblemOrServiceDataResponse = z.infer<typeof PaginatedProblemOrServiceDataResponseSchema>;
+
 export const StatCountsDataResponseSchema = DataResponseSchema(StatCountsSchema);
 export type TStatCountsDataResponse = z.infer<typeof StatCountsDataResponseSchema>;
 
+export const StatCommonCountsDataResponseSchema = DataResponseSchema(StatCommonCountsSchema);
+export type TStatCommonCountsDataResponse = z.infer<typeof StatCommonCountsDataResponseSchema>;
+
 export const StatTrendsDataResponseSchema = DataResponseSchema(z.array(StatTrendsSchema));
 export type TStatTrendsDataResponse = z.infer<typeof StatTrendsDataResponseSchema>;
+
+export const StatCommonTrendsDataResponseSchema = DataResponseSchema(z.array(StatCommonTrendsSchema));
+export type TStatCommonTrendsDataResponse = z.infer<typeof StatCommonTrendsDataResponseSchema>;
 
 export const StatHealthScoresDataResponseSchema = DataResponseSchema(z.array(StatHealthScoresSchema));
 export type TStatHealthScoresDataResponse = z.infer<typeof StatHealthScoresDataResponseSchema>;
@@ -256,10 +281,13 @@ export type TPaginationAndOwnerParams = z.infer<typeof PaginationAndOwnerParamsS
 export interface ApiService {
   fetchProblems: (params: TPaginationAndOrgClientParams) => Promise<TPaginatedProblemDataResponse>;
   fetchServiceAlerts: (params: TPaginationAndOrgClientParams) => Promise<TPaginatedServiceDataResponse>;
+  fetchCommonAlerts: (params: TPaginationAndOrgClientParams) => Promise<TPaginatedProblemOrServiceDataResponse>;
   fetchProblemsCount: (params: TClientsParams) => Promise<TStatCountsDataResponse>;
-  fetchProblemsTrends: (params: TTimeIntervalAndOrgClientParams) => Promise<TStatTrendsDataResponse>;
   fetchServiceAlertsCount: (params: TClientsParams) => Promise<TStatCountsDataResponse>;
+  fetchCommonAlertsCount: (params: TClientsParams) => Promise<TStatCommonCountsDataResponse>;
+  fetchProblemsTrends: (params: TTimeIntervalAndOrgClientParams) => Promise<TStatTrendsDataResponse>;
   fetchServiceAlertsTrends: (params: TTimeIntervalAndOrgClientParams) => Promise<TStatTrendsDataResponse>;
+  fetchCommonAlertsTrends: (params: TTimeIntervalAndOrgClientParams) => Promise<TStatCommonTrendsDataResponse>;
   fetchHostsHealthScores: (params: TClientsParams) => Promise<TStatHealthScoresDataResponse>;
   fetchHostsProblemsCount: (params: TInfiniteTimeIntervalAndOrgClientParams) => Promise<TStatHostsProblemsCountDataResponse>;
 

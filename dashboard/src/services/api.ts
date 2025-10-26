@@ -5,8 +5,11 @@ import type {
   TDataResponseStr,
   TPaginatedClientListItemDataResponse,
   TPaginatedProblemDataResponse,
+  TPaginatedProblemOrServiceDataResponse,
   TPaginatedServiceDataResponse,
   TResponse,
+  TStatCommonCountsDataResponse,
+  TStatCommonTrendsDataResponse,
   TStatCountsDataResponse,
   TStatHealthScoresDataResponse,
   TStatHostsProblemsCountDataResponse,
@@ -42,7 +45,7 @@ api.interceptors.request.use(
 export const apiService: ApiService = {
   fetchProblems: async (params) => {
     const response = await api.get<TPaginatedProblemDataResponse>(
-      "/alerts/problems",
+      "/alerts/problems/",
       { params }
     );
     return response.data;
@@ -50,7 +53,7 @@ export const apiService: ApiService = {
 
   fetchServiceAlerts: async (params) => {
     const response = await api.get<TPaginatedServiceDataResponse>(
-      "/alerts/services",
+      "/alerts/services/",
       { params }
     );
     return response.data;
@@ -88,6 +91,30 @@ export const apiService: ApiService = {
     return response.data;
   },
 
+  fetchCommonAlerts: async (params) => {
+    const response = await api.get<TPaginatedProblemOrServiceDataResponse>(
+      "/alerts/common/",
+      { params }
+    );
+    return response.data;
+  },
+
+  fetchCommonAlertsCount: async (params) => {
+    const response = await api.get<TStatCommonCountsDataResponse>(
+      "/alerts/common/count",
+      { params }
+    );
+    return response.data;
+  },
+
+  fetchCommonAlertsTrends: async (params) => {
+    const response = await api.get<TStatCommonTrendsDataResponse>(
+      "/alerts/common/trends",
+      { params }
+    );
+    return response.data;
+  },
+
   fetchHostsHealthScores: async (params) => {
     const response = await api.get<TStatHealthScoresDataResponse>(
       "/alerts/problems/hosts/health",
@@ -106,7 +133,7 @@ export const apiService: ApiService = {
 
   createClient: async (data) => {
     const response = await api.post<TDataResponseStr>(
-      "/clients",
+      "/clients/",
       { ...data }
     );
     return response.data;
@@ -114,7 +141,7 @@ export const apiService: ApiService = {
 
   listClients: async (params) => {
     const response = await api.get<TPaginatedClientListItemDataResponse>(
-      "/clients",
+      "/clients/",
       { params }
     );
     return response.data;
