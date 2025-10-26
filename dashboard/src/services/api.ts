@@ -9,6 +9,7 @@ import type {
   TResponse,
   TStatCountsDataResponse,
   TStatHealthScoresDataResponse,
+  TStatHostsProblemsCountDataResponse,
   TStatTrendsDataResponse
 } from "../schemas/api";
 
@@ -73,7 +74,15 @@ export const apiService: ApiService = {
 
   fetchHostsHealthScores: async (params) => {
     const response = await api.get<TStatHealthScoresDataResponse>(
-      "/alerts/hosts/health",
+      "/alerts/problems/hosts/health",
+      { params }
+    );
+    return response.data;
+  },
+
+  fetchHostsProblemsCount: async (params) => {
+    const response = await api.get<TStatHostsProblemsCountDataResponse>(
+      "/alerts/problems/hosts/count",
       { params }
     );
     return response.data;

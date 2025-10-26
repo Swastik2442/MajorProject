@@ -263,7 +263,7 @@ async def get_trigger_alert_trends(
         active=active_counts[i]
     ) for i in range(num_periods)])
 
-@router.get("/hosts/health", response_model=DataResponse[Sequence[StatHealthScores]])
+@router.get("/problems/hosts/health", response_model=DataResponse[Sequence[StatHealthScores]])
 async def get_hosts_health_scores(
     clients: ClientsFromQuery,
     db: Database,
@@ -351,8 +351,8 @@ async def get_hosts_health_scores(
 class InfiniteTimePeriodWithClientsParams(InfiniteTimePeriodParams, ClientsParams):
     pass
 
-@router.get("/hosts/problems/count", response_model=DataResponse[Sequence[StatHostProblemCount]])
-async def get_hosts_problem_counts(
+@router.get("/problems/hosts/count", response_model=DataResponse[Sequence[StatHostProblemCount]])
+async def get_hosts_problems_count(
     query: Annotated[InfiniteTimePeriodWithClientsParams, Query()],
     user_id: JwtUserId,
     clerk: ClerkSdk,

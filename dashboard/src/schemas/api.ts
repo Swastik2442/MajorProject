@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SeveritySchema } from "./others";
 
 // --- Zod Schemas generated from OpenAPI ---
 
@@ -134,6 +135,13 @@ export const StatTrendsSchema = z.object({
   active: z.number().int().min(0),
 });
 
+export const StatHostsProblemsCountSchema = z.object({
+  clientId: z.string(),
+  hostname: z.string(),
+  severity: SeveritySchema,
+  count: z.number().int().min(0),
+});
+
 export const DataResponseSchema = <T extends z.ZodType>(dataSchema: T) =>
   z.object({
     status: z.enum(["success", "error"]),
@@ -179,7 +187,13 @@ export const TimeIntervalParamsSchema = z.object({
   interval: z.enum(["hour", "day", "week", "month"]).optional(),
 });
 
+export const InfiniteTimeIntervalParamsSchema = z.object({
+  start: z.iso.datetime().optional(),
+  end: z.iso.datetime().optional(),
+});
+
 export const TimeIntervalAndOrgClientParamsSchema = TimeIntervalParamsSchema.extend(ClientsParamsSchema.shape);
+export const InfiniteTimeIntervalAndOrgClientParamsSchema = InfiniteTimeIntervalParamsSchema.extend(ClientsParamsSchema.shape);
 export const PaginationAndOrgClientParamsSchema = PaginationParamsSchema.extend(ClientsParamsSchema.shape);
 export const PaginationAndOwnerParamsSchema = PaginationParamsSchema.extend({
   owner_id: z.union([
@@ -221,6 +235,9 @@ export type TStatTrendsDataResponse = z.infer<typeof StatTrendsDataResponseSchem
 export const StatHealthScoresDataResponseSchema = DataResponseSchema(z.array(StatHealthScoresSchema));
 export type TStatHealthScoresDataResponse = z.infer<typeof StatHealthScoresDataResponseSchema>;
 
+export const StatHostsProblemsCountDataResponseSchema = DataResponseSchema(z.array(StatHostsProblemsCountSchema));
+export type TStatHostsProblemsCountDataResponse = z.infer<typeof StatHostsProblemsCountDataResponseSchema>;
+
 export const PaginatedClientListItemDataResponseSchema = PaginatedDataResponseSchema(ClientListItemSchema);
 export type TPaginatedClientListItemDataResponse = z.infer<typeof PaginatedClientListItemDataResponseSchema>;
 
@@ -237,6 +254,7 @@ export type TClientsParams = z.infer<typeof ClientsParamsSchema>;
 export type TPaginationParams = z.infer<typeof PaginationParamsSchema>;
 export type TTimeIntervalParams = z.infer<typeof TimeIntervalParamsSchema>;
 export type TTimeIntervalAndOrgClientParams = z.infer<typeof TimeIntervalAndOrgClientParamsSchema>;
+export type TInfiniteTimeIntervalAndOrgClientParams = z.infer<typeof InfiniteTimeIntervalAndOrgClientParamsSchema>;
 export type TPaginationAndOrgClientParams = z.infer<typeof PaginationAndOrgClientParamsSchema>;
 export type TPaginationAndOwnerParams = z.infer<typeof PaginationAndOwnerParamsSchema>;
 
@@ -248,6 +266,7 @@ export interface ApiService {
   fetchProblemsCount: (params: TClientsParams) => Promise<TStatCountsDataResponse>;
   fetchProblemsTrends: (params: TTimeIntervalAndOrgClientParams) => Promise<TStatTrendsDataResponse>;
   fetchHostsHealthScores: (params: TClientsParams) => Promise<TStatHealthScoresDataResponse>;
+  fetchHostsProblemsCount: (params: TInfiniteTimeIntervalAndOrgClientParams) => Promise<TStatHostsProblemsCountDataResponse>;
 
   // Client endpoints
   createClient: (body: TClientCreate) => Promise<TDataResponseStr>;
