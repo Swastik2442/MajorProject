@@ -17,7 +17,7 @@ from src.services.hishel import hishel_service
 from src.services.redis import redis_service
 from src.schemas import Response as CustomResponse
 
-# logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG if config.DEBUG else None)
 logger = logging.getLogger()
 
 @asynccontextmanager
@@ -36,6 +36,12 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(
     title="NMS API",
+    version="0.3.1",
+    description="API Service to store and serve Zabbix Alerts",
+    openapi_url="/openapi.json" if config.ENV == "dev" else None,
+    docs_url="/docs" if config.ENV == "dev" else None,
+    redoc_url="/redoc" if config.ENV == "dev" else None,
+    swagger_ui_oauth2_redirect_url="/docs/oauth2-redirect" if config.ENV == "dev" else None,
     lifespan=lifespan,
     exception_handlers={
         StarletteHTTPException: http_exception_handler,
@@ -58,6 +64,7 @@ app.add_middleware(
 def root():
     return CustomResponse(message="API for Zabbix Alerts Storage")
 
+@app.get("/favicon.png", include_in_schema=False)
 @app.get("/favicon.ico", include_in_schema=False)
 def favicon():
     return Response(status_code=status.HTTP_204_NO_CONTENT)
