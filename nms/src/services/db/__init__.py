@@ -9,11 +9,12 @@ from pymongo import AsyncMongoClient
 from pymongo.asynchronous.database import AsyncDatabase
 
 from src.config import config
+from src.services import Service
 from .init_collections import init_collections
 
 logger = getLogger(__name__)
 
-class DatabaseService:
+class DatabaseService(Service):
     def __init__(self) -> None:
         self._db_client: AsyncMongoClient[Any]
         self._db: AsyncDatabase[Any]
@@ -46,3 +47,10 @@ class DatabaseService:
 db_service = DatabaseService()
 DatabaseClient = Annotated[AsyncMongoClient[Any], Depends(db_service.get_db_client)]
 Database = Annotated[AsyncDatabase[Any], Depends(db_service.get_db)]
+
+__all__ = [
+    "DatabaseService",
+    "db_service",
+    "DatabaseClient",
+    "Database"
+]

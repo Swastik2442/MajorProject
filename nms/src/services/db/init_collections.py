@@ -23,3 +23,5 @@ async def init_collections(db: AsyncDatabase) -> None:
     await db[Service.Meta.collection_name()].create_index([
         (fields(Service).zid, ASCENDING), (fields(Service).clientId, ASCENDING)
     ], unique=True)
+
+__all__ = ["init_collections"]
