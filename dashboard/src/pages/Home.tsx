@@ -51,6 +51,7 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen w-full bg-[#050b16] text-white overflow-x-hidden">
+      <Metadata title={import.meta.env.VITE_APP_TITLE} />
       {/* Background layer that spans both sections and is GPU-transformed */}
       <div
         ref={bgRef}
@@ -222,7 +223,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Footer — sits at the bottom naturally */}
+        {/* Footer */}
         <footer className="w-full bg-[#050b16] py-6 text-center text-gray-500 text-sm border-t border-white/10">
           <p>&copy; 2025 NMS</p>
           <p>
@@ -233,15 +234,6 @@ export default function Home() {
           </p>
         </footer>
       </div>
-
-      {/* caret blink style (kept) */}
-      <style>{`
-        @keyframes blink {
-          0%, 50%, 100% { opacity: 1; }
-          25%, 75% { opacity: 0; }
-        }
-        .animate-caret-blink { animation: blink 1s infinite; }
-      `}</style>
     </div>
   );
 }
