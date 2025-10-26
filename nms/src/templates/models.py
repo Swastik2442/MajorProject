@@ -11,6 +11,12 @@ ZABBIX_DATETIME_FORMAT = "%Y.%m.%d %H:%M:%S"
 ZABBIX_DATE_REGEX = r"^\d{4}.\d{2}.\d{2}$"
 ZABBIX_TIME_REGEX = r"^\d{2}:\d{2}:\d{2}$"
 
+class ZabbixAlert(BaseModel):
+    "Expected Payload from Zabbix webhook"
+    to: str | None = Field(default_factory=lambda: None, description="IP/DNS Address of receiving Server")
+    subject: str = Field(description="Subject of the Alert")
+    message: str = Field(description="JSON message containing the details of the Alert")
+
 # Common sub-models
 class Recovery(BaseModel):
     time: str = Field(pattern=ZABBIX_TIME_REGEX)

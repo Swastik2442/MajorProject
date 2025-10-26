@@ -1,4 +1,4 @@
-"API Service to store and serve Zabbix Alerts"
+"Database Service"
 
 from logging import getLogger
 from typing import Annotated, Any

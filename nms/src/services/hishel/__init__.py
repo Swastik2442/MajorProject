@@ -1,3 +1,5 @@
+"Hishel Caching Service"
+
 import os
 from logging import getLogger
 from typing import Annotated

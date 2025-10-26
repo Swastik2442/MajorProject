@@ -1,4 +1,4 @@
-"API Routes for serving Zabbix Alerts"
+"API Routes for serving Zabbix Trigger Alerts"
 
 import asyncio
 from collections.abc import Sequence
@@ -6,112 +6,39 @@ from datetime import datetime, timedelta
 from math import ceil
 from typing import Annotated
 
-from bson import ObjectId
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, Response, Query
 from pymongo import DESCENDING
 
-from src.models import Client, ClientListItem, Problem, Service
+from src.middlewares.client import get_clients_from_query, ClientsFromQuery
+from src.models import Problem, Service
 from src.models.utils import fields, now
 from src.services.auth import ClerkSdk, JwtUserId
 from src.services.db import Database
 from src.schemas import (
-    ClientsParams,
     DataResponse,
-    InfiniteTimePeriodParams,
-    PaginationParams,
+    InfiniteTimePeriodWithClientsParams,
+    PaginationWithClientsParams,
     PaginatedDataResponse,
     StatCounts,
     StatHealthScores,
     StatHostProblemCount,
     StatTrends,
-    TimePeriodParams
+    TimePeriodWithClientsParams
 )
 
 router = APIRouter(
-    prefix="/alerts",
-    tags=["alerts"],
+    prefix="/problems",
+    tags=["trigger alerts"],
 )
 
-async def get_clients(
-    clients_query: Annotated[ClientsParams, Query()],
-    user_id: JwtUserId,
-    clerk: ClerkSdk,
-    db: Database
-) -> Sequence[ClientListItem]:
-    # Get all Clients in the Org
-    if clients_query.org_id is not None:
-        orgs = await clerk.organizations.list_async(
-            organization_id=[clients_query.org_id],
-            user_id=[user_id],
-            limit=1
-        )
-        if orgs is None or len(orgs.data) == 0:
-            raise HTTPException(
-                status.HTTP_401_UNAUTHORIZED,
-                "Organization not found or you don't have access to it"
-            )
-
-        return [
-            ClientListItem(**doc) async for doc in db[Client.Meta.collection_name()].find(
-                {fields(Client).ownerId: orgs.data[0].id},
-                {fields(Client).idForApi: False, fields(Client).secretForApi: False}
-            )
-        ]
-
-    # Get specific Clients by ID(s)
-    if clients_query.client_id is not None:
-        if isinstance(clients_query.client_id, str): # Single ID
-            client = await db[Client.Meta.collection_name()].find_one(
-                {"_id": ObjectId(clients_query.client_id)},
-                {fields(Client).idForApi: False, fields(Client).secretForApi: False}
-            )
-            if client is None:
-                raise HTTPException(status.HTTP_404_NOT_FOUND, "Client not found")
-            clients = [ClientListItem(**client)]
-        else:                                        # List of IDs
-            clients = [
-                ClientListItem(**doc) async for doc in db[Client.Meta.collection_name()].find(
-                    {"_id": {"$in": [ObjectId(cid) for cid in clients_query.client_id]}},
-                    {fields(Client).idForApi: False, fields(Client).secretForApi: False}
-                )
-            ]
-
-        # Ensure user has access to all requested Clients
-        orgs = await clerk.organizations.list_async(
-            organization_id=[client.ownerId for client in clients],
-            user_id=[user_id]
-        )
-        if orgs is None or orgs.total_count != len(set(client.ownerId for client in clients)):
-            raise HTTPException(
-                status.HTTP_401_UNAUTHORIZED,
-                "Client not found or you don't have access to it"
-            )
-
-        return clients
-
-    # Get all Clients accessible to the user
-    orgs = await clerk.organizations.list_async(user_id=[user_id])
-    if orgs is None or len(orgs.data) == 0:
-        return []
-    return [
-        ClientListItem(**doc) async for doc in db[Client.Meta.collection_name()].find(
-            {fields(Client).ownerId: {"$in": [org.id for org in orgs.data]}},
-            {fields(Client).idForApi: False, fields(Client).secretForApi: False}
-        )
-    ]
-ClientsFromQuery = Annotated[Sequence[ClientListItem], Depends(get_clients)]
-
-class PaginationWithClientsParams(PaginationParams, ClientsParams):
-    pass
-
-@router.get("/problems", response_model=PaginatedDataResponse[Sequence[Problem]])
+@router.get("/", response_model=PaginatedDataResponse[Sequence[Problem]])
 async def get_trigger_alerts(
     query: Annotated[PaginationWithClientsParams, Query()],
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database
 ) -> PaginatedDataResponse[Sequence[Problem]]:
-    clients = await get_clients(query, user_id, clerk, db)
+    clients = await get_clients_from_query(query, user_id, clerk, db)
     offset = (query.page - 1) * query.limit
     cursor = db[Problem.Meta.collection_name()].find(
         {fields(Problem).clientId: {"$in": [client.id for client in clients if client.id is not None]}},
@@ -122,25 +49,7 @@ async def get_trigger_alerts(
     results = [Problem(**doc) async for doc in cursor]
     return PaginatedDataResponse(data=results, page=query.page, limit=query.limit)
 
-@router.get("/services", response_model=PaginatedDataResponse[Sequence[Service]])
-async def get_service_alerts(
-    query: Annotated[PaginationWithClientsParams, Query()],
-    user_id: JwtUserId,
-    clerk: ClerkSdk,
-    db: Database
-) -> PaginatedDataResponse[Sequence[Service]]:
-    clients = await get_clients(query, user_id, clerk, db)
-    offset = (query.page - 1) * query.limit
-    cursor = db[Service.Meta.collection_name()].find(
-        {fields(Service).clientId: {"$in": [client.id for client in clients if client.id is not None]}},
-        sort=[(fields(Service).updatedAt, DESCENDING), (fields(Service).createdAt, DESCENDING)],
-        skip=offset,
-        limit=query.limit
-    )
-    results = [Service(**doc) async for doc in cursor]
-    return PaginatedDataResponse(data=results, page=query.page, limit=query.limit)
-
-@router.get("/problems/count", response_model=DataResponse[StatCounts])
+@router.get("/count", response_model=DataResponse[StatCounts])
 async def get_trigger_alerts_count(
     clients: ClientsFromQuery,
     db: Database,
@@ -181,11 +90,8 @@ async def get_trigger_alerts_count(
         problemsInLastMonth=results[4]
     ))
 
-class TimePeriodWithClientsParams(TimePeriodParams, ClientsParams):
-    pass
-
 IntervalSeconds = {'hour': 3600, 'day': 86400, 'week': 604800, 'month': 2592000}
-@router.get("/problems/trends", response_model=DataResponse[Sequence[StatTrends]])
+@router.get("/trends", response_model=DataResponse[Sequence[StatTrends]])
 async def get_trigger_alert_trends(
     query: Annotated[TimePeriodWithClientsParams, Query()],
     user_id: JwtUserId,
@@ -193,7 +99,7 @@ async def get_trigger_alert_trends(
     db: Database,
     response: Response
 ) -> DataResponse[Sequence[StatTrends]]:
-    clients = await get_clients(query, user_id, clerk, db)
+    clients = await get_clients_from_query(query, user_id, clerk, db)
 
     if query.end is None:
         query.end = now()
@@ -263,7 +169,7 @@ async def get_trigger_alert_trends(
         active=active_counts[i]
     ) for i in range(num_periods)])
 
-@router.get("/problems/hosts/health", response_model=DataResponse[Sequence[StatHealthScores]])
+@router.get("/hosts/health", response_model=DataResponse[Sequence[StatHealthScores]])
 async def get_hosts_health_scores(
     clients: ClientsFromQuery,
     db: Database,
@@ -348,10 +254,7 @@ async def get_hosts_health_scores(
     response.headers["Cache-Control"] = "private, max-age=120"
     return DataResponse(data=results)
 
-class InfiniteTimePeriodWithClientsParams(InfiniteTimePeriodParams, ClientsParams):
-    pass
-
-@router.get("/problems/hosts/count", response_model=DataResponse[Sequence[StatHostProblemCount]])
+@router.get("/hosts/count", response_model=DataResponse[Sequence[StatHostProblemCount]])
 async def get_hosts_problems_count(
     query: Annotated[InfiniteTimePeriodWithClientsParams, Query()],
     user_id: JwtUserId,
@@ -359,7 +262,7 @@ async def get_hosts_problems_count(
     db: Database,
     response: Response
 ) -> DataResponse[Sequence[StatHostProblemCount]]:
-    clients = await get_clients(query, user_id, clerk, db)
+    clients = await get_clients_from_query(query, user_id, clerk, db)
 
     pipeline = [
         # Get relevant problems for the clients

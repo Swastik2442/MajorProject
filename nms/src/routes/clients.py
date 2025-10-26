@@ -1,21 +1,21 @@
 "API Routes for handling Client operations"
 
 from collections.abc import Sequence
-from dataclasses import dataclass
 import logging
 from typing import Annotated
 
-from bson import ObjectId
-from fastapi import APIRouter, Body, Depends, Query, Response, status
+from fastapi import APIRouter, Body, Query, Response, status
 from fastapi.exceptions import HTTPException
 from pymongo import DESCENDING
 
 from src.exceptions import HTTPException as CustomHTTPException
+from src.middlewares.client import ClientFromId
+from src.middlewares.user import is_org_admin
 from src.models import Client, ClientCreate, ClientListItem, ClientUpdate, ClientOwnerUpdate
 from src.models.utils import fields, now, to_doc, uuid4_hex
 from src.services.auth import ClerkSdk, JwtUserId, generate_secret, get_hashed_secret
 from src.services.db import Database
-from src.schemas import DataResponse, PaginatedDataResponse, PaginationParams, Response as CustomResponse
+from src.schemas import DataResponse, PaginatedDataResponse, PaginationWithOwnerIdParams, Response as CustomResponse
 
 logger = logging.getLogger(__name__)
 
@@ -23,47 +23,6 @@ router = APIRouter(
     prefix="/clients",
     tags=["clients"],
 )
-
-async def is_org_admin(
-    org_id: str,
-    user_id: JwtUserId,
-    clerk: ClerkSdk
-) -> bool:
-    org = await clerk.organization_memberships.list_async(
-        organization_id=org_id,
-        user_id=[user_id],
-        limit=1
-    )
-    if org is None or len(org.data) == 0:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Org not found")
-    return org.data[0].role == "org:admin"
-
-@dataclass(frozen=True)
-class ClientWithPerms:
-    client: ClientListItem
-    hasEditPerms: bool = False
-
-async def find_client_by_id(
-    client_id: str,
-    user_id: JwtUserId,
-    clerk: ClerkSdk,
-    db: Database
-) -> ClientWithPerms:
-    client = await db[Client.Meta.collection_name()].find_one(
-        {"_id": ObjectId(client_id)},
-        {fields(Client).idForApi: False, fields(Client).secretForApi: False}
-    )
-    if client is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Client not found")
-    client = ClientListItem(**client)
-
-    isAdmin = await is_org_admin(client.ownerId, user_id, clerk)
-
-    return ClientWithPerms(
-        client=client,
-        hasEditPerms=isAdmin
-    )
-ClientFromId = Annotated[ClientWithPerms, Depends(find_client_by_id)]
 
 @router.post(
     "/",
@@ -92,20 +51,13 @@ async def create_client(
     )).inserted_id
     return DataResponse(data=f"{new_client.idForApi}:::{client_secret}", message="Client created successfully")
 
-class PaginationWithOwnerId(PaginationParams):
-    owner_id: str | None = Query(
-        default=None,
-        title="Owner ID",
-        description="ID of the Org whose Clients are to be fetched. If not provided, fetches clients from all Orgs the user belongs to."
-    )
-
 @router.get(
     "/",
     response_model=PaginatedDataResponse[Sequence[ClientListItem]],
     responses={404: {"model": CustomHTTPException}}
 )
 async def list_clients(
-    query: Annotated[PaginationWithOwnerId, Query()],
+    query: Annotated[PaginationWithOwnerIdParams, Query()],
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database,

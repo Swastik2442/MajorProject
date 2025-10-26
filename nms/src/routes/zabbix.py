@@ -2,21 +2,19 @@
 
 from datetime import datetime
 import logging
-from typing import Annotated
 
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Request, status
 from fastapi.exceptions import HTTPException
-from pydantic import BaseModel, Field
 
-from src.templates import ZABBIX_DATETIME_FORMAT, parse_json_message
+from src.middlewares.client import ClientFromApiKey
 from src.exceptions import HTTPException as CustomHTTPException
-from src.models import Client, Problem, ProblemUpdate, Service, ServiceUpdate
+from src.models import Problem, ProblemUpdate, Service, ServiceUpdate
 from src.models.problem import Update as PUpdate
 from src.models.service import Update as SUpdate
-from src.models.utils import fields, none, to_doc
-from src.services.auth import IdAndSecret, split_api_key, verify_secret
+from src.models.utils import fields, to_doc
 from src.services.db import Database
 from src.schemas import Response as CustomResponse
+from src.templates import ZABBIX_DATETIME_FORMAT, ZabbixAlert, parse_json_message
 
 logger = logging.getLogger(__name__)
 
@@ -25,29 +23,11 @@ router = APIRouter(
     tags=["zabbix"],
 )
 
-async def get_client(db: Database, idAndSecret: Annotated[IdAndSecret, Depends(split_api_key)]) -> Client:
-    client = await db[Client.Meta.collection_name()].find_one(
-        {fields(Client).idForApi: idAndSecret.identifier}
-    )
-    if client is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Client not found")
-    client = Client(**client)
-
-    if not verify_secret(idAndSecret.secret, client.secretForApi):
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid API Key")
-    return client
-
-class ZabbixAlert(BaseModel):
-    "Expected Payload from Zabbix webhook"
-    to: str | None = Field(default_factory=none, description="IP/DNS Address of receiving Server")
-    subject: str = Field(description="Subject of the Alert")
-    message: str = Field(description="JSON message containing the details of the Alert")
-
 @router.post("/webhook", response_model=CustomResponse, responses={400: {"model": CustomHTTPException}})
 async def receive_alert(
     req: Request,
     alert: ZabbixAlert,
-    client: Annotated[Client, Depends(get_client)],
+    client: ClientFromApiKey,
     db: Database
 ):
     if req.client is None or client.id is None:

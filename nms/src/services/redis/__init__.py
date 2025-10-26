@@ -1,3 +1,5 @@
+"Redis Service"
+
 from logging import getLogger
 from typing import Annotated
 

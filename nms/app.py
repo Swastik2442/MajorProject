@@ -36,12 +36,8 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(
     title="NMS API",
-    version="0.3.1",
+    version="0.3.2",
     description="API Service to store and serve Zabbix Alerts",
-    openapi_url="/openapi.json" if config.ENV == "dev" else None,
-    docs_url="/docs" if config.ENV == "dev" else None,
-    redoc_url="/redoc" if config.ENV == "dev" else None,
-    swagger_ui_oauth2_redirect_url="/docs/oauth2-redirect" if config.ENV == "dev" else None,
     lifespan=lifespan,
     exception_handlers={
         StarletteHTTPException: http_exception_handler,
@@ -49,7 +45,13 @@ app = FastAPI(
     },
     responses={
         422: {"model": CustomRequestValidationError}
-    }
+    },
+    **({} if config.ENV == "dev" else { # type: ignore[argument-type]
+        "openapi_url": None,
+        "docs_url": None,
+        "redoc_url": None,
+        "swagger_ui_oauth2_redirect_url": None
+    })
 )
 
 app.add_middleware(

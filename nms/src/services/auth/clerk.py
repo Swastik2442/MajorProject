@@ -1,3 +1,5 @@
+"Clerk SDK Service Integration"
+
 from logging import getLogger
 from typing import Annotated
 

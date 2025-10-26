@@ -52,6 +52,20 @@ class ClientsParams(BaseModel):
         description="ID of the Org whose Clients are to be fetched"
     )
 
+class PaginationWithOwnerIdParams(PaginationParams):
+    owner_id: str | None = Query(
+        default=None,
+        title="Owner ID",
+        description="ID of the Org whose Clients are to be fetched. If not provided, fetches clients from all Orgs the user belongs to."
+    )
+
+class PaginationWithClientsParams(PaginationParams, ClientsParams):
+    pass
+class TimePeriodWithClientsParams(TimePeriodParams, ClientsParams):
+    pass
+class InfiniteTimePeriodWithClientsParams(InfiniteTimePeriodParams, ClientsParams):
+    pass
+
 class Response(BaseModel):
     status: Literal["success", "error"] = Field(default_factory=lambda: "success")
     message: str | None = Field(default_factory=none)
