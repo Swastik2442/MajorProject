@@ -1,9 +1,13 @@
+import argparse
 import json
 
 from data import getWebhookScript, json_files_content
 
-apiKey = "<YOUR_API_KEY_HERE>"
-apiUrl = "<YOUR_API_URL_HERE>"
+argparser = argparse.ArgumentParser(description="Generate Zabbix Media Type Template JSON")
+argparser.add_argument("--output", type=str, default="data.json", help="Output JSON file path")
+argparser.add_argument("--api-key", type=str, default="<YOUR_API_KEY_HERE>", help="API Key for the webhook")
+argparser.add_argument("--api-url", type=str, default="<YOUR_API_URL_HERE>", help="API URL for the webhook")
+args = argparser.parse_args()
 
 data = {"zabbix_export": {
     "version": "7.4",
@@ -11,11 +15,11 @@ data = {"zabbix_export": {
         "name": "Post to API",
         "type": "WEBHOOK",
         "parameters": [
-            {"name": "API_KEY", "value": apiKey},
+            {"name": "API_KEY", "value": args.api_key},
             {"name": "Message", "value": "{ALERT.MESSAGE}"},
             {"name": "Subject", "value": "{ALERT.SUBJECT}"},
             {"name": "To", "value": "{ALERT.SENDTO}"},
-            {"name": "URL", "value": apiUrl}
+            {"name": "URL", "value": args.api_url}
         ],
         "script": getWebhookScript(),
         "message_templates": [
@@ -59,5 +63,5 @@ data = {"zabbix_export": {
     }]
 }}
 
-with open('data.json', 'w', encoding='utf-8') as f:
+with open(args.output, 'w', encoding='utf-8') as f:
     json.dump(data, f)

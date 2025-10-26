@@ -1,0 +1,46 @@
+name: Update Zabbix Media Type Template
+
+on:
+  push:
+    branches:
+      - mother
+    paths: # run only when these directories are touched
+      - "nms/src/templates/**"
+      - "zabbix/**"
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Generate Template
+        run: |
+          python zabbix/generateMediaTypeTemplate.py --output dashboard/src/zbx-mediatype-template.json
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "octocat"
+          git config user.email "octocat@github.com"
+
+          # If there are no changes, exit gracefully
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git add -A
+          git commit -m "Auto-update zbx-mediatype-template.json [skip ci]"
+          git push
