@@ -1,6 +1,6 @@
 import os
 
-templates_dir = os.path.join(os.path.dirname(__file__), '..', 'src', 'templates')
+templates_dir = os.path.join(os.path.dirname(__file__), '..', 'nms', 'src', 'templates')
 json_files_content: dict[str, str] = {}
 for filename in os.listdir(templates_dir):
     if filename.endswith('.json'):
