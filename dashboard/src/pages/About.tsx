@@ -4,12 +4,7 @@ import { Link } from "react-router";
 import { Brain, Wifi, Lock, Gauge } from "lucide-react";
 import { useEffect, useRef } from "react";
 
-/**
- * About.tsx
- * - Displays all the “features” from old Home page
- * - Matches the same glowing background & animations
- * - Adds GPU-friendly background offset for continuity
- */
+
 
 export default function About() {
   const bgRef = useRef<HTMLDivElement | null>(null);

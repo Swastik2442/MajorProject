@@ -10,11 +10,6 @@ import {
   Gauge,
 } from "lucide-react";
 
-/**
- * Updated Home.tsx
- * - Keeps hero and background identical
- * - “Learn More” now navigates to `/about` instead of #features
- */
 
 const HEADLINE_1 = "Unified Network Intelligence";
 const HEADLINE_2 = "at Your Fingertips";
