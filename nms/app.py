@@ -2,7 +2,6 @@
 
 from contextlib import asynccontextmanager
 import logging
-import sys
 
 from fastapi import FastAPI, Response, status
 from fastapi.exceptions import RequestValidationError
@@ -17,7 +16,7 @@ from src.services.db import db_service
 from src.services.redis import redis_service
 from src.schemas import Response as CustomResponse
 
-logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+# logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
 
 @asynccontextmanager

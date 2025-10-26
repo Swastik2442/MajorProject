@@ -1,4 +1,3 @@
-// src/pages/Dashboard.tsx
 import { useState } from "react";
 import { useOrganization } from "@clerk/clerk-react";
 import DashboardComponent from "@/components/dashboard";
@@ -10,23 +9,25 @@ import {
   RegenApiKeyButton,
   type TClientSelectParam
 } from "@/components/client";
+import Metadata from "@/components/Metadata";
 
 export default function Dashboard() {
   const { organization } = useOrganization();
   const [selectedClient, setSelectedClient] = useState<TClientSelectParam>(null);
 
+  const dashboardTitle = selectedClient === null
+    ? "Dashboard"
+    : Array.isArray(selectedClient)
+      ? "Dashboard - Selected Clients"
+      : `Dashboard - ${selectedClient.name}`;
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold leading-tight">
-          {selectedClient === null
-            ? "Dashboard"
-            : Array.isArray(selectedClient)
-              ? "Dashboard - Selected Clients"
-              : `Dashboard - ${selectedClient.name}`
-          }
-        </h1>
+        <Metadata title={`${dashboardTitle} | ${import.meta.env.VITE_APP_TITLE}`} />
+        <h1 className="text-2xl font-bold leading-tight">{dashboardTitle}</h1>
         <div className="flex justify-between items-center gap-2">
+          {/* Actions for when only a single client is selected */}
           {selectedClient && !Array.isArray(selectedClient) && (<>
             <RegenApiKeyButton clientId={selectedClient._id} />
             <ChangeOwnerButton clientId={selectedClient._id} />
@@ -37,11 +38,13 @@ export default function Dashboard() {
             <ChangeOwnerButton clientId={selectedClient[0]._id} />
             <DeleteClientButton clientId={selectedClient[0]._id} />
           </>)}
+          {/* Client selection dropdown */}
           <ClientSelect
             org_id={organization?.id ?? null}
             selectedClient={selectedClient}
             setSelectedClient={setSelectedClient}
           />
+          {/* Create Client only when some organization is active */}
           {organization && <CreateClientButton ownerId={organization.id} />}
         </div>
       </div>

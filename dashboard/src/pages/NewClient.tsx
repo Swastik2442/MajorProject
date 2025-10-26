@@ -3,6 +3,7 @@ import { DownloadIcon } from "lucide-react";
 import { API_KEY_TEMP_STORAGE_KEY } from "@/config";
 import { CopyButton } from "@/components/ui/copy-button";
 import data from "@/zbx-mediatype-template.json";
+import Metadata from "@/components/Metadata";
 
 export function SetupInstructions({ url, apiKey }: { url: string; apiKey: string | null }) {
   data.zabbix_export.media_types[0].parameters[0].value = apiKey ?? "<YOUR_API_KEY_HERE>";
@@ -11,7 +12,7 @@ export function SetupInstructions({ url, apiKey }: { url: string; apiKey: string
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Zabbix Setup Instructions</h2>
-      <p className="">
+      <p>
         To get started, setup a Webhook Media Type in your Zabbix Server by importing this{" "}
         <a
           download
@@ -20,7 +21,7 @@ export function SetupInstructions({ url, apiKey }: { url: string; apiKey: string
         >
           Media Type template <DownloadIcon className="w-4 h-4" />
         </a>.
-        {apiKey === null && " Make sure to set the API Key, to the one retrieved earlier, in the template."}
+        {apiKey === null && (<strong> Make sure to set the API Key, to the one retrieved earlier, in the template.</strong>)}
       </p>
 
       <details className="border rounded-xl animate-collapsible-down">
@@ -29,14 +30,14 @@ export function SetupInstructions({ url, apiKey }: { url: string; apiKey: string
           <li>Create a new Webhook Media Type.</li>
           <li>
             Add a new Parameter <code className="bg-background px-1 py-0.5 rounded">URL</code> set to:{" "}
-            <span className="bg-background px-1 py-0.5 rounded">{url}</span>
+            <code className="bg-background px-1 py-0.5 rounded">{url}</code>
             <CopyButton text={url} />
           </li>
           <li>
             Add a new Parameter <code className="bg-background px-1 py-0.5 rounded">API_KEY</code> set{" "}
             {apiKey ? (
               <>
-                to: <span className="bg-background px-1 py-0.5 rounded">{apiKey}</span>
+                to: <code className="bg-background px-1 py-0.5 rounded">{apiKey}</code>
                 <CopyButton text={apiKey} />
               </>
             ) : (
@@ -56,7 +57,7 @@ export function SetupInstructions({ url, apiKey }: { url: string; apiKey: string
             </div>
           </li>
           <li>
-            Add the Subject and Message Templates as the JSON strings for each Message Type:
+            Add the Subject and Message pairs for each Message Type:
             <ul className="list-disc list-inside ml-4 mt-2 space-y-2">
               {data.zabbix_export.media_types[0].message_templates.map((v, idx) => (
                 <li key={idx}>
@@ -91,8 +92,8 @@ export function SetupInstructions({ url, apiKey }: { url: string; apiKey: string
 
       <p>
         Furthermore, create a new Media for a user with the type as the created Media Type. Lastly,
-        create a new Trigger Action and a new Service Action with the operation as the created Media Type
-        and User as selected earlier.
+        create a new Trigger Action and a new Service Action, with the Operation as the created Media Type
+        and the User as selected earlier.
       </p>
     </div>
   );
@@ -111,6 +112,7 @@ export default function NewClient() {
 
   return (
     <div className="max-w-5xl mx-auto p-6 bg-card border rounded-xl shadow-md">
+      <Metadata title={`New Client | ${import.meta.env.VITE_APP_TITLE}`} />
       <SetupInstructions url={`${import.meta.env.VITE_API_URL}/zabbix/webhook`} apiKey={apiKey} />
     </div>
   );
