@@ -15,15 +15,15 @@ import { apiService } from "@/services/api";
 
 export default function TrendsChart({ client_id = null, org_id = null }: TClientsParams) {
   const { data } = useQuery({
-    queryKey: ["problemTrends", client_id, org_id],
+    queryKey: ["alertTrends", client_id, org_id],
     queryFn: () =>
-      apiService.fetchProblemsTrends({
+      apiService.fetchCommonAlertsTrends({
         client_id,
         org_id,
         start: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
         interval: "hour"
     }),
-    staleTime: 60 * 60 * 1000,
+    staleTime: 60 * 60 * 1000, // 1 hour
   });
 
   const trends = (data?.data ?? []).map((t) => ({
@@ -45,7 +45,7 @@ export default function TrendsChart({ client_id = null, org_id = null }: TClient
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-sm font-semibold tracking-wider text-primary uppercase">
-          Problem Trends (Last 24 Hours)
+          Alert Trends (Last 24 Hours)
         </h2>
       </div>
 
@@ -82,9 +82,17 @@ export default function TrendsChart({ client_id = null, org_id = null }: TClient
             />
             <Line
               type="monotone"
-              dataKey="active"
+              dataKey="activeProblems"
               name="Active Problems"
               stroke="var(--chart-1)"
+              strokeWidth={2}
+              dot={false}
+            />
+            <Line
+              type="monotone"
+              dataKey="activeServiceOutages"
+              name="Active Service Outages"
+              stroke="var(--chart-2)"
               strokeWidth={2}
               dot={false}
             />

@@ -5,13 +5,20 @@ import { apiService } from "@/services/api";
 
 export default function StatusCards({ client_id = null, org_id = null }: TClientsParams) {
   const { data } = useQuery({
-    queryKey: ["problemsCount", client_id, org_id],
-    queryFn: () => apiService.fetchProblemsCount({ client_id, org_id }),
+    queryKey: ["alertsCount", client_id, org_id],
+    queryFn: () => apiService.fetchCommonAlertsCount({ client_id, org_id }),
     staleTime: 15 * 60 * 1000, // 15 minutes
   });
 
-  const counts = data?.data ?? {
+  const counts = data?.data ? {
+    totalActiveProblems: data.data.problems.totalActiveProblems + data.data.services.totalActiveProblems,
+    activeProblemsInLast24Hours: data.data.problems.activeProblemsInLast24Hours + data.data.services.activeProblemsInLast24Hours,
+    problemsInLast24Hours: data.data.problems.problemsInLast24Hours + data.data.services.problemsInLast24Hours,
+    problemsInLastWeek: data.data.problems.problemsInLastWeek + data.data.services.problemsInLastWeek,
+    problemsInLastMonth: data.data.problems.problemsInLastMonth + data.data.services.problemsInLastMonth,
+  } : {
     totalActiveProblems: 0,
+    activeProblemsInLast24Hours: 0,
     problemsInLast24Hours: 0,
     problemsInLastWeek: 0,
     problemsInLastMonth: 0,

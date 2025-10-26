@@ -26,8 +26,8 @@ function MiniSpark({ data = [] }: { data: { v: number }[] }) {
 
 export default function ActivityStream({ client_id = null, org_id = null }: TClientsParams) {
   const { data, isError, error, isPending } = useQuery({
-    queryKey: ["problems", client_id, org_id],
-    queryFn: () => apiService.fetchProblems({ client_id, org_id, page: 1, limit: 8 }),
+    queryKey: ["alerts", client_id, org_id],
+    queryFn: () => apiService.fetchCommonAlerts({ client_id, org_id, page: 1, limit: 8 }),
   });
 
   if (isPending) {
@@ -87,7 +87,7 @@ export default function ActivityStream({ client_id = null, org_id = null }: TCli
                   {it.name}
                 </div>
                 <div className="text-xs text-muted-foreground mt-0.5">
-                  {it.hostname}{" · "}
+                  {("hostname" in it ? it.hostname : it.serviceName)}{" · "}
                   {new Date(it.startedAt).toLocaleString()}
                 </div>
               </div>

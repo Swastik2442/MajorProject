@@ -97,6 +97,8 @@ export const ServiceSchema = z.object({
   age: z.string().nullable().optional(),
   severity: SeveritySchema,
   duration: z.string().nullable().optional(),
+  status: z.string(),
+  serviceName: z.string(),
   description: z.string(),
   rootcause: z.string(),
   updates: z.array(UpdateSchema),
@@ -114,7 +116,7 @@ export const StatCountsSchema = z.object({
 
 export const StatCommonCountsSchema = z.object({
   problems: StatCountsSchema,
-  serviceAlerts: StatCountsSchema,
+  services: StatCountsSchema,
 });
 
 export const StatHealthScoresSchema = z.object({
