@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
-import { Brain, Wifi, Lock, Gauge } from "lucide-react";
+import { Brain, Wifi, Gauge, Building } from "lucide-react";
 import Metadata from "@/components/Metadata";
 
 export default function About() {
@@ -122,20 +122,21 @@ export default function About() {
                 desc: "Ingest Zabbix feeds instantly for live network visibility.",
               },
               {
-                title: "AI & LLM",
-                icon: <Brain className="w-10 h-10 text-cyan-400" />,
-                desc: "LLM contextualization and automated root cause synthesis.",
-              },
-              {
-                title: "AI-Powered Detection",
-                icon: <Lock className="w-10 h-10 text-cyan-400" />,
-                desc: "Automatic anomaly detection with prioritized alerts.",
-              },
-              {
                 title: "Interactive Alerts",
                 icon: <Gauge className="w-10 h-10 text-cyan-400" />,
                 desc: "Actionable alerts and escalation pipelines for ops teams.",
               },
+              {
+                title: "Multi-Tenant Dashboards",
+                icon: <Building  className="w-10 h-10 text-cyan-400" />,
+                desc: "Dedicated dashboards and data isolation for each organization.",
+              },
+              {
+                title: "AI & LLM Powered Detection",
+                icon: <Brain className="w-10 h-10 text-cyan-400" />,
+                desc: "Automatic anomaly detection with prioritized alerts.",
+              },
+              
             ].map((feature, idx) => (
               <motion.div
                 key={idx}

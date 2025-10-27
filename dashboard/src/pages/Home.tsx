@@ -1,12 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
-import {
-  Brain,
-  Wifi,
-  Lock,
-  Gauge,
-} from "lucide-react";
 import useTypingEffect from "@/hooks/typingEffect";
 import Metadata from "@/components/Metadata";
 
@@ -172,55 +166,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* === SECOND SECTION (Beyond Monitoring) === */}
-        <section id="features" className="relative w-full min-h-screen bg-[#08101f] py-28 px-6 flex flex-col items-center justify-center z-10">
-          {/* subtle top overlay to hide seam even further */}
-          <div className="absolute top-0 left-0 w-full h-28 pointer-events-none bg-gradient-to-b from-[#08101f]/90 to-transparent" />
-
-          <div className="max-w-6xl mx-auto text-center relative z-20">
-            <h2 className="text-5xl md:text-5xl font-bold mb-4">
-              Beyond Monitoring:&nbsp;
-              <span className="text-cyan-400">True Network Foresight</span>
-            </h2>
-            <p className="text-gray-400 text-lg max-w-3xl mx-auto mb-12">
-              Gain actionable intelligence and real-time insights. Detect, analyze, and respond with precision powered by AI-driven automation.
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-              {[
-                {
-                  title: "Real-Time Telemetry",
-                  icon: <Wifi className="w-10 h-10 text-cyan-400" />,
-                  desc: "Ingest Zabbix feeds instantly for live network visibility.",
-                },
-                {
-                  title: "AI & LLM",
-                  icon: <Brain className="w-10 h-10 text-cyan-400" />,
-                  desc: "LLM contextualization and automated root cause synthesis.",
-                },
-                {
-                  title: "AI-Powered Detection",
-                  icon: <Lock className="w-10 h-10 text-cyan-400" />,
-                  desc: "Automatic anomaly detection with prioritized alerts.",
-                },
-                {
-                  title: "Interactive Alerts",
-                  icon: <Gauge className="w-10 h-10 text-cyan-400" />,
-                  desc: "Actionable alerts and escalation pipelines for ops teams.",
-                },
-              ].map((feature, idx) => (
-                <div
-                  key={idx}
-                  className="bg-[#0d162b]/80 border border-cyan-400/8 rounded-2xl p-8 backdrop-blur-md hover:shadow-[0_8px_40px_rgba(0,255,220,0.06)] hover:-translate-y-1 transition-transform duration-300"
-                >
-                  <div className="flex justify-center mb-4">{feature.icon}</div>
-                  <h3 className="text-lg font-semibold mb-2 text-white">{feature.title}</h3>
-                  <p className="text-gray-400 text-sm">{feature.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* Footer */}
         <footer className="w-full bg-[#050b16] py-6 text-center text-gray-500 text-sm border-t border-white/10">
