@@ -1,0 +1,113 @@
+# Todo
+
+- [x] Setup Zabbix
+- [x] Create Ingest & Retrieval Server
+  - [ ] Create Media Type things
+    - [x] Problem
+    - [x] Service
+    - [ ] Internal Problem
+    - [ ] Discovery
+    - [ ] Internal Problem
+    - [ ] Auto-registration
+- [x] Create Dashboard
+- [x] Add API Service and Validation Schemas to Dashboard
+- [x] Add things to show in Dashboard
+  - [x] Activity Stream
+    - [x] Backend
+    - [x] Frontend
+  - [ ] Alert Banner
+    - [ ] Backend
+    - [x] Frontend
+  - [x] Host Score Cards
+    - [x] Backend
+    - [x] Frontend
+  - [x] KPI Ring
+    - [x] Backend
+    - [x] Frontend
+  - [ ] Severity Matrix
+    - [ ] Backend
+    - [x] Frontend
+  - [x] Host Status Cards
+    - [x] Backend
+    - [x] Frontend
+  - [x] Problem Trends
+    - [x] Backend
+    - [x] Frontend
+- [x] Add Authentication
+  - [x] Backend
+    - [x] Add JWT Verification via Clerk JWKs
+    - [x] Make all routes protected
+  - [x] Frontend
+    - [x] Fix API Schemas to send Clerk Session Token
+    - [x] Add Auth Components
+- [x] Add Client Management options
+  - [x] Create Client
+    - [x] Backend
+    - [x] Frontend
+  - [x] List Clients
+    - [x] Backend
+    - [x] Frontend
+  - [x] Update Client
+    - [x] Backend
+    - [x] Frontend
+  - [x] Regenerate Client API
+    - [x] Backend
+    - [x] Frontend
+  - [x] Change Client Org
+    - [x] Backend
+    - [x] Frontend
+  - [x] Delete Client
+    - [x] Backend
+    - [x] Frontend
+- [x] Add Client Select Dropdown
+  - [x] Backend
+    - [x] Add Client Select Query to all routes
+  - [x] Frontend
+    - [x] Change API Schemas to have Client Selection params
+    - [x] Fix all components to support Client params
+- [x] Add Client Setup instructions
+  - [x] Backend
+    - [x] Create importable Media Type template
+    - [x] Automate template generation (GitHub Action)
+  - [x] Frontend
+    - [x] Create Instructions page
+    - [x] Handle API Key generation and showcase
+- [ ] Deploy
+  - [ ] Backend
+    - [x] Add Redis instead of FileStorage for Cache Storage
+    - [ ] Fix Services not initializing on Vercel
+  - [x] Frontend
+- [ ] Complete the Home/About page
+  - [x] Hero Section
+  - [x] Features Section
+  - [ ] About Section
+  - [ ] Footer Links
+- [ ] Add the Charts required by Sir
+  - [ ] Bar Chart of No of Problems in Top 10 (change-able) Problematic Host/Service
+    - [x] Backend
+    - [ ] Frontend
+  - [ ] Bar Chart of Active Problems vs Total Problems per given Time Period bin
+    - [ ] Backend
+    - [ ] Frontend
+  - [ ] Bar Chart of No of Problems with Duration > 4hrs (change-able) per Host/Service
+    - [ ] Backend
+    - [ ] Frontend
+  - [ ] Pie Chart of Percentage of Problems with Duration < 4hrs (change-able) vs Problems with more than that
+    - [ ] Backend
+    - [ ] Frontend
+- [ ] Show Alert details Modal when User clicks on Alert
+  - [x] Backend
+  - [ ] Frontend
+- [ ] Add form in Modal to add remarks to Alert
+  - [ ] Backend
+  - [ ] Frontend
+- [ ] Add form to create a PDF out of the Alerts given a Time Period
+  - [ ] Backend
+  - [ ] Frontend
+- [ ] Add a Select dropdown to choose the Components to be shown on the Dashboard
+- [ ] Create Server-Side Events Stream to give events as soon as new Alerts come
+  - [ ] Backend (<https://medium.com/@nandagopal05/server-sent-events-with-python-fastapi-f1960e0c8e4b>)
+    - [ ] Setup RabbitMQ/Celery
+    - [ ] Create Event Producer
+    - [ ] Create Event Consumer
+  - [ ] Frontend

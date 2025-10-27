@@ -52,7 +52,7 @@ class HishelService(Service):
         return self._hishel_controller
 
     async def connect(self) -> None:
-        if os.access(".cache", os.W_OK):
+        if os.access(os.getcwd(), os.W_OK):
             self._hishel_storage = hishel.FileStorage(ttl=60)
             self._hishel_async_storage = hishel.AsyncFileStorage(ttl=60)
             logger.debug("Using file-based hishel cache storage")
