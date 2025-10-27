@@ -4,13 +4,13 @@ import asyncio
 from collections.abc import Sequence
 from datetime import datetime, timedelta
 from math import ceil
-from typing import Annotated
+from typing import Annotated, Callable
 
 from fastapi import APIRouter, Response, Query
 from pymongo import DESCENDING
 
 from src.middlewares.client import get_clients_from_query, ClientsFromQuery
-from src.models import Problem, ProblemDatetimesAndStatus
+from src.models import Problem, ProblemDatetimesAndStatus, ProblemDatetimesStatusAndSeverity
 from src.models.utils import fields, now
 from src.services.auth import ClerkSdk, JwtUserId
 from src.services.db import Database
@@ -23,9 +23,12 @@ from src.schemas import (
     StatCounts,
     StatHealthScores,
     StatHostProblemCount,
+    StatProblematicAlertTrends,
     StatTrends,
+    TimePeriodWithClientsAndSeverityParams,
     TimePeriodWithClientsParams
 )
+from src.templates.models import Severity
 
 router = APIRouter(
     prefix="/problems",
@@ -128,8 +131,10 @@ async def get_trigger_alert_trends(
                 {fields(Problem).startedAt: {"$gte": min_time, "$lt": max_time}},
                 {
                     fields(Problem).startedAt: {"$lt": min_time},
-                    fields(Problem).status: {"$ne": "Recovered"},
-                    fields(Problem).recoveryAt: {"$gte": min_time}
+                    "$or": [
+                        {fields(Problem).status: {"$ne": "Recovered"}},
+                        {fields(Problem).recoveryAt: {"$gte": min_time}}
+                    ]
                 }
             ]
         }, {k: True for k in ProblemDatetimesAndStatus.model_fields.keys()})
@@ -138,6 +143,7 @@ async def get_trigger_alert_trends(
     counts = [0] * num_periods
     for p in problems:
         for i, (bin_start, bin_end) in enumerate(bins):
+            # Started before the end of the bin and either not recovered or recovered after the start of the bin
             if bin_start >= p.startedAt and (
                 p.status != "Recovered" or (p.recoveryAt is not None and p.recoveryAt >= bin_end)
             ):
@@ -275,3 +281,81 @@ async def get_hosts_problems_count(
 
     response.headers["Cache-Control"] = "private, max-age=60"
     return DataResponse(data=results)
+
+@router.get("/trends/problematic-alerts", response_model=DataResponse[Sequence[StatProblematicAlertTrends]])
+async def get_problematic_alerts_trends(
+    query: Annotated[TimePeriodWithClientsAndSeverityParams, Query()],
+    user_id: JwtUserId,
+    clerk: ClerkSdk,
+    db: Database,
+    response: Response
+) -> DataResponse[Sequence[StatProblematicAlertTrends]]:
+    clients = await get_clients_from_query(query, user_id, clerk, db)
+
+    if query.end is None:
+        query.end = now()
+    if query.severity is None:
+        query.severity = "Warning"
+
+    # pylint: disable=unnecessary-lambda-assignment
+    is_problematic: Callable[[Severity], bool] = lambda _: True
+    if query.severity == "Information":
+        is_problematic = lambda severity: severity != "Not classified"
+    elif query.severity == "Warning":
+        is_problematic = lambda severity: severity not in ("Not classified", "Information")
+    elif query.severity == "Average":
+        is_problematic = lambda severity: severity not in ("Not classified", "Information", "Warning")
+    elif query.severity == "High":
+        is_problematic = lambda severity: severity in ("High", "Disaster")
+    elif query.severity == "Disaster":
+        is_problematic = lambda severity: severity == "Disaster"
+
+    # Get specific time periods
+    bins: list[tuple[datetime, datetime]] = []
+    intervalStr = "days" if query.interval == "month" else query.interval + "s"
+    intervalDiff = 30 if query.interval == "month" else 1
+    num_periods = ceil((query.end.timestamp() - query.start.timestamp()) / IntervalSeconds[query.interval])
+    for i in range(num_periods):
+        bin_start = query.start + timedelta(**{intervalStr: i * intervalDiff})
+        bin_end = bin_start + timedelta(**{intervalStr: intervalDiff})
+        if bin_end > query.end:
+            bins.append((bin_start, query.end))
+            break
+        bins.append((bin_start, bin_end))
+
+    # Fetch all problems in the whole time period (plus those that started before but are still active)
+    min_time, max_time = bins[0][0], bins[-1][1]
+    problems = (
+        ProblemDatetimesStatusAndSeverity(**doc)
+        async for doc in db[Problem.Meta.collection_name()].find({
+            fields(Problem).clientId: {"$in": [client.id for client in clients if client.id is not None]},
+            "$or": [
+                {fields(Problem).startedAt: {"$gte": min_time, "$lt": max_time}},
+                {
+                    fields(Problem).startedAt: {"$lt": min_time},
+                    "$or": [
+                        {fields(Problem).status: {"$ne": "Recovered"}},
+                        {fields(Problem).recoveryAt: {"$gte": min_time}}
+                    ]
+                }
+            ]
+        }, {k: True for k in ProblemDatetimesStatusAndSeverity.model_fields.keys()})
+    )
+
+    problem_counts = [0] * num_periods
+    total_counts = [0] * num_periods
+    async for p in problems:
+        for i, (bin_start, bin_end) in enumerate(bins):
+            # Started before or in bin and recovered after or in bin
+            if ((p.startedAt <= bin_start and (p.recoveryAt is None or bin_start <= p.recoveryAt <= bin_end))
+            or ((bin_start <= p.startedAt <= bin_end and (p.recoveryAt is not None and bin_start <= p.recoveryAt <= bin_end)))
+            or (bin_start <= p.startedAt <= bin_end and (p.recoveryAt is None or bin_end <= p.recoveryAt))):
+                total_counts[i] += 1
+                problem_counts[i] += is_problematic(p.severity)
+
+    response.headers["Cache-Control"] = f"private, max-age={IntervalSeconds[query.interval] // 60}, must-revalidate"
+    return DataResponse(data=[StatProblematicAlertTrends(
+        timestamp=bins[i][0],
+        problematic=problem_counts[i],
+        total=total_counts[i]
+    ) for i in range(num_periods)])

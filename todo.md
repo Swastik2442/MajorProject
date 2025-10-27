@@ -86,8 +86,8 @@
   - [ ] Bar Chart of No of Problems in Top 10 (change-able) Problematic Host/Service
     - [x] Backend
     - [ ] Frontend
-  - [ ] Bar Chart of Active Problems vs Total Problems per given Time Period bin
-    - [ ] Backend
+  - [ ] Bar Chart of Problem Alerts vs Total Alerts per given Time Period bin
+    - [x] Backend
     - [ ] Frontend
   - [ ] Bar Chart of No of Problems with Duration > 4hrs (change-able) per Host/Service
     - [ ] Backend
@@ -109,5 +109,5 @@
   - [ ] Backend (<https://medium.com/@nandagopal05/server-sent-events-with-python-fastapi-f1960e0c8e4b>)
     - [ ] Setup RabbitMQ/Celery
     - [ ] Create Event Producer
-    - [ ] Create Event Consumer
+    - [ ] Create Event Consumer (Client Id -> List of monitoring Users)
   - [ ] Frontend

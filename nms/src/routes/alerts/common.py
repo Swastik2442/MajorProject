@@ -182,8 +182,10 @@ async def get_common_alert_trends(
                 {fields(Service).startedAt: {"$gte": min_time, "$lt": max_time}},
                 {
                     fields(Service).startedAt: {"$lt": min_time},
-                    fields(Service).status: {"$ne": "Recovered"},
-                    fields(Service).recoveryAt: {"$gte": min_time}
+                    "$or": [
+                        {fields(Service).status: {"$ne": "Recovered"}},
+                        {fields(Service).recoveryAt: {"$gte": min_time}}
+                    ]
                 }
             ]
         }, {k: True for k in ServiceDatetimesAndStatus.model_fields.keys()})
@@ -193,6 +195,7 @@ async def get_common_alert_trends(
     serviceCounts = [0] * num_periods
     for p in problems:
         for i, (bin_start, bin_end) in enumerate(bins):
+            # Started before the end of the bin and either not recovered or recovered after the start of the bin
             if bin_start >= p.startedAt and (
                 p.status != "Recovered" or (p.recoveryAt is not None and p.recoveryAt >= bin_end)
             ):
@@ -200,6 +203,7 @@ async def get_common_alert_trends(
 
     for s in services:
         for i, (bin_start, bin_end) in enumerate(bins):
+            # Started before the end of the bin and either not recovered or recovered after the start of the bin
             if bin_start >= s.startedAt and (
                 s.status != "Recovered" or (s.recoveryAt is not None and s.recoveryAt >= bin_end)
             ):

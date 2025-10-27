@@ -44,3 +44,6 @@ class ProblemDatetimesAndStatus(BaseModel):
     startedAt: MyDatetime = Field()
     recoveryAt: MyDatetime | None = Field(default_factory=none)
     status: str = Field()
+
+class ProblemDatetimesStatusAndSeverity(ProblemDatetimesAndStatus):
+    severity: Severity = Field()

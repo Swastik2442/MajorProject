@@ -54,6 +54,13 @@ class ClientsParams(BaseModel):
         description="ID of the Org whose Clients are to be fetched"
     )
 
+class SeverityParams(BaseModel):
+    severity: Severity | None = Query(
+        default_factory=none,
+        title="Severity Level",
+        description="Severity level to filter/threshold by"
+    )
+
 class PaginationWithOwnerIdParams(PaginationParams):
     owner_id: str | None = Query(
         default=None,
@@ -64,6 +71,8 @@ class PaginationWithOwnerIdParams(PaginationParams):
 class PaginationWithClientsParams(PaginationParams, ClientsParams):
     pass
 class TimePeriodWithClientsParams(TimePeriodParams, ClientsParams):
+    pass
+class TimePeriodWithClientsAndSeverityParams(TimePeriodParams, ClientsParams, SeverityParams):
     pass
 class InfiniteTimePeriodWithClientsParams(InfiniteTimePeriodParams, ClientsParams):
     pass
@@ -94,6 +103,11 @@ class StatCommonCounts(BaseModel):
 class StatTrends(BaseModel):
     timestamp: MyDatetime
     active: int = Field(ge=0)
+
+class StatProblematicAlertTrends(BaseModel):
+    timestamp: MyDatetime
+    problematic: int = Field(ge=0)
+    total: int = Field(ge=0)
 
 class StatCommonTrends(BaseModel):
     timestamp: MyDatetime
