@@ -4,6 +4,9 @@ import { motion } from "framer-motion";
 import useTypingEffect from "@/hooks/typingEffect";
 import Metadata from "@/components/Metadata";
 
+
+
+
 const HEADLINE_1 = "Unified Network Intelligence";
 const HEADLINE_2 = "at Your Fingertips";
 
@@ -166,7 +169,7 @@ export default function Home() {
           </div>
         </section>
 
-
+      
         {/* Footer */}
         <footer className="w-full bg-[#050b16] py-6 text-center text-gray-500 text-sm border-t border-white/10">
           <p>&copy; 2025 {import.meta.env.VITE_APP_TITLE}</p>

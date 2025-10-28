@@ -3,11 +3,12 @@ import { Link } from "react-router";
 import { motion } from "framer-motion";
 import { Brain, Wifi, Gauge, Building } from "lucide-react";
 import Metadata from "@/components/Metadata";
+import ThreatDetectionVisual from "@/components/ThreatDetectionVisual";
 
 export default function About() {
   const bgRef = useRef<HTMLDivElement | null>(null);
 
-  // GPU-friendly background scroll offset (same as Home)
+  // Parallax background scroll
   useEffect(() => {
     let ticking = false;
 
@@ -31,14 +32,22 @@ export default function About() {
   return (
     <div className="relative min-h-screen w-full bg-[#050b16] text-white overflow-x-hidden">
       <Metadata />
-      {/* Background Layer */}
+
+      {/* === Floating Back Button (Top Right) === */}
+      <Link
+        to="/"
+        className="fixed top-6 right-8 z-50 px-6 py-2 rounded-full bg-gradient-to-br from-green-400 to-blue-500 text-white font-semibold text-sm md:text-base shadow-lg hover:opacity-90 transition-all border border-white/10"
+      >
+        ⬅ Back to Home
+      </Link>
+
+      {/* === Background Layer === */}
       <div
         ref={bgRef}
         style={{ transform: "translateY(var(--bg-translate-y, 0))" }}
         className="pointer-events-none fixed inset-0 -z-20 will-change-transform"
       >
         <div className="absolute left-1/2 top-32 -translate-x-1/2 w-[1300px] h-[1300px] bg-[radial-gradient(circle,rgba(0,255,153,0.12),transparent_70%)] blur-3xl opacity-90" />
-
         <svg
           className="absolute inset-0 w-full h-full opacity-70"
           viewBox="0 0 1600 1200"
@@ -86,16 +95,16 @@ export default function About() {
         </svg>
       </div>
 
-      {/* === PAGE CONTENT === */}
+      {/* === MAIN CONTENT === */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen py-28 px-6">
-        {/* Header */}
+        {/* Header App Name */}
         <div className="absolute top-6 left-10">
           <h1 className="text-lg font-semibold text-gray-300 tracking-wide">
             {import.meta.env.VITE_APP_TITLE}
           </h1>
         </div>
 
-        {/* Title Section */}
+        {/* Title & Grid */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -113,7 +122,7 @@ export default function About() {
             automation and Zabbix telemetry.
           </p>
 
-          {/* Feature Grid */}
+          {/* Feature Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
             {[
               {
@@ -128,7 +137,7 @@ export default function About() {
               },
               {
                 title: "Multi-Tenant Dashboards",
-                icon: <Building  className="w-10 h-10 text-cyan-400" />,
+                icon: <Building className="w-10 h-10 text-cyan-400" />,
                 desc: "Dedicated dashboards and data isolation for each organization.",
               },
               {
@@ -136,7 +145,6 @@ export default function About() {
                 icon: <Brain className="w-10 h-10 text-cyan-400" />,
                 desc: "Automatic anomaly detection with prioritized alerts.",
               },
-              
             ].map((feature, idx) => (
               <motion.div
                 key={idx}
@@ -158,21 +166,17 @@ export default function About() {
               </motion.div>
             ))}
           </div>
-
-          {/* Back to Home Button */}
-          <div className="mt-16">
-            <Link
-              to="/"
-              className="inline-block px-10 py-3 rounded-full bg-gradient-to-br from-green-400 to-blue-500 text-white text-lg font-semibold hover:opacity-90 transition-all"
-            >
-              Back to Home
-            </Link>
-          </div>
         </motion.div>
       </div>
 
-      {/* Footer */}
-      <footer className="w-full bg-[#050b16] py-6 text-center text-gray-500 text-sm border-t border-white/10">
+      {/* === SMOOTH TRANSITION SECTION === */}
+      <div className="h-40 bg-gradient-to-b from-[#050b16] to-[#020617]" />
+
+      {/* === THREAT DETECTION VISUAL === */}
+      <ThreatDetectionVisual />
+
+      {/* === FOOTER === */}
+      <footer className="w-full bg-[#020617] py-6 text-center text-gray-500 text-sm border-t border-white/10">
         <p>&copy; 2025 {import.meta.env.VITE_APP_TITLE}</p>
         <p>
           <span>by </span>
