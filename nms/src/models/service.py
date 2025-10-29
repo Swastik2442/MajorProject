@@ -50,3 +50,7 @@ class ServiceDatetimesAndStatus(BaseModel):
 
 class ServiceDatetimesStatusAndSeverity(ServiceDatetimesAndStatus):
     severity: Severity = Field()
+
+class ServiceClientIdAndServiceName(BaseModel):
+    clientId: PyObjectId = Field(title="Client ID", description="ID of the Client who owns this Service")
+    serviceName: str = Field()

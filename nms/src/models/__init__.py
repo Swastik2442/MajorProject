@@ -2,7 +2,7 @@
 
 from .client import Client, ClientCreate, ClientListItem, ClientUpdate, ClientOwnerUpdate
 from .problem import Problem, ProblemUpdate, ProblemDatetimesAndStatus, ProblemDatetimesStatusAndSeverity, ProblemClientIdAndHostname
-from .service import Service, ServiceUpdate, ServiceDatetimesAndStatus, ServiceDatetimesStatusAndSeverity
+from .service import Service, ServiceUpdate, ServiceDatetimesAndStatus, ServiceDatetimesStatusAndSeverity, ServiceClientIdAndServiceName
 
 __all__ = [
     "Client",
@@ -19,4 +19,5 @@ __all__ = [
     "ServiceUpdate",
     "ServiceDatetimesAndStatus",
     "ServiceDatetimesStatusAndSeverity",
+    "ServiceClientIdAndServiceName",
 ]

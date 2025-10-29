@@ -23,7 +23,7 @@ from src.schemas import (
     StatAlertDurations,
     StatCounts,
     StatHealthScores,
-    StatHostProblemCount,
+    StatHostAlertCount,
     StatProblematicAlertTrends,
     StatTrends,
     TimePeriodWithClientsAndSeverityParams,
@@ -241,14 +241,14 @@ async def get_hosts_health_scores(
     response.headers["Cache-Control"] = "private, max-age=120"
     return DataResponse(data=results)
 
-@router.get("/hosts/count", response_model=DataResponse[Sequence[StatHostProblemCount]])
+@router.get("/hosts/count", response_model=DataResponse[Sequence[StatHostAlertCount]])
 async def get_hosts_problems_count(
     query: Annotated[InfiniteTimePeriodWithClientsParams, Query()],
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database,
     response: Response
-) -> DataResponse[Sequence[StatHostProblemCount]]:
+) -> DataResponse[Sequence[StatHostAlertCount]]:
     clients = await get_clients_from_query(query, user_id, clerk, db)
 
     pipeline = [
@@ -278,7 +278,7 @@ async def get_hosts_problems_count(
     ]
 
     cursor = await db[Problem.Meta.collection_name()].aggregate(pipeline)
-    results = [StatHostProblemCount(**doc["_id"], count=doc["count"]) async for doc in cursor]
+    results = [StatHostAlertCount(**doc["_id"], count=doc["count"]) async for doc in cursor]
 
     response.headers["Cache-Control"] = "private, max-age=60"
     return DataResponse(data=results)

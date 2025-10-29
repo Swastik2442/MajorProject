@@ -128,8 +128,13 @@ class StatHealthScores(BaseModel):
     disaster: int = Field(ge=0)
     healthScore: int = Field(ge=0, le=100)
 
-class StatHostProblemCount(BaseModel, frozen=True):
+class StatAlertCount(BaseModel, frozen=True):
     clientId: PyObjectId
-    hostname: str
     severity: Severity
     count: int
+
+class StatHostAlertCount(StatAlertCount, frozen=True):
+    hostname: str
+
+class StatServiceAlertCount(StatAlertCount, frozen=True):
+    serviceName: str
