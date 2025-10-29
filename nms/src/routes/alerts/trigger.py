@@ -1,16 +1,16 @@
 "API Routes for serving Zabbix Trigger Alerts"
 
 import asyncio
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from datetime import datetime, timedelta
 from math import ceil
-from typing import Annotated, Callable
+from typing import Annotated
 
 from fastapi import APIRouter, Response, Query
 from pymongo import DESCENDING
 
 from src.middlewares.client import get_clients_from_query, ClientsFromQuery
-from src.models import Problem, ProblemDatetimesAndStatus, ProblemDatetimesStatusAndSeverity
+from src.models import Problem, ProblemDatetimesAndStatus, ProblemDatetimesStatusAndSeverity, ProblemClientIdAndHostname
 from src.models.utils import fields, now
 from src.services.auth import ClerkSdk, JwtUserId
 from src.services.db import Database
@@ -20,6 +20,7 @@ from src.schemas import (
     IntervalSeconds,
     PaginationWithClientsParams,
     PaginatedDataResponse,
+    StatAlertDurations,
     StatCounts,
     StatHealthScores,
     StatHostProblemCount,
@@ -359,3 +360,60 @@ async def get_problematic_alerts_trends(
         problematic=problem_counts[i],
         total=total_counts[i]
     ) for i in range(num_periods)])
+
+class ProblemDurationPerHost(ProblemClientIdAndHostname, StatAlertDurations):
+    pass
+
+@router.get("/hosts/duration", response_model=Sequence[ProblemDurationPerHost])
+async def get_alert_duration_per_host(
+    query: Annotated[InfiniteTimePeriodWithClientsParams, Query()],
+    user_id: JwtUserId,
+    clerk: ClerkSdk,
+    db: Database,
+    response: Response
+) -> Sequence[ProblemDurationPerHost]:
+    clients = await get_clients_from_query(query, user_id, clerk, db)
+
+    pipeline = [
+        # Get relevant problems for the clients
+        {"$match": {
+            fields(Problem).clientId: {"$in": [c.id for c in clients if c.id is not None]},
+            **({fields(Problem).startedAt: {"$gte": query.start}} if query.start is not None else {}),
+            **({fields(Problem).startedAt: {"$lte": query.end}} if query.end is not None else {})
+        }},
+
+        # Get relevant fields only
+        {"$project": {
+            fields(Problem).clientId: 1,
+            fields(Problem).hostname: 1,
+            fields(Problem).startedAt: 1,
+            fields(Problem).recoveryAt: 1
+        }},
+
+        # Group by hostname and list durations
+        {"$group": {
+            "_id": {
+                fields(Problem).clientId: "$" + fields(Problem).clientId,
+                fields(Problem).hostname: "$" + fields(Problem).hostname
+            },
+            "durationSeconds": {"$push": {"$cond": {
+                "if": {"$" + fields(Problem).recoveryAt: None}, # type: ignore
+                "then": "Infinity",
+                "else": {"$divide": [
+                    {"$subtract": [
+                        "$" + fields(Problem).recoveryAt, # type: ignore
+                        "$" + fields(Problem).startedAt # type: ignore
+                    ]},
+                    1000
+                ]}
+            }}}
+        }}
+    ]
+
+    cursor = await db[Problem.Meta.collection_name()].aggregate(pipeline)
+
+    response.headers["Cache-Control"] = "private, max-age=300"
+    return [
+        ProblemDurationPerHost(**doc["_id"], durationSeconds=doc["durationSeconds"])
+        async for doc in cursor
+    ]

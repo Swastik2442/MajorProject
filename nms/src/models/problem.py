@@ -47,3 +47,7 @@ class ProblemDatetimesAndStatus(BaseModel):
 
 class ProblemDatetimesStatusAndSeverity(ProblemDatetimesAndStatus):
     severity: Severity = Field()
+
+class ProblemClientIdAndHostname(BaseModel):
+    clientId: PyObjectId = Field(title="Client ID", description="ID of the Client who reported this Problem")
+    hostname: str = Field()

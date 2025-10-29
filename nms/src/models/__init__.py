@@ -1,7 +1,7 @@
 "MongoDB Schema Models"
 
 from .client import Client, ClientCreate, ClientListItem, ClientUpdate, ClientOwnerUpdate
-from .problem import Problem, ProblemUpdate, ProblemDatetimesAndStatus, ProblemDatetimesStatusAndSeverity
+from .problem import Problem, ProblemUpdate, ProblemDatetimesAndStatus, ProblemDatetimesStatusAndSeverity, ProblemClientIdAndHostname
 from .service import Service, ServiceUpdate, ServiceDatetimesAndStatus, ServiceDatetimesStatusAndSeverity
 
 __all__ = [
@@ -14,6 +14,7 @@ __all__ = [
     "ProblemUpdate",
     "ProblemDatetimesAndStatus",
     "ProblemDatetimesStatusAndSeverity",
+    "ProblemClientIdAndHostname",
     "Service",
     "ServiceUpdate",
     "ServiceDatetimesAndStatus",
