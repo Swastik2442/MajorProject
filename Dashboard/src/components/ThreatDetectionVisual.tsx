@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import eyeImage from "/eyeImage.png";
 
-export default function ThreatDetectionVisual() {
+export default function PredictiveAnalysisVisual() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -84,32 +84,33 @@ export default function ThreatDetectionVisual() {
         <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-400/10 to-transparent blur-md pointer-events-none"></div>
 
         <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-          Intelligent Threat <br />
-          <span className="text-cyan-400">& Anomaly Detection</span>
+          Predictive <br />
+          <span className="text-cyan-400">Insights & LLM Reasoning</span>
         </h2>
 
         <p className="text-gray-300 text-lg mb-8 leading-relaxed">
-          Leverage advanced AI and machine learning to proactively identify and neutralize
-          hidden threats across your network infrastructure. Gain unparalleled visibility
-          and control with real-time anomaly detection.
+          Harness the analytical depth of Large Language Models to uncover trends,
+          anticipate future outcomes, and provide intelligent, context-aware predictions.
+          Our LLM-powered framework goes beyond statistics — it interprets data with
+          real-world reasoning and foresight.
         </p>
 
         <div className="space-y-3 text-gray-300">
           <div className="flex items-center gap-3 bg-[#101a2e]/80 border border-cyan-400/10 px-4 py-3 rounded-lg backdrop-blur-md hover:bg-[#12233c]/90 transition-all">
-            <span className="text-cyan-400 text-xl">⚡</span>
-            <span className="font-medium">Predictive Analysis for emerging threats</span>
+            <span className="text-cyan-400 text-xl">🧩</span>
+            <span className="font-medium">LLM-driven contextual prediction models</span>
           </div>
           <div className="flex items-center gap-3 bg-[#101a2e]/80 border border-cyan-400/10 px-4 py-3 rounded-lg backdrop-blur-md hover:bg-[#12233c]/90 transition-all">
             <span className="text-cyan-400 text-xl">🔍</span>
-            <span className="font-medium">Real-time Anomaly Recognition</span>
+            <span className="font-medium">Deep data reasoning and pattern interpretation</span>
           </div>
           <div className="flex items-center gap-3 bg-[#101a2e]/80 border border-cyan-400/10 px-4 py-3 rounded-lg backdrop-blur-md hover:bg-[#12233c]/90 transition-all">
-            <span className="text-cyan-400 text-xl">🧠</span>
-            <span className="font-medium">Deep Learning-driven Adaptivity</span>
+            <span className="text-cyan-400 text-xl">⚙️</span>
+            <span className="font-medium">Adaptive large-scale inference pipeline</span>
           </div>
           <div className="flex items-center gap-3 bg-[#101a2e]/80 border border-cyan-400/10 px-4 py-3 rounded-lg backdrop-blur-md hover:bg-[#12233c]/90 transition-all">
-            <span className="text-cyan-400 text-xl">🌐</span>
-            <span className="font-medium">Continuous Behavior Mapping</span>
+            <span className="text-cyan-400 text-xl">📈</span>
+            <span className="font-medium">Proactive decision support through LLM insights</span>
           </div>
         </div>
       </div>
@@ -127,7 +128,7 @@ export default function ThreatDetectionVisual() {
         <div className="absolute z-10 flex items-center justify-center">
           <img
             src={eyeImage}
-            alt="AI Eye"
+            alt="Predictive LLM Eye"
             className="w-56 h-56 object-contain opacity-95 drop-shadow-[0_0_25px_rgba(0,255,255,0.6)]"
           />
         </div>

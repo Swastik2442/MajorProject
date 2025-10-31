@@ -80,7 +80,7 @@
 - [ ] Complete the Home/About page
   - [x] Hero Section
   - [x] Features Section
-  - [ ] About Section
+  - [x] About Section
   - [ ] Footer Links
 - [ ] Add the Charts required by Sir
   - [ ] Bar Chart of No of Problems in Top 10 (change-able) Problematic Host/Service
