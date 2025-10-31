@@ -138,8 +138,8 @@ export default function Home() {
             </h2>
 
             <p className="text-gray-400 text-lg max-w-3xl mx-auto mb-10">
-              Harnessing Zabbix & AI for Predictive Operations. Gain real-time
-              insights, detect anomalies, and manage network health with advanced AI and machine learning.
+              Harnessing Zabbix & AI for Predictive Operations. Integrating large language models (LLMs) to enhance predictive network status analysis, 
+              enabling context-aware aggregation and automated interpretation of alert data..
             </p>
 
             <div className="flex flex-wrap justify-center gap-6">
