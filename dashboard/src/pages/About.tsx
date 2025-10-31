@@ -141,9 +141,9 @@ export default function About() {
                 desc: "Dedicated dashboards and data isolation for each organization.",
               },
               {
-                title: "AI & LLM Powered Detection",
+                title: "LLM Powered Analysis",
                 icon: <Brain className="w-10 h-10 text-cyan-400" />,
-                desc: "Automatic anomaly detection with prioritized alerts.",
+                desc: "Network Status Analysis with prioritized alerts.",
               },
             ].map((feature, idx) => (
               <motion.div
