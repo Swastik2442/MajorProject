@@ -86,6 +86,3 @@ venv/
 
 # VS Code
 .vscode/
-
-# Custom
-src/templates/*.json

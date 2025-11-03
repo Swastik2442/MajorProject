@@ -9,6 +9,6 @@ RUN uv sync --frozen --no-cache
 
 RUN mkdir /app/.cache
 
-EXPOSE 5000
+EXPOSE 2442
 
-CMD ["/app/.venv/bin/fastapi", "run", "app/main.py", "--port", "5000", "--host", "0.0.0.0"]
+CMD ["/app/.venv/bin/fastapi", "run", "app/main.py", "--port", "2442", "--host", "0.0.0.0"]
