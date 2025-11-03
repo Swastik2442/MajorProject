@@ -90,10 +90,10 @@
     - [x] Backend
     - [ ] Frontend
   - [ ] Bar Chart of No of Problems with Duration > 4hrs (change-able) per Host/Service
-    - [ ] Backend
+    - [x] Backend
     - [ ] Frontend
   - [ ] Pie Chart of Percentage of Problems with Duration < 4hrs (change-able) vs Problems with more than that
-    - [ ] Backend
+    - [x] Backend
     - [ ] Frontend
 - [ ] Show Alert details Modal when User clicks on Alert
   - [x] Backend

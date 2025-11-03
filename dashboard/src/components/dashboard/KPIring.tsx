@@ -7,7 +7,7 @@ import { apiService } from "@/services/api";
 export default function KPIring({ client_id = null, org_id = null }: TClientsParams) {
   const { data: actual } = useQuery({
     queryKey: ["problemsCount", client_id, org_id],
-    queryFn: () => apiService.fetchProblemsCount({ client_id, org_id }),
+    queryFn: () => apiService.getTriggerAlertsCount({ client_id, org_id }),
     staleTime: 15 * 60 * 1000, // 15 minutes
   });
 

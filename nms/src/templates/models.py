@@ -65,6 +65,7 @@ class ProblemUpdateEvent(BaseModel):
     name: str
     status: str
     age: str
+    ack: Acknowledgement
     update: Update
 
 class ServiceEvent(BaseModel):

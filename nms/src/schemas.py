@@ -61,9 +61,6 @@ class SeverityParams(BaseModel):
         description="Severity level to filter/threshold by"
     )
 
-class StatAlertDurations(BaseModel):
-    durationSeconds: Sequence[int | Literal["Infinity"]] = Field()
-
 class PaginationWithOwnerIdParams(PaginationParams):
     owner_id: str | None = Query(
         default=None,
@@ -138,3 +135,6 @@ class StatHostAlertCount(StatAlertCount, frozen=True):
 
 class StatServiceAlertCount(StatAlertCount, frozen=True):
     serviceName: str
+
+class StatAlertDurations(BaseModel):
+    durationSeconds: Sequence[int | Literal["Infinity"]] = Field()

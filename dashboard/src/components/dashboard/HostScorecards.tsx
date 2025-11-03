@@ -7,7 +7,7 @@ import { apiService } from "@/services/api";
 export default function HostScorecards({ client_id = null, org_id = null }: TClientsParams) {
   const { data } = useQuery({
     queryKey: ["hostHealthScores", client_id, org_id],
-    queryFn: () => apiService.fetchHostsHealthScores({ client_id, org_id }),
+    queryFn: () => apiService.getHostsHealthScores({ client_id, org_id }),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
   const hosts = data?.data ?? [];

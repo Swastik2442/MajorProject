@@ -284,7 +284,7 @@ async def get_services_problems_count(
     return DataResponse(data=results)
 
 @router.get("/trends/problematic-alerts", response_model=DataResponse[Sequence[StatProblematicAlertTrends]])
-async def get_problematic_alerts_trends(
+async def get_problematic_service_alert_trends(
     query: Annotated[TimePeriodWithClientsAndSeverityParams, Query()],
     user_id: JwtUserId,
     clerk: ClerkSdk,
@@ -364,14 +364,14 @@ async def get_problematic_alerts_trends(
 class AlertDurationPerService(ServiceClientIdAndServiceName, StatAlertDurations):
     pass
 
-@router.get("/hosts/duration", response_model=Sequence[AlertDurationPerService])
-async def get_alert_duration_per_host(
+@router.get("/duration", response_model=DataResponse[Sequence[AlertDurationPerService]])
+async def get_alert_duration_per_service(
     query: Annotated[InfiniteTimePeriodWithClientsParams, Query()],
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database,
     response: Response
-) -> Sequence[AlertDurationPerService]:
+) -> DataResponse[Sequence[AlertDurationPerService]]:
     clients = await get_clients_from_query(query, user_id, clerk, db)
 
     pipeline = [
@@ -413,7 +413,7 @@ async def get_alert_duration_per_host(
     cursor = await db[Service.Meta.collection_name()].aggregate(pipeline)
 
     response.headers["Cache-Control"] = "private, max-age=300"
-    return [
+    return DataResponse(data=[
         AlertDurationPerService(**doc["_id"], durationSeconds=doc["durationSeconds"])
         async for doc in cursor
-    ]
+    ])

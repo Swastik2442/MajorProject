@@ -6,7 +6,7 @@ import { apiService } from "@/services/api";
 export default function StatusCards({ client_id = null, org_id = null }: TClientsParams) {
   const { data } = useQuery({
     queryKey: ["alertsCount", client_id, org_id],
-    queryFn: () => apiService.fetchCommonAlertsCount({ client_id, org_id }),
+    queryFn: () => apiService.getCommonAlertsCount({ client_id, org_id }),
     staleTime: 15 * 60 * 1000, // 15 minutes
   });
 

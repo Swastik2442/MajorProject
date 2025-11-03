@@ -32,7 +32,7 @@ from src.schemas import (
 from src.templates.models import Severity
 
 router = APIRouter(
-    prefix="/problems",
+    prefix="/triggers",
     tags=["trigger alerts"],
 )
 
@@ -284,7 +284,7 @@ async def get_hosts_problems_count(
     return DataResponse(data=results)
 
 @router.get("/trends/problematic-alerts", response_model=DataResponse[Sequence[StatProblematicAlertTrends]])
-async def get_problematic_alerts_trends(
+async def get_problematic_trigger_alert_trends(
     query: Annotated[TimePeriodWithClientsAndSeverityParams, Query()],
     user_id: JwtUserId,
     clerk: ClerkSdk,
@@ -361,17 +361,17 @@ async def get_problematic_alerts_trends(
         total=total_counts[i]
     ) for i in range(num_periods)])
 
-class ProblemDurationPerHost(ProblemClientIdAndHostname, StatAlertDurations):
+class AlertDurationPerHost(ProblemClientIdAndHostname, StatAlertDurations):
     pass
 
-@router.get("/hosts/duration", response_model=Sequence[ProblemDurationPerHost])
+@router.get("/hosts/duration", response_model=DataResponse[Sequence[AlertDurationPerHost]])
 async def get_alert_duration_per_host(
     query: Annotated[InfiniteTimePeriodWithClientsParams, Query()],
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database,
     response: Response
-) -> Sequence[ProblemDurationPerHost]:
+) -> DataResponse[Sequence[AlertDurationPerHost]]:
     clients = await get_clients_from_query(query, user_id, clerk, db)
 
     pipeline = [
@@ -413,7 +413,7 @@ async def get_alert_duration_per_host(
     cursor = await db[Problem.Meta.collection_name()].aggregate(pipeline)
 
     response.headers["Cache-Control"] = "private, max-age=300"
-    return [
-        ProblemDurationPerHost(**doc["_id"], durationSeconds=doc["durationSeconds"])
+    return DataResponse(data=[
+        AlertDurationPerHost(**doc["_id"], durationSeconds=doc["durationSeconds"])
         async for doc in cursor
-    ]
+    ])

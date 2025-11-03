@@ -20,12 +20,12 @@ export const ClientCreateSchema = z.object({
 });
 
 export const ClientListItemSchema = z.object({
-  _id: z.string(),
-  createdAt: z.iso.datetime(),
-  updatedAt: z.iso.datetime(),
+  _id: z.string().nullable().optional(),
+  createdAt: z.iso.datetime().optional(),
+  updatedAt: z.iso.datetime().optional(),
   ownerId: z.string(),
   name: z.string().min(3).max(100),
-  description: z.string().nullable(),
+  description: z.string().nullable().optional(),
 });
 
 export const ClientUpdateSchema = z.object({
@@ -74,6 +74,7 @@ export const ProblemSchema = z.object({
   _id: z.string().nullable().optional(),
   createdAt: z.iso.datetime().optional(),
   updatedAt: z.iso.datetime().optional(),
+  clientId: z.string(),
   zid: z.string(),
   name: z.string(),
   startedAt: z.iso.datetime(),
@@ -90,6 +91,7 @@ export const ServiceSchema = z.object({
   _id: z.string().nullable().optional(),
   createdAt: z.iso.datetime().optional(),
   updatedAt: z.iso.datetime().optional(),
+  clientId: z.string(),
   zid: z.string(),
   name: z.string(),
   startedAt: z.iso.datetime(),
@@ -105,6 +107,16 @@ export const ServiceSchema = z.object({
 });
 
 export const ProblemOrServiceSchema = z.union([ProblemSchema, ServiceSchema]);
+
+export const ProblemClientIdAndHostnameSchema = ProblemSchema.pick({
+  clientId: true,
+  hostname: true,
+});
+
+export const ServiceClientIdAndServiceNameSchema = ServiceSchema.pick({
+  clientId: true,
+  serviceName: true,
+});
 
 export const StatCountsSchema = z.object({
   totalActiveProblems: z.number().int().min(0),
@@ -142,12 +154,28 @@ export const StatCommonTrendsSchema = z.object({
   activeServiceOutages: z.number().int().min(0),
 });
 
-export const StatHostsProblemsCountSchema = z.object({
-  clientId: z.string(),
-  hostname: z.string(),
+export const StatAlertCountsSchema = z.object({
   severity: SeveritySchema,
   count: z.number().int().min(0),
 });
+
+export const StatHostsProblemsCountSchema = StatAlertCountsSchema.extend(ProblemClientIdAndHostnameSchema.shape);
+
+export const StatServicesProblemsCountSchema = StatAlertCountsSchema.extend(ServiceClientIdAndServiceNameSchema.shape);
+
+export const StatProblematicAlertTrendsSchema = z.object({
+  timestamp: z.iso.datetime(),
+  problematic: z.number().int().min(0),
+  total: z.number().int().min(0),
+});
+
+export const StatAlertDurationsSchema = z.object({
+  durationSeconds: z.union([z.number().int().min(0), z.literal("Infinity")]),
+});
+
+export const StatAlertDurationPerHostSchema = StatAlertDurationsSchema.extend(ProblemClientIdAndHostnameSchema.shape);
+
+export const StatAlertDurationPerServiceSchema = StatAlertDurationsSchema.extend(ServiceClientIdAndServiceNameSchema.shape);
 
 export const DataResponseSchema = <T extends z.ZodType>(dataSchema: T) =>
   z.object({
@@ -188,59 +216,28 @@ export const PaginationParamsSchema = z.object({
   limit: z.number().int().min(1).max(100).default(20).optional(),
 });
 
-export const TimeIntervalParamsSchema = z.object({
+export const TimePeriodParamsSchema = z.object({
   start: z.iso.datetime(),
-  end: z.iso.datetime().optional(),
+  end: z.union([z.iso.datetime(), z.null()]).optional(),
   interval: z.enum(["hour", "day", "week", "month"]).optional(),
 });
 
-export const InfiniteTimeIntervalParamsSchema = z.object({
-  start: z.iso.datetime().optional(),
-  end: z.iso.datetime().optional(),
+export const InfiniteTimePeriodParamsSchema = z.object({
+  start: z.union([z.iso.datetime(), z.null()]).optional(),
+  end: z.union([z.iso.datetime(), z.null()]).optional(),
 });
 
-export const TimeIntervalAndOrgClientParamsSchema = TimeIntervalParamsSchema.extend(ClientsParamsSchema.shape);
-export const InfiniteTimeIntervalAndOrgClientParamsSchema = InfiniteTimeIntervalParamsSchema.extend(ClientsParamsSchema.shape);
-export const PaginationAndOrgClientParamsSchema = PaginationParamsSchema.extend(ClientsParamsSchema.shape);
-export const PaginationAndOwnerParamsSchema = PaginationParamsSchema.extend({
+export const TimePeriodWithClientsParamsSchema = TimePeriodParamsSchema.extend(ClientsParamsSchema.shape);
+export const TimePeriodWithClientsAndSeverityParamsSchema = TimePeriodWithClientsParamsSchema.extend({
+  severity: SeveritySchema.nullable().optional(),
+});
+export const InfiniteTimePeriodWithClientsParamsSchema = InfiniteTimePeriodParamsSchema.extend(ClientsParamsSchema.shape);
+export const PaginationWithClientsParamsSchema = PaginationParamsSchema.extend(ClientsParamsSchema.shape);
+export const PaginationWithOwnerIdParamsSchema = PaginationParamsSchema.extend({
   owner_id: z.union([
     IdSchema,
     z.null(),
   ]).optional(),
-});
-
-export const TopProblemSourcesSchema = z.object({
-  hostname: z.string(),
-  alert_count: z.number().int().min(0),
-});
-
-export const AlertsByHostSchema = z.object({
-  host: z.string(),
-  total_alerts: z.number().int().min(0),
-});
-
-export const AlertsBySeverityOverTimeSchema = z.object({
-  timestamp: z.iso.datetime(),
-  critical: z.number().int().min(0),
-  high: z.number().int().min(0),
-  medium: z.number().int().min(0),
-  low: z.number().int().min(0),
-});
-
-export const ServiceUptimeSchema = z.object({
-  service_name: z.string(),
-  uptime_percentage: z.number().min(0).max(100),
-});
-
-export const AlertAcknowledgementStatsSchema = z.object({
-  acknowledged: z.number().int().min(0),
-  unacknowledged: z.number().int().min(0),
-  percentage_acknowledged: z.number().min(0).max(100),
-});
-
-export const AlertsPerClientSchema = z.object({
-  client_name: z.string(),
-  total_alerts: z.number().int().min(0),
 });
 
 // --- Inferred Types ---
@@ -249,11 +246,20 @@ export type TSeveritySchema = z.infer<typeof SeveritySchema>;
 export type TProblem = z.infer<typeof ProblemSchema>;
 export type TService = z.infer<typeof ServiceSchema>;
 export type TProblemOrService = z.infer<typeof ProblemOrServiceSchema>;
+export type TProblemClientIdAndHostname = z.infer<typeof ProblemClientIdAndHostnameSchema>;
+export type TServiceClientIdAndServiceName = z.infer<typeof ServiceClientIdAndServiceNameSchema>;
 export type TStatCounts = z.infer<typeof StatCountsSchema>;
 export type TStatCommonCounts = z.infer<typeof StatCommonCountsSchema>;
 export type TStatHealthScores = z.infer<typeof StatHealthScoresSchema>;
 export type TStatTrends = z.infer<typeof StatTrendsSchema>;
 export type TStatCommonTrends = z.infer<typeof StatCommonTrendsSchema>;
+export type TStatAlertCounts = z.infer<typeof StatAlertCountsSchema>;
+export type TStatHostsProblemsCount = z.infer<typeof StatHostsProblemsCountSchema>;
+export type TStatServicesProblemsCount = z.infer<typeof StatServicesProblemsCountSchema>;
+export type TStatProblematicAlertTrends = z.infer<typeof StatProblematicAlertTrendsSchema>;
+export type TStatAlertDurations = z.infer<typeof StatAlertDurationsSchema>;
+export type TStatAlertDurationPerHost = z.infer<typeof StatAlertDurationPerHostSchema>;
+export type TStatAlertDurationPerService = z.infer<typeof StatAlertDurationPerServiceSchema>;
 
 export type TClient = z.infer<typeof ClientSchema>;
 export type TClientCreate = z.infer<typeof ClientCreateSchema>;
@@ -274,6 +280,12 @@ export type TPaginatedServiceDataResponse = z.infer<typeof PaginatedServiceDataR
 export const PaginatedProblemOrServiceDataResponseSchema = PaginatedDataResponseSchema(ProblemOrServiceSchema);
 export type TPaginatedProblemOrServiceDataResponse = z.infer<typeof PaginatedProblemOrServiceDataResponseSchema>;
 
+export const ProblemClientIdAndHostNameDataResponseSchema = DataResponseSchema(z.array(ProblemClientIdAndHostnameSchema));
+export type TProblemClientIdAndHostnameDataResponse = z.infer<typeof ProblemClientIdAndHostNameDataResponseSchema>;
+
+export const ServiceClientIdAndServiceNameDataResponseSchema = DataResponseSchema(z.array(ServiceClientIdAndServiceNameSchema));
+export type TServiceClientIdAndServiceNameDataResponse = z.infer<typeof ServiceClientIdAndServiceNameDataResponseSchema>;
+
 export const StatCountsDataResponseSchema = DataResponseSchema(StatCountsSchema);
 export type TStatCountsDataResponse = z.infer<typeof StatCountsDataResponseSchema>;
 
@@ -292,6 +304,18 @@ export type TStatHealthScoresDataResponse = z.infer<typeof StatHealthScoresDataR
 export const StatHostsProblemsCountDataResponseSchema = DataResponseSchema(z.array(StatHostsProblemsCountSchema));
 export type TStatHostsProblemsCountDataResponse = z.infer<typeof StatHostsProblemsCountDataResponseSchema>;
 
+export const StatServicesProblemsCountDataResponseSchema = DataResponseSchema(z.array(StatServicesProblemsCountSchema));
+export type TStatServicesProblemsCountDataResponse = z.infer<typeof StatServicesProblemsCountDataResponseSchema>;
+
+export const StatProblematicAlertTrendsDataResponseSchema = DataResponseSchema(z.array(StatProblematicAlertTrendsSchema));
+export type TStatProblematicAlertTrendsDataResponse = z.infer<typeof StatProblematicAlertTrendsDataResponseSchema>;
+
+export const StatAlertDurationPerHostDataResponseSchema = DataResponseSchema(z.array(StatAlertDurationPerHostSchema));
+export type TStatAlertDurationPerHostDataResponse = z.infer<typeof StatAlertDurationPerHostDataResponseSchema>;
+
+export const StatAlertDurationPerServiceDataResponseSchema = DataResponseSchema(z.array(StatAlertDurationPerServiceSchema));
+export type TStatAlertDurationPerServiceDataResponse = z.infer<typeof StatAlertDurationPerServiceDataResponseSchema>;
+
 export const PaginatedClientListItemDataResponseSchema = PaginatedDataResponseSchema(ClientListItemSchema);
 export type TPaginatedClientListItemDataResponse = z.infer<typeof PaginatedClientListItemDataResponseSchema>;
 
@@ -301,66 +325,47 @@ export type TDataResponseClientListItem = z.infer<typeof DataResponseClientListI
 export const DataResponseStrSchema = DataResponseSchema(z.string());
 export type TDataResponseStr = z.infer<typeof DataResponseStrSchema>;
 
-export const TopProblemSourcesDataResponseSchema = DataResponseSchema(z.array(TopProblemSourcesSchema));
-export type TTopProblemSourcesDataResponse = z.infer<typeof TopProblemSourcesDataResponseSchema>;
-
-export const AlertsByHostDataResponseSchema = DataResponseSchema(z.array(AlertsByHostSchema));
-export type TAlertsByHostDataResponse = z.infer<typeof AlertsByHostDataResponseSchema>;
-
-export const AlertsBySeverityOverTimeDataResponseSchema = DataResponseSchema(z.array(AlertsBySeverityOverTimeSchema));
-export type TAlertsBySeverityOverTimeDataResponse = z.infer<typeof AlertsBySeverityOverTimeDataResponseSchema>;
-
-export const ServiceUptimeDataResponseSchema = DataResponseSchema(z.array(ServiceUptimeSchema));
-export type TServiceUptimeDataResponse = z.infer<typeof ServiceUptimeDataResponseSchema>;
-
-export const AlertAcknowledgementStatsDataResponseSchema = DataResponseSchema(AlertAcknowledgementStatsSchema);
-export type TAlertAcknowledgementStatsDataResponse = z.infer<typeof AlertAcknowledgementStatsDataResponseSchema>;
-
-export const AlertsPerClientDataResponseSchema = DataResponseSchema(z.array(AlertsPerClientSchema));
-export type TAlertsPerClientDataResponse = z.infer<typeof AlertsPerClientDataResponseSchema>;
-
-
 // --- API Parameters Types ---
 
 export type TClientParam = z.infer<typeof ClientParamSchema>;
 export type TClientsParams = z.infer<typeof ClientsParamsSchema>;
 export type TPaginationParams = z.infer<typeof PaginationParamsSchema>;
-export type TTimeIntervalParams = z.infer<typeof TimeIntervalParamsSchema>;
-export type TTimeIntervalAndOrgClientParams = z.infer<typeof TimeIntervalAndOrgClientParamsSchema>;
-export type TInfiniteTimeIntervalAndOrgClientParams = z.infer<typeof InfiniteTimeIntervalAndOrgClientParamsSchema>;
-export type TPaginationAndOrgClientParams = z.infer<typeof PaginationAndOrgClientParamsSchema>;
-export type TPaginationAndOwnerParams = z.infer<typeof PaginationAndOwnerParamsSchema>;
+export type TTimePeriodParams = z.infer<typeof TimePeriodParamsSchema>;
+export type TTimePeriodWithClientsParams = z.infer<typeof TimePeriodWithClientsParamsSchema>;
+export type TTimePeriodWithClientsAndSeverityParams = z.infer<typeof TimePeriodWithClientsAndSeverityParamsSchema>;
+export type TInfiniteTimePeriodWithClientsParams = z.infer<typeof InfiniteTimePeriodWithClientsParamsSchema>;
+export type TPaginationWithClientsParams = z.infer<typeof PaginationWithClientsParamsSchema>;
+export type TPaginationWithOwnerIdParams = z.infer<typeof PaginationWithOwnerIdParamsSchema>;
 
 // --- API Service Interface ---
 
 export interface ApiService {
-  fetchProblems: (params: TPaginationAndOrgClientParams) => Promise<TPaginatedProblemDataResponse>;
-  fetchServiceAlerts: (params: TPaginationAndOrgClientParams) => Promise<TPaginatedServiceDataResponse>;
-  fetchCommonAlerts: (params: TPaginationAndOrgClientParams) => Promise<TPaginatedProblemOrServiceDataResponse>;
-  fetchProblemsCount: (params: TClientsParams) => Promise<TStatCountsDataResponse>;
-  fetchServiceAlertsCount: (params: TClientsParams) => Promise<TStatCountsDataResponse>;
-  fetchCommonAlertsCount: (params: TClientsParams) => Promise<TStatCommonCountsDataResponse>;
-  fetchProblemsTrends: (params: TTimeIntervalAndOrgClientParams) => Promise<TStatTrendsDataResponse>;
-  fetchServiceAlertsTrends: (params: TTimeIntervalAndOrgClientParams) => Promise<TStatTrendsDataResponse>;
-  fetchCommonAlertsTrends: (params: TTimeIntervalAndOrgClientParams) => Promise<TStatCommonTrendsDataResponse>;
-  fetchHostsHealthScores: (params: TClientsParams) => Promise<TStatHealthScoresDataResponse>;
-  fetchHostsProblemsCount: (params: TInfiniteTimeIntervalAndOrgClientParams) => Promise<TStatHostsProblemsCountDataResponse>;
+  getCommonAlerts: (params: TPaginationWithClientsParams) => Promise<TPaginatedProblemOrServiceDataResponse>;
+  getCommonAlertsCount: (params: TClientsParams) => Promise<TStatCommonCountsDataResponse>;
+  getCommonAlertTrends: (params: TTimePeriodWithClientsParams) => Promise<TStatCommonTrendsDataResponse>;
+
+  getTriggerAlerts: (params: TPaginationWithClientsParams) => Promise<TPaginatedProblemDataResponse>;
+  getTriggerAlertsCount: (params: TClientsParams) => Promise<TStatCountsDataResponse>;
+  getTriggerAlertTrends: (params: TTimePeriodWithClientsParams) => Promise<TStatTrendsDataResponse>;
+  getHostsHealthScores: (params: TClientsParams) => Promise<TStatHealthScoresDataResponse>;
+  getHostsProblemsCount: (params: TInfiniteTimePeriodWithClientsParams) => Promise<TStatHostsProblemsCountDataResponse>;
+  getProblematicTriggerAlertTrends: (params: TTimePeriodWithClientsAndSeverityParams) => Promise<TStatProblematicAlertTrendsDataResponse>;
+  getAlertDurationPerHost: (params: TInfiniteTimePeriodWithClientsParams) => Promise<TStatAlertDurationPerHostDataResponse>;
+
+  getServiceAlerts: (params: TPaginationWithClientsParams) => Promise<TPaginatedServiceDataResponse>;
+  getServiceAlertsCount: (params: TClientsParams) => Promise<TStatCountsDataResponse>;
+  getServiceAlertTrends: (params: TTimePeriodWithClientsParams) => Promise<TStatTrendsDataResponse>;
+  getServicesHealthScores: (params: TClientsParams) => Promise<TStatHealthScoresDataResponse>;
+  getServicesProblemsCount: (params: TInfiniteTimePeriodWithClientsParams) => Promise<TStatServicesProblemsCountDataResponse>;
+  getProblematicServiceAlertTrends: (params: TTimePeriodWithClientsAndSeverityParams) => Promise<TStatProblematicAlertTrendsDataResponse>;
+  getAlertDurationPerService: (params: TInfiniteTimePeriodWithClientsParams) => Promise<TStatAlertDurationPerServiceDataResponse>;
 
   // Client endpoints
   createClient: (body: TClientCreate) => Promise<TDataResponseStr>;
-  listClients: (params: TPaginationAndOwnerParams) => Promise<TPaginatedClientListItemDataResponse>;
+  listClients: (params: TPaginationWithOwnerIdParams) => Promise<TPaginatedClientListItemDataResponse>;
   getClient: (client_id: string) => Promise<TDataResponseClientListItem>;
   updateClient: (client_id: string, body: TClientUpdate) => Promise<TResponse>;
   deleteClient: (client_id: string) => Promise<TResponse>;
   regenerateClientApiKey: (client_id: string) => Promise<TDataResponseStr>;
   changeClientOwner: (client_id: string, body: TClientOwnerUpdate) => Promise<TResponse>;
-
-    // --- New Alert Stats Endpoints ---
-  fetchTopProblemSources: (params?: TClientsParams) => Promise<TTopProblemSourcesDataResponse>;
-  fetchAlertsByHost: (params?: TClientsParams) => Promise<TAlertsByHostDataResponse>;
-  fetchAlertsBySeverityOverTime: (params?: TTimeIntervalAndOrgClientParams) => Promise<TAlertsBySeverityOverTimeDataResponse>;
-  fetchServiceUptime: (params?: TClientsParams) => Promise<TServiceUptimeDataResponse>;
-  fetchAlertAcknowledgementStats: (params?: TClientsParams) => Promise<TAlertAcknowledgementStatsDataResponse>;
-  fetchAlertsPerClient: (params?: TClientsParams) => Promise<TAlertsPerClientDataResponse>;
-
 }

@@ -27,7 +27,7 @@ function MiniSpark({ data = [] }: { data: { v: number }[] }) {
 export default function ActivityStream({ client_id = null, org_id = null }: TClientsParams) {
   const { data, isError, error, isPending } = useQuery({
     queryKey: ["alerts", client_id, org_id],
-    queryFn: () => apiService.fetchCommonAlerts({ client_id, org_id, page: 1, limit: 8 }),
+    queryFn: () => apiService.getCommonAlerts({ client_id, org_id, page: 1, limit: 8 }),
   });
 
   if (isPending) {

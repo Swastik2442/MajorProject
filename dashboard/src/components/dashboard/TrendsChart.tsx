@@ -17,7 +17,7 @@ export default function TrendsChart({ client_id = null, org_id = null }: TClient
   const { data } = useQuery({
     queryKey: ["alertTrends", client_id, org_id],
     queryFn: () =>
-      apiService.fetchCommonAlertsTrends({
+      apiService.getCommonAlertTrends({
         client_id,
         org_id,
         start: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
