@@ -13,7 +13,13 @@ import type {
   TStatCountsDataResponse,
   TStatHealthScoresDataResponse,
   TStatHostsProblemsCountDataResponse,
-  TStatTrendsDataResponse
+  TStatTrendsDataResponse,
+  TTopProblemSourcesDataResponse,
+  TAlertsByHostDataResponse,
+  TAlertsBySeverityOverTimeDataResponse,
+  TServiceUptimeDataResponse,
+  TAlertAcknowledgementStatsDataResponse,
+  TAlertsPerClientDataResponse,
 } from "@/schemas/api";
 
 const BASE = import.meta.env.VITE_API_URL || "/api";
@@ -42,18 +48,13 @@ api.interceptors.request.use(
   }
 );
 
+// MAIN API SERVICE IMPLEMENTATION
+
 export const apiService: ApiService = {
+  // --- PROBLEMS ---
   fetchProblems: async (params) => {
     const response = await api.get<TPaginatedProblemDataResponse>(
       "/alerts/problems/",
-      { params }
-    );
-    return response.data;
-  },
-
-  fetchServiceAlerts: async (params) => {
-    const response = await api.get<TPaginatedServiceDataResponse>(
-      "/alerts/services/",
       { params }
     );
     return response.data;
@@ -75,6 +76,31 @@ export const apiService: ApiService = {
     return response.data;
   },
 
+  fetchHostsHealthScores: async (params) => {
+    const response = await api.get<TStatHealthScoresDataResponse>(
+      "/alerts/problems/hosts/health",
+      { params }
+    );
+    return response.data;
+  },
+
+  fetchHostsProblemsCount: async (params) => {
+    const response = await api.get<TStatHostsProblemsCountDataResponse>(
+      "/alerts/problems/hosts/count",
+      { params }
+    );
+    return response.data;
+  },
+
+  // --- SERVICE ALERTS ---
+  fetchServiceAlerts: async (params) => {
+    const response = await api.get<TPaginatedServiceDataResponse>(
+      "/alerts/services/",
+      { params }
+    );
+    return response.data;
+  },
+
   fetchServiceAlertsCount: async (params) => {
     const response = await api.get<TStatCountsDataResponse>(
       "/alerts/services/count",
@@ -91,6 +117,7 @@ export const apiService: ApiService = {
     return response.data;
   },
 
+  // --- COMMON ALERTS ---
   fetchCommonAlerts: async (params) => {
     const response = await api.get<TPaginatedProblemOrServiceDataResponse>(
       "/alerts/common/",
@@ -115,27 +142,60 @@ export const apiService: ApiService = {
     return response.data;
   },
 
-  fetchHostsHealthScores: async (params) => {
-    const response = await api.get<TStatHealthScoresDataResponse>(
-      "/alerts/problems/hosts/health",
+  // NEWLY ADDED ADVANCED ALERT STATS ENDPOINTS
+
+  fetchTopProblemSources: async (params) => {
+    const response = await api.get<TTopProblemSourcesDataResponse>(
+      "/alerts/common/top-problem-sources",
       { params }
     );
     return response.data;
   },
 
-  fetchHostsProblemsCount: async (params) => {
-    const response = await api.get<TStatHostsProblemsCountDataResponse>(
-      "/alerts/problems/hosts/count",
+  fetchAlertsByHost: async (params) => {
+    const response = await api.get<TAlertsByHostDataResponse>(
+      "/alerts/common/alerts-by-host",
       { params }
     );
     return response.data;
   },
+
+  fetchAlertsBySeverityOverTime: async (params) => {
+    const response = await api.get<TAlertsBySeverityOverTimeDataResponse>(
+      "/alerts/common/severity-over-time",
+      { params }
+    );
+    return response.data;
+  },
+
+  fetchServiceUptime: async (params) => {
+    const response = await api.get<TServiceUptimeDataResponse>(
+      "/alerts/common/service-uptime",
+      { params }
+    );
+    return response.data;
+  },
+
+  fetchAlertAcknowledgementStats: async (params) => {
+    const response = await api.get<TAlertAcknowledgementStatsDataResponse>(
+      "/alerts/common/acknowledgement-stats",
+      { params }
+    );
+    return response.data;
+  },
+
+  fetchAlertsPerClient: async (params) => {
+    const response = await api.get<TAlertsPerClientDataResponse>(
+      "/alerts/common/alerts-per-client",
+      { params }
+    );
+    return response.data;
+  },
+
+  // CLIENT MANAGEMENT
 
   createClient: async (data) => {
-    const response = await api.post<TDataResponseStr>(
-      "/clients/",
-      { ...data }
-    );
+    const response = await api.post<TDataResponseStr>("/clients/", { ...data });
     return response.data;
   },
 
@@ -163,9 +223,7 @@ export const apiService: ApiService = {
   },
 
   deleteClient: async (client_id) => {
-    const response = await api.delete<TResponse>(
-      `/clients/${client_id}`
-    );
+    const response = await api.delete<TResponse>(`/clients/${client_id}`);
     return response.data;
   },
 

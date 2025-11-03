@@ -209,6 +209,40 @@ export const PaginationAndOwnerParamsSchema = PaginationParamsSchema.extend({
   ]).optional(),
 });
 
+export const TopProblemSourcesSchema = z.object({
+  hostname: z.string(),
+  alert_count: z.number().int().min(0),
+});
+
+export const AlertsByHostSchema = z.object({
+  host: z.string(),
+  total_alerts: z.number().int().min(0),
+});
+
+export const AlertsBySeverityOverTimeSchema = z.object({
+  timestamp: z.iso.datetime(),
+  critical: z.number().int().min(0),
+  high: z.number().int().min(0),
+  medium: z.number().int().min(0),
+  low: z.number().int().min(0),
+});
+
+export const ServiceUptimeSchema = z.object({
+  service_name: z.string(),
+  uptime_percentage: z.number().min(0).max(100),
+});
+
+export const AlertAcknowledgementStatsSchema = z.object({
+  acknowledged: z.number().int().min(0),
+  unacknowledged: z.number().int().min(0),
+  percentage_acknowledged: z.number().min(0).max(100),
+});
+
+export const AlertsPerClientSchema = z.object({
+  client_name: z.string(),
+  total_alerts: z.number().int().min(0),
+});
+
 // --- Inferred Types ---
 
 export type TSeveritySchema = z.infer<typeof SeveritySchema>;
@@ -267,6 +301,25 @@ export type TDataResponseClientListItem = z.infer<typeof DataResponseClientListI
 export const DataResponseStrSchema = DataResponseSchema(z.string());
 export type TDataResponseStr = z.infer<typeof DataResponseStrSchema>;
 
+export const TopProblemSourcesDataResponseSchema = DataResponseSchema(z.array(TopProblemSourcesSchema));
+export type TTopProblemSourcesDataResponse = z.infer<typeof TopProblemSourcesDataResponseSchema>;
+
+export const AlertsByHostDataResponseSchema = DataResponseSchema(z.array(AlertsByHostSchema));
+export type TAlertsByHostDataResponse = z.infer<typeof AlertsByHostDataResponseSchema>;
+
+export const AlertsBySeverityOverTimeDataResponseSchema = DataResponseSchema(z.array(AlertsBySeverityOverTimeSchema));
+export type TAlertsBySeverityOverTimeDataResponse = z.infer<typeof AlertsBySeverityOverTimeDataResponseSchema>;
+
+export const ServiceUptimeDataResponseSchema = DataResponseSchema(z.array(ServiceUptimeSchema));
+export type TServiceUptimeDataResponse = z.infer<typeof ServiceUptimeDataResponseSchema>;
+
+export const AlertAcknowledgementStatsDataResponseSchema = DataResponseSchema(AlertAcknowledgementStatsSchema);
+export type TAlertAcknowledgementStatsDataResponse = z.infer<typeof AlertAcknowledgementStatsDataResponseSchema>;
+
+export const AlertsPerClientDataResponseSchema = DataResponseSchema(z.array(AlertsPerClientSchema));
+export type TAlertsPerClientDataResponse = z.infer<typeof AlertsPerClientDataResponseSchema>;
+
+
 // --- API Parameters Types ---
 
 export type TClientParam = z.infer<typeof ClientParamSchema>;
@@ -301,4 +354,13 @@ export interface ApiService {
   deleteClient: (client_id: string) => Promise<TResponse>;
   regenerateClientApiKey: (client_id: string) => Promise<TDataResponseStr>;
   changeClientOwner: (client_id: string, body: TClientOwnerUpdate) => Promise<TResponse>;
+
+    // --- New Alert Stats Endpoints ---
+  fetchTopProblemSources: (params?: TClientsParams) => Promise<TTopProblemSourcesDataResponse>;
+  fetchAlertsByHost: (params?: TClientsParams) => Promise<TAlertsByHostDataResponse>;
+  fetchAlertsBySeverityOverTime: (params?: TTimeIntervalAndOrgClientParams) => Promise<TAlertsBySeverityOverTimeDataResponse>;
+  fetchServiceUptime: (params?: TClientsParams) => Promise<TServiceUptimeDataResponse>;
+  fetchAlertAcknowledgementStats: (params?: TClientsParams) => Promise<TAlertAcknowledgementStatsDataResponse>;
+  fetchAlertsPerClient: (params?: TClientsParams) => Promise<TAlertsPerClientDataResponse>;
+
 }
