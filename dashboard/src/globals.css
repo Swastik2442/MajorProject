@@ -122,9 +122,9 @@ html, body, #root {
 
 #root > div {
   height: 100%;
+  overflow-x: hidden;
   overflow-y: auto;
 }
-
 
 @layer base {
   * {
@@ -133,4 +133,12 @@ html, body, #root {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@utility no-scrollbar {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

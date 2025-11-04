@@ -38,9 +38,9 @@ export default function Dashboard({ onShowCharts }: { onShowCharts: () => void }
           {/* Actions */}
           {selectedClient && !Array.isArray(selectedClient) && selectedClient._id && (
             <>
-              <RegenApiKeyButton clientId={selectedClient._id as string} />
-              <ChangeOwnerButton clientId={selectedClient._id as string} />
-              <DeleteClientButton clientId={selectedClient._id as string} />
+              <RegenApiKeyButton clientId={selectedClient._id} />
+              <ChangeOwnerButton clientId={selectedClient._id} />
+              <DeleteClientButton clientId={selectedClient._id} />
             </>
           )}
 

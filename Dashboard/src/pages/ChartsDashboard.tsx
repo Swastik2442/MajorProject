@@ -13,10 +13,6 @@ import DurationOver4HrsChart from "@/components/charts/DurationOver4HrsChart";
 import DurationSplitPieChart from "@/components/charts/DurationSplitPieChart";
 import ProblemVsTotalChart from "@/components/charts/ProblemVsTotalChart";
 
-
-
-
-
 export default function ChartsDashboard({ onBack }: { onBack: () => void }) {
   const [date, setDate] = useState<DateRange | undefined>({
     from: addDays(new Date(), -7),
@@ -24,7 +20,7 @@ export default function ChartsDashboard({ onBack }: { onBack: () => void }) {
   });
 
   const formatted =
-    date?.from && date?.to
+    date?.from && date.to
       ? `${format(date.from, "dd/MM/yyyy")} - ${format(date.to, "dd/MM/yyyy")}`
       : "Select Date Range";
 

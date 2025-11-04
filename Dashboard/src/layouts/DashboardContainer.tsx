@@ -7,8 +7,7 @@ export default function DashboardContainer() {
   const [showCharts, setShowCharts] = useState(false);
 
   return (
-    <div className="relative w-full min-h-screen bg-background text-foreground overflow-y-auto">
-
+    <div className="relative w-full min-h-screen no-scrollbar">
       <AnimatePresence mode="wait" initial={false}>
         {!showCharts ? (
           <motion.div
@@ -17,9 +16,8 @@ export default function DashboardContainer() {
             exit={{ x: "-100%", opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ type: "spring", stiffness: 70, damping: 20 }}
-            className="absolute inset-0 w-full h-full overflow-y-auto"
           >
-            <Dashboard onShowCharts={() => setShowCharts(true)} />
+            <Dashboard onShowCharts={() => {setShowCharts(true)}} />
           </motion.div>
         ) : (
           <motion.div
@@ -28,9 +26,8 @@ export default function DashboardContainer() {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: "100%", opacity: 0 }}
             transition={{ type: "spring", stiffness: 70, damping: 20 }}
-            className="absolute inset-0 w-full h-full overflow-y-auto"
           >
-            <ChartsDashboard onBack={() => setShowCharts(false)} />
+            <ChartsDashboard onBack={() => {setShowCharts(false)}} />
           </motion.div>
         )}
       </AnimatePresence>
