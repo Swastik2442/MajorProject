@@ -7,7 +7,8 @@ export default function DashboardContainer() {
   const [showCharts, setShowCharts] = useState(false);
 
   return (
-    <div className="relative w-full h-full min-h-screen overflow-hidden bg-background text-foreground">
+    <div className="relative w-full min-h-screen bg-background text-foreground overflow-y-auto">
+
       <AnimatePresence mode="wait" initial={false}>
         {!showCharts ? (
           <motion.div
