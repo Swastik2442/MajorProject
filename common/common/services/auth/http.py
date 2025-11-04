@@ -1,5 +1,6 @@
 "Middlewares for Clerk-based JWT Authentication"
 
+from logging import getLogger
 from typing import Annotated, Any
 
 from fastapi import HTTPException, Depends, status
@@ -7,6 +8,8 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
 
 from .clerk import clerk_service
+
+logger = getLogger(__name__)
 
 http_bearer = HTTPBearer()
 HttpBearerCredentials = Annotated[HTTPAuthorizationCredentials, Depends(http_bearer)]
@@ -21,6 +24,7 @@ def _decode_token(token: str, jwks_client: jwt.PyJWKClient, issuer: str) -> dict
             issuer=issuer
         )
     except jwt.exceptions.PyJWTError as e:
+        logger.debug("Error while decoding JWT: %s", e)
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid token") from e
 
 def get_jwt_payload(

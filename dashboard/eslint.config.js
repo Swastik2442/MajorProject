@@ -25,6 +25,7 @@ export default defineConfig([
         "allowNullish": true,
         "allowRegExp": true
       }],
+      "@typescript-eslint/consistent-type-definitions": "off"
     },
     languageOptions: {
       ecmaVersion: 2020,

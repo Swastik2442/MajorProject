@@ -3,15 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import type { DateRange } from "react-day-picker";
 import { apiService } from "@/services/api";
 
-type DurationHost = { clientId: string; hostname: string; durationSeconds: Array<number | "Infinity"> };
-
-function normalizeApiResult<T>(res: any): T[] {
-  if (!res) return [];
-  if (Array.isArray(res)) return res as T[];
-  if (res?.data && Array.isArray(res.data)) return res.data as T[];
-  return [];
-}
-
 export default function DurationOver4HrsChart({ date }: { date?: DateRange }) {
   const { data: raw } = useQuery({
     queryKey: ["durationOver4hrs", date?.from?.toISOString(), date?.to?.toISOString()],
@@ -22,12 +13,13 @@ export default function DurationOver4HrsChart({ date }: { date?: DateRange }) {
       }),
   });
 
-  const rows: DurationHost[] = normalizeApiResult<DurationHost>(raw);
+  const rows = raw?.data ?? [];
 
+  // BUG: Error valued function - needs to be fixed
   const chartData = rows
     .map((r) => {
-      const countLong = (r.durationSeconds || []).filter((d) => (typeof d === "number" ? d > 14400 : true)).length;
-      return { name: r.hostname ?? "<unknown>", long: countLong };
+      const countLong = (r.durationSeconds).filter((d) => (typeof d === "number" ? d > 14400 : true)).length;
+      return { name: r.hostname, long: countLong };
     })
     .sort((a, b) => b.long - a.long)
     .slice(0, 20);
