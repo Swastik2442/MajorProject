@@ -1,4 +1,5 @@
 for (const varName of [
+    "VITE_NMS_URL",
     "VITE_API_URL",
     "VITE_APP_URL",
     "VITE_APP_TITLE",
