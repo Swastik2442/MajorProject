@@ -8,7 +8,7 @@ from pydantic import MongoDsn
 from pymongo import AsyncMongoClient
 from pymongo.asynchronous.database import AsyncDatabase
 
-from services import Service
+from common.services import Service
 from .init_collections import init_collections
 
 logger = getLogger(__name__)

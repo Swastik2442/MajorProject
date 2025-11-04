@@ -8,8 +8,8 @@ from clerk_backend_api import Clerk
 from fastapi import Depends
 import jwt
 
-from services import Service
-from services.hishel import hishel_service
+from common.services import Service
+from common.services.hishel import hishel_service
 
 logger = getLogger(__name__)
 

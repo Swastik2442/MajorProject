@@ -7,7 +7,7 @@ from fastapi import Depends
 from pydantic import RedisDsn
 import redis
 
-from services import Service
+from common.services import Service
 
 logger = getLogger(__name__)
 

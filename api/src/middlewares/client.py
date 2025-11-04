@@ -11,8 +11,8 @@ from common.models import Client, ClientListItem
 from common.models.utils import fields
 from common.services.auth import ClerkSdk, JwtUserId
 from common.services.db import Database
-from common.schemas import ClientsParams
-from api.src.middlewares.user import is_org_admin
+from src.middlewares.user import is_org_admin
+from src.schemas import ClientsParams
 
 async def get_clients_from_query(
     clients_query: Annotated[ClientsParams, Query()],

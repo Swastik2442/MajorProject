@@ -7,8 +7,8 @@ from typing import Annotated
 from fastapi import Depends
 import hishel
 
-from services import Service
-from services.redis import redis_service
+from common.services import Service
+from common.services.redis import redis_service
 
 Storage = hishel.FileStorage | hishel.RedisStorage | None
 AsyncStorage = hishel.AsyncFileStorage | hishel.AsyncRedisStorage | None
