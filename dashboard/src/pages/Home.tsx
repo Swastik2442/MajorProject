@@ -25,8 +25,9 @@ export default function Home() {
       if (!bgRef.current) return;
       if (!ticking) {
         window.requestAnimationFrame(() => {
+          if (!bgRef.current) return;
           const offset = window.scrollY * 0.08;
-          bgRef.current!.style.setProperty("--bg-translate-y", `${offset}px`);
+          bgRef.current.style.setProperty("--bg-translate-y", `${offset}px`);
           ticking = false;
         });
         ticking = true;
@@ -35,14 +36,14 @@ export default function Home() {
 
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {window.removeEventListener("scroll", onScroll)};
   }, []);
 
   // Trigger typing of second headline
   useEffect(() => {
     if (headline1.length === HEADLINE_1.length) {
-      const timeout = setTimeout(() => setStartSecond(true), 150);
-      return () => clearTimeout(timeout);
+      const timeout = setTimeout(() => {setStartSecond(true)}, 150);
+      return () => {clearTimeout(timeout)};
     }
   }, [headline1]);
 
@@ -138,7 +139,7 @@ export default function Home() {
             </h2>
 
             <p className="text-gray-400 text-lg max-w-3xl mx-auto mb-10">
-              Harnessing Zabbix & AI for Predictive Operations. Integrating large language models (LLMs) to enhance predictive network status analysis, 
+              Harnessing Zabbix & AI for Predictive Operations. Integrating large language models (LLMs) to enhance predictive network status analysis,
               enabling context-aware aggregation and automated interpretation of alert data..
             </p>
 
@@ -169,7 +170,7 @@ export default function Home() {
           </div>
         </section>
 
-      
+
         {/* Footer */}
         <footer className="w-full bg-[#050b16] py-6 text-center text-gray-500 text-sm border-t border-white/10">
           <p>&copy; 2025 {import.meta.env.VITE_APP_TITLE}</p>

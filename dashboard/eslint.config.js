@@ -19,12 +19,12 @@ export default defineConfig([
       ...pluginQuery.configs['flat/recommended']
     ],
     rules: {
-      "@typescript-eslint/restrict-template-expressions": {
+      "@typescript-eslint/restrict-template-expressions": ["warn", {
         "allowNumber": true,
         "allowBoolean": true,
         "allowNullish": true,
         "allowRegExp": true
-      },
+      }],
     },
     languageOptions: {
       ecmaVersion: 2020,

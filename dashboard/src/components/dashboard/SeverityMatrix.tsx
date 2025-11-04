@@ -21,10 +21,10 @@ const SEVERITY_KEYS = [
 ] as const;
 type TSeveritySchema = typeof SEVERITY_KEYS[number];
 
-type Problem = {
+interface Problem {
   name: string;
   severity: string;
-};
+}
 
 type SeverityMatrixData = {
   category: string;
@@ -124,7 +124,7 @@ function calculateSeverityMatrix(problems: Problem[]): SeverityMatrixData[] {
     const category = deriveCategory(name);
     const normalizedSeverity = normalizeSeverity(severity);
 
-    if (!categoryMap[category]) {
+    if (!(category in categoryMap)) {
       categoryMap[category] = SEVERITY_KEYS.reduce((acc, key) => {
         acc[key] = 0;
         return acc;

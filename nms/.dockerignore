@@ -3,7 +3,6 @@
 .gitignore
 .gitattributes
 
-
 # CI
 .codeclimate.yml
 .travis.yml
@@ -90,4 +89,3 @@ venv/
 
 # Custom
 src/templates/*.json
-zabbix/*

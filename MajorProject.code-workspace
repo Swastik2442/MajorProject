@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "dashboard"
+		},
+		{
+			"path": "common"
+		},
+		{
+			"path": "nms"
+		},
+		{
+			"path": "api"
+		},
+		{
+			"path": "zabbix"
+		},
+		{
+			"path": "docs"
+		}
+	],
+	"settings": {}
+}

@@ -6,14 +6,14 @@ import logging
 from fastapi import APIRouter, Request, status
 from fastapi.exceptions import HTTPException
 
+from common.exceptions import HTTPException as CustomHTTPException
+from common.models import Problem, ProblemUpdate, Service, ServiceUpdate
+from common.models.problem import Update as PUpdate
+from common.models.service import Update as SUpdate
+from common.models.utils import fields, to_doc
+from common.schemas import Response as CustomResponse
+from common.services.db import Database
 from src.middlewares.client import ClientFromApiKey
-from src.exceptions import HTTPException as CustomHTTPException
-from src.models import Problem, ProblemUpdate, Service, ServiceUpdate
-from src.models.problem import Update as PUpdate
-from src.models.service import Update as SUpdate
-from src.models.utils import fields, to_doc
-from src.services.db import Database
-from src.schemas import Response as CustomResponse
 from src.templates import ZABBIX_DATETIME_FORMAT, ZabbixAlert, parse_json_message
 
 logger = logging.getLogger(__name__)

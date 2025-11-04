@@ -113,7 +113,7 @@ export default function NewClient() {
   return (
     <div className="max-w-5xl mx-auto p-6 bg-card border rounded-xl shadow-md">
       <Metadata title={`New Client | ${import.meta.env.VITE_APP_TITLE}`} />
-      <SetupInstructions url={`${import.meta.env.VITE_API_URL}/zabbix/webhook`} apiKey={apiKey} />
+      <SetupInstructions url={`${import.meta.env.VITE_NMS_URL}/zabbix/webhook`} apiKey={apiKey} />
     </div>
   );
 }
