@@ -6,11 +6,11 @@ import { ClerkProvider, SignedIn, SignedOut } from "@clerk/clerk-react";
 import PrivateRoutes from "@/components/PrivateRoutes";
 import RootErrorBoundary from "@/components/RootErrorBoundary";
 import AppLayout from "@/layouts/AppLayout";
+import DashboardContainer from "@/layouts/DashboardContainer";
 
 import Home from "@/pages/Home";
 import About from "@/pages/About";
 import Login from "@/pages/Login";
-import Dashboard from "@/pages/Dashboard";
 import NewClient from "@/pages/NewClient";
 
 import "@/globals.css";
@@ -28,14 +28,14 @@ const router = createBrowserRouter([
     errorElement: <RootErrorBoundary />,
   },
 
-  // === Root route for both signed in and signed out users ===
+  // === Root route (Home / Dashboard) ===
   {
     path: "/",
     element: (
       <>
         <SignedIn>
           <AppLayout>
-            <Dashboard />
+            <DashboardContainer />
           </AppLayout>
         </SignedIn>
         <SignedOut>
@@ -46,7 +46,7 @@ const router = createBrowserRouter([
     errorElement: <RootErrorBoundary />,
   },
 
-  // === Authenticated routes ===
+  // === Authenticated routes (inside layout) ===
   {
     element: <AppLayout />,
     errorElement: <RootErrorBoundary />,
