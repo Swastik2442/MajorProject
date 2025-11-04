@@ -1,28 +1,40 @@
 import { useState } from "react";
 import { useOrganization } from "@clerk/clerk-react";
+import { AnimatePresence, motion } from "framer-motion";
+import useClientele from "@/stores/clientele";
 import DashboardComponent from "@/components/dashboard";
-import {
-  ClientSelect,
-  CreateClientButton,
-  ChangeOwnerButton,
-  DeleteClientButton,
-  RegenApiKeyButton,
-  type TClientSelectParam
-} from "@/components/client";
 import Metadata from "@/components/Metadata";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import SetClientele from "@/components/SetClientele";
+import ChartsDashboard from "@/components/charts";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 
-export default function Dashboard({ onShowCharts }: { onShowCharts: () => void }) {
+export default function Dashboard() {
   const { organization } = useOrganization();
-  const [selectedClient, setSelectedClient] = useState<TClientSelectParam>(null);
+  const clients = useClientele((s) => s.clients);
+  const [currentView, setCurrentView] = useState<"Dashboard" | "Charts" | "AI" | (string & {})>("Dashboard");
 
   const dashboardTitle =
-    selectedClient === null
-      ? "Dashboard"
-      : Array.isArray(selectedClient)
-      ? "Dashboard - Selected Clients"
-      : `Dashboard - ${selectedClient.name}`;
+    clients === null
+      ? currentView
+      : Array.isArray(clients)
+      ? `${currentView} - Selected Clients`
+      : `${currentView} - ${clients.name}`;
+
+  const clientIds =
+    Array.isArray(clients)
+      ? clients.map((c) => c._id).filter((id): id is string => id != null)
+      : (clients?._id ?? null);
+  const organizationId =
+    clients === null ||
+    (Array.isArray(clients) && clients.length === 0)
+      ? (organization?.id ?? null)
+      : null;
 
   return (
     <div>
@@ -30,44 +42,47 @@ export default function Dashboard({ onShowCharts }: { onShowCharts: () => void }
         <Metadata title={`${dashboardTitle} | ${import.meta.env.VITE_APP_TITLE}`} />
         <h1 className="text-2xl font-bold leading-tight">{dashboardTitle}</h1>
         <div className="flex items-center gap-2">
-          {/* Charts Button */}
-          <Button variant="outline" onClick={onShowCharts} className="flex items-center gap-2">
-            <ArrowRight size={18} /> View Charts
-          </Button>
+          <Select defaultValue="Dashboard" onValueChange={setCurrentView}>
+            <SelectTrigger>
+              <SelectValue placeholder="View" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Dashboard">Dashboard</SelectItem>
+              <SelectItem value="Charts">Charts</SelectItem>
+              <SelectItem value="AI">AI</SelectItem>
+            </SelectContent>
+          </Select>
 
-          {/* Actions */}
-          {selectedClient && !Array.isArray(selectedClient) && selectedClient._id && (
-            <>
-              <RegenApiKeyButton clientId={selectedClient._id} />
-              <ChangeOwnerButton clientId={selectedClient._id} />
-              <DeleteClientButton clientId={selectedClient._id} />
-            </>
-          )}
-
-          {/* Client Select */}
-          <ClientSelect
-            org_id={organization?.id ?? null}
-            selectedClient={selectedClient}
-            setSelectedClient={setSelectedClient}
-          />
-
-          {organization && <CreateClientButton ownerId={organization.id} />}
+          <SetClientele />
         </div>
       </div>
 
-      <DashboardComponent
-        client_id={
-          Array.isArray(selectedClient)
-            ? selectedClient.map((c) => c._id).filter((id): id is string => id != null)
-            : selectedClient?._id ?? null
-        }
-        org_id={
-          selectedClient === null ||
-          (Array.isArray(selectedClient) && selectedClient.length === 0)
-            ? organization?.id ?? null
-            : null
-        }
-      />
+      <div className="relative w-full min-h-screen no-scrollbar">
+        <AnimatePresence mode="wait" initial={false}>
+          {currentView === "Dashboard" && (
+            <motion.div
+              key="main-dashboard"
+              initial={{ x: 0, opacity: 1 }}
+              exit={{ x: "-100%", opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 70, damping: 20 }}
+            >
+              <DashboardComponent client_id={clientIds} org_id={organizationId} />
+            </motion.div>
+          )}
+          {currentView === "Charts" && (
+            <motion.div
+              key="charts-dashboard"
+              initial={{ x: "100%", opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: "100%", opacity: 0 }}
+              transition={{ type: "spring", stiffness: 70, damping: 20 }}
+            >
+              <ChartsDashboard />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

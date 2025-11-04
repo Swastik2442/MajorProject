@@ -6,8 +6,8 @@ import { ClerkProvider, SignedIn, SignedOut } from "@clerk/clerk-react";
 import PrivateRoutes from "@/components/PrivateRoutes";
 import RootErrorBoundary from "@/components/RootErrorBoundary";
 import AppLayout from "@/layouts/AppLayout";
-import DashboardContainer from "@/layouts/DashboardContainer";
 
+import Dashboard from "@/pages/Dashboard";
 import Home from "@/pages/Home";
 import About from "@/pages/About";
 import Login from "@/pages/Login";
@@ -35,7 +35,7 @@ const router = createBrowserRouter([
       <>
         <SignedIn>
           <AppLayout>
-            <DashboardContainer />
+            <Dashboard />
           </AppLayout>
         </SignedIn>
         <SignedOut>
