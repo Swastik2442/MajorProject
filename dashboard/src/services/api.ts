@@ -99,7 +99,7 @@ export const apiService: ApiService = {
 
   getAlertDurationPerHost: async (params) => {
     const response = await api.get<TStatAlertDurationPerHostDataResponse>(
-      "/alerts/problems/hosts/duration",
+      "/alerts/triggers/hosts/duration",
       { params }
     );
     return response.data;

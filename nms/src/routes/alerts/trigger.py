@@ -397,7 +397,10 @@ async def get_alert_duration_per_host(
                 fields(Problem).hostname: "$" + fields(Problem).hostname
             },
             "durationSeconds": {"$push": {"$cond": {
-                "if": {"$" + fields(Problem).recoveryAt: None}, # type: ignore
+                "if": {"$or": [
+                    {"$eq": ["$" + fields(Problem).recoveryAt, None]}, # type: ignore
+                    {"$not": ["$" + fields(Problem).recoveryAt]} # type: ignore
+                ]},
                 "then": "Infinity",
                 "else": {"$divide": [
                     {"$subtract": [

@@ -1,4 +1,5 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter } from "react-router";
+import { RouterProvider } from "react-router/dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ClerkProvider, SignedIn, SignedOut } from "@clerk/clerk-react";
 
@@ -14,7 +15,6 @@ import NewClient from "@/pages/NewClient";
 
 import "@/globals.css";
 
-// ✅ Setup Router
 const router = createBrowserRouter([
   // === Public routes ===
   {
@@ -35,7 +35,6 @@ const router = createBrowserRouter([
       <>
         <SignedIn>
           <AppLayout>
-            {/* ✅ Use DashboardContainer instead of Dashboard */}
             <DashboardContainer />
           </AppLayout>
         </SignedIn>
@@ -65,16 +64,13 @@ const router = createBrowserRouter([
   },
 ]);
 
-// ✅ React Query Client
 const queryClient = new QueryClient();
 
-// ✅ Clerk setup
 const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 if (!CLERK_PUBLISHABLE_KEY) {
   throw new Error("Missing Clerk Publishable Key");
 }
 
-// ✅ Main App
 export default function App() {
   return (
     <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} afterSignOutUrl="/">
