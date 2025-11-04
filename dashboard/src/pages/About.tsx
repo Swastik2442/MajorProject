@@ -16,8 +16,9 @@ export default function About() {
       if (!bgRef.current) return;
       if (!ticking) {
         window.requestAnimationFrame(() => {
+          if (!bgRef.current) return;
           const offset = window.scrollY * 0.08;
-          bgRef.current!.style.setProperty("--bg-translate-y", `${offset}px`);
+          bgRef.current.style.setProperty("--bg-translate-y", `${offset}px`);
           ticking = false;
         });
         ticking = true;
@@ -26,7 +27,7 @@ export default function About() {
 
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {window.removeEventListener("scroll", onScroll)};
   }, []);
 
   return (

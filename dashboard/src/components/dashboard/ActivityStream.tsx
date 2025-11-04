@@ -38,7 +38,7 @@ export default function ActivityStream({ client_id = null, org_id = null }: TCli
     );
   }
 
-  if (isError || data?.status === "error") {
+  if (isError || data.status === "error") {
     return (
       <div className="p-8 text-red-500">
         Error loading problems: {error?.message ?? data?.message}
@@ -46,7 +46,7 @@ export default function ActivityStream({ client_id = null, org_id = null }: TCli
     );
   }
 
-  const items = data?.data ?? [];
+  const items = data.data ?? [];
 
   return (
     <motion.div
