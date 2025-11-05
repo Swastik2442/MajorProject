@@ -8,6 +8,7 @@ type HostCount = { clientId: string; hostname: string; severity: string; count: 
 function normalizeApiResult<T>(res: any): T[] {
   if (!res) return [];
   if (Array.isArray(res)) return res as T[];
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   if (res?.data && Array.isArray(res.data)) return res.data as T[];
   return [];
 }
@@ -26,7 +27,9 @@ export default function TopProblematicHostsChart({ date }: { date?: DateRange })
 
   // Aggregate counts by hostname (sum severities)
   const agg = results.reduce<Record<string, number>>((acc, item) => {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     const host = item.hostname ?? "<unknown>";
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     acc[host] = (acc[host] || 0) + (item.count ?? 0);
     return acc;
   }, {});

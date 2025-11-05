@@ -1,11 +1,8 @@
 import { useState } from "react";
-import { addDays, format } from "date-fns";
+import { addDays } from "date-fns";
 import type { DateRange } from "react-day-picker";
 
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { CalendarIcon } from "lucide-react";
+import DateRangeFilter from "@/components/DateRangeFilter"; // ✅ new Zabbix-style date/time filter
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import TopProblematicHostsChart from "@/components/charts/TopProblematicHostsChart";
@@ -19,43 +16,19 @@ export default function Charts() {
     to: new Date(),
   });
 
-  const formatted =
-    date?.from && date.to
-      ? `${format(date.from, "dd/MM/yyyy")} - ${format(date.to, "dd/MM/yyyy")}`
-      : "Select Date Range";
-
   return (
-    <div className="relative w-full min-h-screen p-4 md:p-6 space-y-6 overflow-visible">
+    <div className="relative w-full min-h-screen p-4 md:p-6 space-y-6 overflow-visible bg-background text-foreground">
       {/* === Top Bar === */}
-      {/* Date Range Picker */}
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className="flex items-center gap-2 text-sm font-medium px-4 py-2 shadow-sm hover:shadow-md transition"
-          >
-            <CalendarIcon size={18} />
-            {formatted}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent
-          align="end"
-          className="p-3 bg-card shadow-xl border border-border rounded-xl w-fit mx-auto"
-        >
-          <div className="flex justify-center items-center">
-            <Calendar
-              mode="range"
-              numberOfMonths={2}
-              selected={date}
-              onSelect={setDate}
-              className="rounded-lg border-none bg-background text-foreground"
-            />
-          </div>
-        </PopoverContent>
-      </Popover>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 sticky top-0 z-20 bg-background/80 backdrop-blur-md pb-2 border-b border-border">
+        <div></div>
+        {/* === Date / Time Range Filter === */}
+        <div className="w-full md:w-auto">
+          <DateRangeFilter date={date} setDate={setDate} />
+        </div>
+      </div>
 
       {/* === Charts Grid === */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-10">
         {/* Top Problematic Hosts */}
         <Card className="bg-card/70 backdrop-blur-lg border-border shadow-md hover:shadow-lg transition-all">
           <CardHeader>
@@ -66,10 +39,10 @@ export default function Charts() {
           </CardContent>
         </Card>
 
-        {/* Problems Over Time */}
+        {/* Problem vs Total */}
         <Card className="bg-card/70 backdrop-blur-lg border-border shadow-md hover:shadow-lg transition-all">
           <CardHeader>
-            <CardTitle>Problems Over Time</CardTitle>
+            <CardTitle>Problem Alerts vs Total Alerts</CardTitle>
           </CardHeader>
           <CardContent>
             <ProblemVsTotalChart date={date} />
