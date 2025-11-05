@@ -8,7 +8,7 @@ export default function HostScorecards({ client_id = null, org_id = null }: TCli
   const { data } = useQuery({
     queryKey: ["hostHealthScores", client_id, org_id],
     queryFn: () => apiService.getHostsHealthScores({ client_id, org_id }),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 300000, // 5 minutes
   });
   const hosts = data?.data ?? [];
 

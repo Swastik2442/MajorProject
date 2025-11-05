@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { subDays } from "date-fns";
 import type { DateRange } from "react-day-picker";
 import {
   LineChart,
@@ -36,11 +37,11 @@ export default function TrendsChart({
       apiService.getCommonAlertTrends({
         client_id,
         org_id,
-        start: dateRange?.from?.toISOString() ?? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        start: dateRange?.from?.toISOString() ?? subDays(new Date(), 1).toISOString(),
         end: dateRange?.to?.toISOString() ?? new Date().toISOString(),
         interval: interval ?? "hour"
     }),
-    staleTime: 60 * 60 * 1000, // 1 hour
+    staleTime: 3600000, // 1 hour
   });
 
   const trends = (data?.data ?? []).map((t) => ({

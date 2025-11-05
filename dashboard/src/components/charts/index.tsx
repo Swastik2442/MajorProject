@@ -2,7 +2,7 @@ import { useShallow } from "zustand/shallow";
 import type { TClientsParams } from "@/schemas/api";
 import useDateRange from "@/stores/dateRange";
 import TopProblematicHostsChart from "@/components/charts/TopProblematicHostsChart";
-import DurationOver4HrsChart from "@/components/charts/DurationOver4HrsChart";
+import DurationOverThresholdChart from "@/components/charts/DurationOverThresholdChart";
 import DurationSplitPieChart from "@/components/charts/DurationSplitPieChart";
 import ProblemVsTotalChart from "@/components/charts/ProblemVsTotalChart";
 import {
@@ -40,13 +40,14 @@ export default function Charts({ client_id = null, org_id = null }: TClientsPara
         </CardContent>
       </Card>
 
+      {/* TODO: Add Threshold changing option */}
       {/* Duration > 4 Hours */}
       <Card className="bg-card/70 backdrop-blur-lg border-border shadow-md hover:shadow-lg transition-all">
         <CardHeader>
           <CardTitle className="uppercase">Problems with Duration &gt; 4 Hours</CardTitle>
         </CardHeader>
         <CardContent>
-          <DurationOver4HrsChart client_id={client_id} org_id={org_id} dateRange={dateRange} />
+          <DurationOverThresholdChart client_id={client_id} org_id={org_id} dateRange={dateRange} />
         </CardContent>
       </Card>
 

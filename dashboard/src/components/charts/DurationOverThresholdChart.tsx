@@ -15,6 +15,9 @@ import {
 } from "recharts";
 import type { TClientsParams } from "@/schemas/api";
 import { apiService } from "@/services/api";
+import ms from "ms";
+
+const colors = ["#f59e0b", "#fbbf24", "#fcd34d", "#fde68a", "#ffedd5"];
 
 function CustomTooltip({ active, payload, label }: TooltipContentProps<number | string, string>) {
   if (active && payload.length) {
@@ -41,11 +44,13 @@ function CustomTooltip({ active, payload, label }: TooltipContentProps<number | 
   return null;
 }
 
-export default function DurationOver4HrsChart({
+export default function DurationOverThresholdChart({
+  threshold = 14400, // 4 hours
   client_id = null,
   org_id = null,
   dateRange,
 }: {
+  threshold?: number;
   dateRange?: DateRange;
 } & TClientsParams) {
   const { data: raw } = useQuery({
@@ -70,15 +75,15 @@ export default function DurationOver4HrsChart({
   const chartData = rows
     .map((r) => {
       const countLong = r.durationSeconds.filter((d) =>
-        typeof d === "number" ? d > 14400 : true
+        typeof d === "number" ? d > threshold : true
       ).length;
       return { clientId: r.clientId, name: r.hostname, long: countLong };
     })
     .sort((a, b) => b.long - a.long)
     .slice(0, 20);
 
-  const colors = ["#f59e0b", "#fbbf24", "#fcd34d", "#fde68a", "#ffedd5"];
-
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+  const thresholdAsWords = ms(threshold * 1000, { long: true });
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}
@@ -113,7 +118,7 @@ export default function DurationOver4HrsChart({
           />
           <Bar
             dataKey="long"
-            name="> 4 Hours"
+            name={`> ${thresholdAsWords}`}
             fill="url(#barGradientYellow)"
             radius={[8, 8, 0, 0]}
             animationDuration={900}

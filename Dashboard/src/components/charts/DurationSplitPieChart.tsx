@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import type { DateRange } from "react-day-picker";
+import ms from "ms";
 import {
   ResponsiveContainer,
   PieChart,
@@ -39,10 +40,12 @@ function CustomTooltip({ active, payload }: TooltipContentProps<number | string,
 }
 
 export default function DurationSplitPieChart({
+  threshold = 14400, // 4 hours
   client_id = null,
   org_id = null,
   dateRange,
 }: {
+  threshold?: number;
   dateRange?: DateRange;
 } & TClientsParams) {
   const { data: raw } = useQuery({
@@ -66,21 +69,23 @@ export default function DurationSplitPieChart({
 
   const less4 = rows.reduce((acc, host) => {
     const n = host.durationSeconds.filter(
-      (d) => typeof d === "number" && d <= 14400
+      (d) => typeof d === "number" && d <= threshold
     ).length;
     return acc + n;
   }, 0);
 
   const more4 = rows.reduce((acc, host) => {
     const n = host.durationSeconds.filter(
-      (d) => (typeof d === "number" ? d > 14400 : true)
+      (d) => (typeof d === "number" ? d > threshold : true)
     ).length;
     return acc + n;
   }, 0);
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+  const thresholdAsWords = ms(threshold * 1000, { long: true });
   const chartData = [
-    { name: "< 4 Hours", value: less4 },
-    { name: "> 4 Hours", value: more4 },
+    { name: `< ${thresholdAsWords}`, value: less4 },
+    { name: `> ${thresholdAsWords}`, value: more4 },
   ];
 
   return (

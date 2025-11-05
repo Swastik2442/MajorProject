@@ -8,7 +8,7 @@ export default function KPIring({ client_id = null, org_id = null }: TClientsPar
   const { data: actual } = useQuery({
     queryKey: ["problemsCount", client_id, org_id],
     queryFn: () => apiService.getTriggerAlertsCount({ client_id, org_id }),
-    staleTime: 15 * 60 * 1000, // 15 minutes
+    staleTime: 900000, // 15 minutes
   });
 
   const counts = actual?.data ?? { activeProblemsInLast24Hours: 0, problemsInLast24Hours: 0 };

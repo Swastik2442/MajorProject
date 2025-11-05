@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import { subDays } from "date-fns";
 import type { DateRange } from "react-day-picker";
 import {
   ResponsiveContainer,
@@ -68,7 +69,7 @@ export default function ProblemVsTotalChart({
       apiService.getProblematicTriggerAlertTrends({
         client_id,
         org_id,
-        start: dateRange?.from?.toISOString() ?? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        start: dateRange?.from?.toISOString() ?? subDays(new Date(), 1).toISOString(),
         end: dateRange?.to?.toISOString() ?? new Date().toISOString(),
         interval
       }),

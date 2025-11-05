@@ -7,7 +7,7 @@ export default function StatusCards({ client_id = null, org_id = null }: TClient
   const { data } = useQuery({
     queryKey: ["alertsCount", client_id, org_id],
     queryFn: () => apiService.getCommonAlertsCount({ client_id, org_id }),
-    staleTime: 15 * 60 * 1000, // 15 minutes
+    staleTime: 900000, // 15 minutes
   });
 
   const counts = data?.data ? {
