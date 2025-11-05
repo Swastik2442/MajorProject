@@ -1,3 +1,6 @@
+import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import type { DateRange } from "react-day-picker";
 import {
   ResponsiveContainer,
   BarChart,
@@ -7,39 +10,18 @@ import {
   Tooltip,
   CartesianGrid,
   Legend,
+  type TooltipContentProps
 } from "recharts";
-import { useQuery } from "@tanstack/react-query";
-import type { DateRange } from "react-day-picker";
 import { apiService } from "@/services/api";
-import { motion } from "framer-motion";
-
-type TrendRow = { timestamp: string; problematic: number; total: number };
-
-function normalizeApiResult<T>(res: unknown): T[] {
-  if (Array.isArray(res)) return res as T[];
-  if (
-    typeof res === "object" &&
-    res !== null &&
-    Array.isArray((res as { data?: unknown }).data)
-  ) {
-    return (res as { data: T[] }).data;
-  }
-  return [];
-}
 
 interface TooltipPayload {
   name: string;
   value: number;
   fill: string;
 }
-interface TooltipProps {
-  active?: boolean;
-  payload?: TooltipPayload[];
-  label?: string;
-}
 
-function CustomTooltip({ active, payload, label }: TooltipProps) {
-  if (active && payload?.length) {
+function CustomTooltip({ active, payload, label }: TooltipContentProps<number | string, string>) {
+  if (active && payload.length) {
     return (
       <div
         style={{
@@ -52,7 +34,7 @@ function CustomTooltip({ active, payload, label }: TooltipProps) {
         }}
       >
         <p style={{ fontWeight: 600, marginBottom: 6 }}>{label}</p>
-        {payload.map((entry, index) => (
+        {(payload as TooltipPayload[]).map((entry, index) => (
           <p key={`item-${index}`} style={{ margin: 0, color: entry.fill }}>
             {entry.name}: {entry.value}
           </p>
@@ -73,7 +55,7 @@ export default function ProblemVsTotalChart({ date }: { date?: DateRange }) {
       }),
   });
 
-  const rows = normalizeApiResult<TrendRow>(raw);
+  const rows = raw?.data ?? [];
 
   const chartData = rows.map((r) => ({
     timestamp: new Date(r.timestamp).toLocaleDateString(),
@@ -88,9 +70,6 @@ export default function ProblemVsTotalChart({ date }: { date?: DateRange }) {
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 shadow-lg"
     >
-      <h2 className="text-xl font-semibold text-emerald-400 mb-3">
-        Problematic vs Total Alerts
-      </h2>
       <ResponsiveContainer width="100%" height={320}>
         <BarChart data={chartData} barGap={6}>
           <defs>
@@ -115,7 +94,7 @@ export default function ProblemVsTotalChart({ date }: { date?: DateRange }) {
             axisLine={false}
             tickLine={false}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={CustomTooltip} />
           <Legend
             wrapperStyle={{ color: "#94a3b8", fontSize: "13px" }}
             iconType="circle"

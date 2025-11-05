@@ -2,7 +2,7 @@ import { useState } from "react";
 import { addDays } from "date-fns";
 import type { DateRange } from "react-day-picker";
 
-import DateRangeFilter from "@/components/DateRangeFilter"; // ✅ new Zabbix-style date/time filter
+import DateRangeFilter from "@/components/DateRangeFilter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import TopProblematicHostsChart from "@/components/charts/TopProblematicHostsChart";
@@ -32,7 +32,7 @@ export default function Charts() {
         {/* Top Problematic Hosts */}
         <Card className="bg-card/70 backdrop-blur-lg border-border shadow-md hover:shadow-lg transition-all">
           <CardHeader>
-            <CardTitle>Top 10 Problematic Hosts</CardTitle>
+            <CardTitle className="uppercase">Top 10 Problematic Hosts</CardTitle>
           </CardHeader>
           <CardContent>
             <TopProblematicHostsChart date={date} />
@@ -42,7 +42,7 @@ export default function Charts() {
         {/* Problem vs Total */}
         <Card className="bg-card/70 backdrop-blur-lg border-border shadow-md hover:shadow-lg transition-all">
           <CardHeader>
-            <CardTitle>Problem Alerts vs Total Alerts</CardTitle>
+            <CardTitle className="uppercase">Problem Alerts vs Total Alerts</CardTitle>
           </CardHeader>
           <CardContent>
             <ProblemVsTotalChart date={date} />
@@ -52,7 +52,7 @@ export default function Charts() {
         {/* Duration > 4 Hours */}
         <Card className="bg-card/70 backdrop-blur-lg border-border shadow-md hover:shadow-lg transition-all">
           <CardHeader>
-            <CardTitle>Problems with Duration &gt; 4 Hours</CardTitle>
+            <CardTitle className="uppercase">Problems with Duration &gt; 4 Hours</CardTitle>
           </CardHeader>
           <CardContent>
             <DurationOver4HrsChart date={date} />
@@ -62,7 +62,7 @@ export default function Charts() {
         {/* Duration Split (Pie) */}
         <Card className="bg-card/70 backdrop-blur-lg border-border shadow-md hover:shadow-lg transition-all">
           <CardHeader>
-            <CardTitle>Problem Duration Split</CardTitle>
+            <CardTitle className="uppercase">Problem Duration Split</CardTitle>
           </CardHeader>
           <CardContent>
             <DurationSplitPieChart date={date} />

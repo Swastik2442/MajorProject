@@ -1,3 +1,6 @@
+import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import type { DateRange } from "react-day-picker";
 import {
   ResponsiveContainer,
   BarChart,
@@ -8,50 +11,14 @@ import {
   CartesianGrid,
   Legend,
   Cell,
+  type TooltipContentProps
 } from "recharts";
-import { useQuery } from "@tanstack/react-query";
-import type { DateRange } from "react-day-picker";
 import { apiService } from "@/services/api";
-import { motion } from "framer-motion";
 
-interface DurationHost {
-  clientId?: string;
-  hostname?: string;
-  durationSeconds: (number | "Infinity")[];
-}
-
-interface ChartDatum {
-  name: string;
-  long: number;
-}
-
-interface TooltipPayload {
-  value?: number | null; 
-}
-
-interface TooltipProps {
-  active?: boolean;
-  payload?: TooltipPayload[];
-  label?: string;
-}
-
-// --- Safe Normalizer ---
-function normalizeApiResult<T>(res: unknown): T[] {
-  if (Array.isArray(res)) return res as T[];
-  if (
-    typeof res === "object" &&
-    res !== null &&
-    Array.isArray((res as { data?: unknown }).data)
-  ) {
-    return (res as { data: T[] }).data;
-  }
-  return [];
-}
-
-// --- Custom Tooltip ---
-function CustomTooltip({ active, payload, label }: TooltipProps) {
-  if (active && payload?.length) {
-    const value = payload[0]?.value ?? 0;
+function CustomTooltip({ active, payload, label }: TooltipContentProps<number | string, string>) {
+  if (active && payload.length) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const { value }: { value: number } = payload[0];
     return (
       <div
         style={{
@@ -87,14 +54,14 @@ export default function DurationOver4HrsChart({ date }: { date?: DateRange }) {
       }),
   });
 
-  const rows = normalizeApiResult<DurationHost>(raw);
+  const rows = raw?.data ?? [];
 
-  const chartData: ChartDatum[] = rows
+  const chartData = rows
     .map((r) => {
       const countLong = r.durationSeconds.filter((d) =>
         typeof d === "number" ? d > 14400 : true
       ).length;
-      return { name: r.hostname ?? "<unknown>", long: countLong };
+      return { clientId: r.clientId, name: r.hostname, long: countLong };
     })
     .sort((a, b) => b.long - a.long)
     .slice(0, 20);
@@ -108,10 +75,6 @@ export default function DurationOver4HrsChart({ date }: { date?: DateRange }) {
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 shadow-xl"
     >
-      <h2 className="text-xl font-semibold text-amber-400 mb-3">
-        Hosts with Alerts Lasting Over 4 Hours
-      </h2>
-
       <ResponsiveContainer width="100%" height={320}>
         <BarChart data={chartData} barSize={28}>
           <defs>
@@ -132,7 +95,7 @@ export default function DurationOver4HrsChart({ date }: { date?: DateRange }) {
             axisLine={false}
             tickLine={false}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={CustomTooltip} />
           <Legend
             wrapperStyle={{ color: "#94a3b8", fontSize: "13px" }}
             iconType="circle"

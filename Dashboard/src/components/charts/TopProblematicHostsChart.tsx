@@ -1,3 +1,6 @@
+import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import type { DateRange } from "react-day-picker";
 import {
   ResponsiveContainer,
   BarChart,
@@ -8,44 +11,27 @@ import {
   CartesianGrid,
   Legend,
   Cell,
+  type TooltipContentProps,
 } from "recharts";
-import { useQuery } from "@tanstack/react-query";
-import type { DateRange } from "react-day-picker";
 import { apiService } from "@/services/api";
-import { motion } from "framer-motion";
 
-type HostCount = {
-  clientId?: string;
-  hostname?: string;
-  severity?: string;
-  count?: number;
-};
+const colors = [
+  "#06b6d4",
+  "#0ea5e9",
+  "#3b82f6",
+  "#6366f1",
+  "#8b5cf6",
+  "#a855f7",
+  "#d946ef",
+  "#ec4899",
+  "#f43f5e",
+  "#fb7185",
+] as const;
 
-function normalizeApiResult<T>(res: unknown): T[] {
-  if (Array.isArray(res)) {
-    return res as T[];
-  }
-
-  if (
-    typeof res === "object" &&
-    res !== null &&
-    Array.isArray((res as { data?: unknown }).data)
-  ) {
-    return (res as { data: T[] }).data;
-  }
-
-  return [];
-}
-
-interface TooltipProps {
-  active?: boolean;
-  payload?: { value: number }[];
-  label?: string;
-}
-
-function CustomTooltip({ active, payload, label }: TooltipProps) {
-  if (active && payload?.length) {
-    const value = payload[0]?.value ?? 0;
+function CustomTooltip({ active, payload, label }: TooltipContentProps<number | string, string>) {
+  if (active && payload.length) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const { value }: { value: number } = payload[0];
     return (
       <div
         style={{
@@ -83,12 +69,10 @@ export default function TopProblematicHostsChart({
       }),
   });
 
-  const results = normalizeApiResult<HostCount>(raw);
+  const results = raw?.data ?? [];
 
   const agg = results.reduce<Record<string, number>>((acc, item) => {
-    const host = item.hostname ?? "<unknown>";
-    const count = item.count ?? 0;
-    acc[host] = (acc[host] ?? 0) + count;
+    acc[item.hostname] = (acc[item.hostname] ?? 0) + item.count;
     return acc;
   }, {});
 
@@ -97,19 +81,6 @@ export default function TopProblematicHostsChart({
     .sort((a, b) => b.problems - a.problems)
     .slice(0, 10);
 
-  const colors = [
-    "#06b6d4",
-    "#0ea5e9",
-    "#3b82f6",
-    "#6366f1",
-    "#8b5cf6",
-    "#a855f7",
-    "#d946ef",
-    "#ec4899",
-    "#f43f5e",
-    "#fb7185",
-  ];
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -117,9 +88,6 @@ export default function TopProblematicHostsChart({
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 shadow-xl"
     >
-      <h2 className="text-xl font-semibold text-cyan-400 mb-3">
-        Top Problematic Hosts
-      </h2>
       <ResponsiveContainer width="100%" height={320}>
         <BarChart data={chartData} barSize={28}>
           <defs>
@@ -139,7 +107,7 @@ export default function TopProblematicHostsChart({
             axisLine={false}
             tickLine={false}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={CustomTooltip} />
           <Legend wrapperStyle={{ color: "#94a3b8", fontSize: "13px" }} />
           <Bar
             dataKey="problems"

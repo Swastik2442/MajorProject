@@ -1,3 +1,6 @@
+import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import type { DateRange } from "react-day-picker";
 import {
   ResponsiveContainer,
   PieChart,
@@ -5,48 +8,14 @@ import {
   Cell,
   Tooltip,
   Legend,
+  type PieLabelRenderProps,
+  type TooltipContentProps,
 } from "recharts";
-import { useQuery } from "@tanstack/react-query";
-import type { DateRange } from "react-day-picker";
 import { apiService } from "@/services/api";
-import { motion } from "framer-motion";
-import type { PieLabelRenderProps } from "recharts"; 
 
-type DurationHost = {
-  clientId: string;
-  hostname: string;
-  durationSeconds: (number | "Infinity")[];
-};
-
-type ChartDatum = {
-  name: string;
-  value: number;
-};
-
-interface TooltipPayload {
-  name: string;
-  value: number;
-}
-
-interface TooltipProps {
-  active?: boolean;
-  payload?: TooltipPayload[];
-}
-
-function normalizeApiResult<T>(res: unknown): T[] {
-  if (Array.isArray(res)) return res as T[];
-  if (
-    typeof res === "object" &&
-    res !== null &&
-    Array.isArray((res as { data?: unknown }).data)
-  ) {
-    return (res as { data: T[] }).data;
-  }
-  return [];
-}
-
-function CustomTooltip({ active, payload }: TooltipProps) {
-  if (active && payload?.length) {
+function CustomTooltip({ active, payload }: TooltipContentProps<number | string, string>) {
+  if (active && payload.length) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const { name, value } = payload[0];
 
     return (
@@ -82,7 +51,7 @@ export default function DurationSplitPieChart({ date }: { date?: DateRange }) {
       }),
   });
 
-  const rows = normalizeApiResult<DurationHost>(raw);
+  const rows = raw?.data ?? [];
 
   const less4 = rows.reduce((acc, host) => {
     const n = host.durationSeconds.filter(
@@ -98,7 +67,7 @@ export default function DurationSplitPieChart({ date }: { date?: DateRange }) {
     return acc + n;
   }, 0);
 
-  const chartData: ChartDatum[] = [
+  const chartData = [
     { name: "< 4 Hours", value: less4 },
     { name: "> 4 Hours", value: more4 },
   ];
@@ -110,9 +79,6 @@ export default function DurationSplitPieChart({ date }: { date?: DateRange }) {
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 shadow-xl"
     >
-      <h2 className="text-xl font-semibold text-cyan-400 mb-3">
-        Duration Split per Host
-      </h2>
       <ResponsiveContainer width="100%" height={320}>
         <PieChart>
           <defs>
@@ -155,7 +121,7 @@ export default function DurationSplitPieChart({ date }: { date?: DateRange }) {
             ))}
           </Pie>
 
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={CustomTooltip} />
           <Legend
             verticalAlign="bottom"
             height={36}

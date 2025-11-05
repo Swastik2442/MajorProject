@@ -170,7 +170,10 @@ export const StatProblematicAlertTrendsSchema = z.object({
 });
 
 export const StatAlertDurationsSchema = z.object({
-  durationSeconds: z.union([z.number().int().min(0), z.literal("Infinity")]),
+  durationSeconds: z.array(z.union([
+    z.number().int().min(0),
+    z.literal("Infinity")
+  ])),
 });
 
 export const StatAlertDurationPerHostSchema = StatAlertDurationsSchema.extend(ProblemClientIdAndHostnameSchema.shape);
