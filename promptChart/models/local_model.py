@@ -1,3 +1,5 @@
+"""Local model configuration for an agent."""
+
 from langchain_openai import ChatOpenAI
 
 model = ChatOpenAI(
