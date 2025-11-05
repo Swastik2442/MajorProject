@@ -9,6 +9,7 @@ dependencies = [
     "fastapi[standard]>=0.121.0",
     "pydantic>=2.12.3",
     "pydantic-settings>=2.11.0",
+    "sse-starlette>=3.0.3",
 ]
 
 [tool.uv.sources]
