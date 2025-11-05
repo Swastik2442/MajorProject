@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import {
   subMinutes,
   subHours,
@@ -9,78 +9,63 @@ import {
   endOfWeek,
   endOfMonth,
   endOfYear,
+  min
 } from "date-fns";
 import type { DateRange } from "react-day-picker";
-
+import { CalendarIcon, CheckIcon, Clock3, RotateCcwIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon, Clock3, X } from "lucide-react";
+import { DatePicker } from "@/components/ui/date-picker";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent
+} from "@/components/ui/popover";
 
-interface DateRangeFilterProps {
+const quickRanges: { label: string; range: () => Required<DateRange> }[] = [
+  { label: "Last 5 minutes", range: () => ({ from: subMinutes(new Date(), 5), to: new Date() }) },
+  { label: "Last 15 minutes", range: () => ({ from: subMinutes(new Date(), 15), to: new Date() }) },
+  { label: "Last 30 minutes", range: () => ({ from: subMinutes(new Date(), 30), to: new Date() }) },
+  { label: "Last 1 hour", range: () => ({ from: subHours(new Date(), 1), to: new Date() }) },
+  { label: "Last 3 hours", range: () => ({ from: subHours(new Date(), 3), to: new Date() }) },
+  { label: "Last 6 hours", range: () => ({ from: subHours(new Date(), 6), to: new Date() }) },
+  { label: "Last 12 hours", range: () => ({ from: subHours(new Date(), 12), to: new Date() }) },
+  { label: "Last 1 day", range: () => ({ from: subDays(new Date(), 1), to: new Date() }) },
+  { label: "Last 7 days", range: () => ({ from: subDays(new Date(), 7), to: new Date() }) },
+  { label: "Last 30 days", range: () => ({ from: subDays(new Date(), 30), to: new Date() }) },
+  { label: "This week", range: () => ({ from: startOfWeek(new Date()), to: min([new Date(), endOfWeek(new Date())]) }) },
+  { label: "This month", range: () => ({ from: startOfMonth(new Date()), to: min([new Date(), endOfMonth(new Date())]) }) },
+  { label: "This year", range: () => ({ from: startOfYear(new Date()), to: min([new Date(), endOfYear(new Date())]) }) },
+];
+
+export default function DateRangeFilter({ date, setDate }: {
   date: DateRange | undefined;
   setDate: (range: DateRange | undefined) => void;
-}
-
-export default function DateRangeFilter({ date, setDate }: DateRangeFilterProps) {
+}) {
   const [open, setOpen] = useState(false);
   const [openCustom, setOpenCustom] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  // ✅ Handle click outside dropdown (fixed lint rule)
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent): void => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-
-    if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return (): void => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [open]);
-
-  // ✅ Correct range definitions
-  const quickRanges: { label: string; range: () => Required<DateRange> }[] = [
-    { label: "Last 5 minutes", range: () => ({ from: subMinutes(new Date(), 5), to: new Date() }) },
-    { label: "Last 15 minutes", range: () => ({ from: subMinutes(new Date(), 15), to: new Date() }) },
-    { label: "Last 30 minutes", range: () => ({ from: subMinutes(new Date(), 30), to: new Date() }) },
-    { label: "Last 1 hour", range: () => ({ from: subHours(new Date(), 1), to: new Date() }) },
-    { label: "Last 3 hours", range: () => ({ from: subHours(new Date(), 3), to: new Date() }) },
-    { label: "Last 6 hours", range: () => ({ from: subHours(new Date(), 6), to: new Date() }) },
-    { label: "Last 12 hours", range: () => ({ from: subHours(new Date(), 12), to: new Date() }) },
-    { label: "Last 1 day", range: () => ({ from: subDays(new Date(), 1), to: new Date() }) },
-    { label: "Last 7 days", range: () => ({ from: subDays(new Date(), 7), to: new Date() }) },
-    { label: "Last 30 days", range: () => ({ from: subDays(new Date(), 30), to: new Date() }) },
-    { label: "This week", range: () => ({ from: startOfWeek(new Date()), to: endOfWeek(new Date()) }) },
-    { label: "This month", range: () => ({ from: startOfMonth(new Date()), to: endOfMonth(new Date()) }) },
-    { label: "This year", range: () => ({ from: startOfYear(new Date()), to: endOfYear(new Date()) }) },
-  ];
 
   return (
-    <div className="relative">
+    <Popover open={open} onOpenChange={setOpen}>
       {/* === Trigger Button === */}
+      <PopoverTrigger asChild>
       <Button
+        className="text-muted-foreground"
         variant="outline"
         onClick={() => {
           setOpen((prev) => !prev);
         }}
-        className="flex items-center gap-2 text-sm font-medium px-4 py-2 shadow-sm hover:shadow-md transition"
       >
         <Clock3 size={16} /> Select Time Range
       </Button>
+      </PopoverTrigger>
 
       {/* === Floating Panel (Dropdown) === */}
-      {open && (
-        <div
-          ref={ref}
-          className="absolute right-0 mt-2 z-40 w-[640px] max-w-[95vw] bg-card/95 backdrop-blur-xl border border-border rounded-2xl shadow-2xl p-5 animate-fadeIn"
-        >
-          <div className="flex justify-between items-center mb-4">
+      <PopoverContent
+        side="bottom"
+        align="center"
+        className="w-auto p-3 bg-card rounded-xl shadow-lg border border-border"
+      >
+          <div className="flex justify-between items-center mb-2">
             <h3 className="text-base font-semibold">Select Date & Time Range</h3>
             <Button
               variant="ghost"
@@ -100,9 +85,9 @@ export default function DateRangeFilter({ date, setDate }: DateRangeFilterProps)
               const range = item.range();
               const isActive =
                 date?.from &&
-                date?.to &&
+                date.to &&
                 range.from &&
-                range.to &&
+                // range.to &&
                 date.from.toDateString() === range.from.toDateString() &&
                 date.to.toDateString() === range.to.toDateString();
 
@@ -122,7 +107,7 @@ export default function DateRangeFilter({ date, setDate }: DateRangeFilterProps)
             })}
 
             {/* === Custom Range Button === */}
-            <Popover open={openCustom} onOpenChange={setOpenCustom}>
+            <Popover modal={false} open={openCustom} onOpenChange={setOpenCustom}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
@@ -137,22 +122,44 @@ export default function DateRangeFilter({ date, setDate }: DateRangeFilterProps)
                 align="center"
                 className="w-auto p-3 bg-card rounded-xl shadow-lg border border-border"
               >
-                <Calendar
+                <div className="absolute left-3.25 bottom-4.5 z-10 flex flex-col">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="hover:cursor-pointer"
+                    aria-label="Clear Selection"
+                    onClick={() => {
+                      setDate(undefined);
+                    }}
+                  >
+                    <RotateCcwIcon />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="hover:cursor-pointer"
+                    aria-label="Apply Selection"
+                    onClick={() => {
+                      setOpenCustom(false);
+                      setOpen(false);
+                    }}
+                  >
+                    <CheckIcon />
+                  </Button>
+                </div>
+                <DatePicker
                   mode="range"
                   numberOfMonths={2}
+                  min={1}
+                  excludeDisabled={true}
+                  disabled={{ after: new Date() }}
                   selected={date}
-                  onSelect={(d) => {
-                    setDate(d);
-                    setOpenCustom(false);
-                    setOpen(false);
-                  }}
-                  className="rounded-md bg-background"
+                  onSelect={setDate}
                 />
               </PopoverContent>
             </Popover>
           </div>
-        </div>
-      )}
-    </div>
+      </PopoverContent>
+    </Popover>
   );
 }
