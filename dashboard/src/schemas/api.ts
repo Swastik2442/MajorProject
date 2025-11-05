@@ -197,6 +197,7 @@ export const PaginatedDataResponseSchema = <T extends z.ZodType>(itemSchema: T) 
   });
 
 export const IdSchema = z.string().min(1);
+export const TimeIntervalSchema = z.enum(["hour", "day", "week", "month"]);
 
 export const ClientParamSchema = z.object({
   client_id: IdSchema,
@@ -222,7 +223,7 @@ export const PaginationParamsSchema = z.object({
 export const TimePeriodParamsSchema = z.object({
   start: z.iso.datetime(),
   end: z.union([z.iso.datetime(), z.null()]).optional(),
-  interval: z.enum(["hour", "day", "week", "month"]).optional(),
+  interval: TimeIntervalSchema.optional(),
 });
 
 export const InfiniteTimePeriodParamsSchema = z.object({
@@ -330,6 +331,8 @@ export type TDataResponseStr = z.infer<typeof DataResponseStrSchema>;
 
 // --- API Parameters Types ---
 
+export type TIdParam = z.infer<typeof IdSchema>;
+export type TTimeIntervalParam = z.infer<typeof TimeIntervalSchema>;
 export type TClientParam = z.infer<typeof ClientParamSchema>;
 export type TClientsParams = z.infer<typeof ClientsParamsSchema>;
 export type TPaginationParams = z.infer<typeof PaginationParamsSchema>;

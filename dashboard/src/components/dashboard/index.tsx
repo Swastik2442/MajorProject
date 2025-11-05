@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import type { TClientsParams } from "@/schemas/api";
-import AlertBanner from "./AlertBanner";
 import StatusCards from "./StatusCards";
 import ActivityStream from "./ActivityStream";
 import SeverityMatrix from "./SeverityMatrix";
@@ -23,9 +22,6 @@ export default function Dashboard({ client_id = null, org_id = null }: TClientsP
         mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
       }`}
     >
-      {/* Alert Banner */}
-      <AlertBanner text="SQL Injection on DB-SRV01 - High" />
-
       {/* Main Grid */}
       <div className="grid grid-cols-12 gap-6">
         {/* Left Side */}

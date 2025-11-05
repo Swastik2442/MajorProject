@@ -10,7 +10,6 @@ export type ClienteleActions = {
 export type ClienteleStore = ClienteleState & ClienteleActions;
 
 export const useClientele = create<ClienteleStore>((set) => ({
-  organization: null,
   clients: null,
   setClients: (clients) => {set({ clients })},
 }));
