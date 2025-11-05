@@ -11,6 +11,7 @@ import {
   type PieLabelRenderProps,
   type TooltipContentProps,
 } from "recharts";
+import type { TClientsParams } from "@/schemas/api";
 import { apiService } from "@/services/api";
 
 function CustomTooltip({ active, payload }: TooltipContentProps<number | string, string>) {
@@ -37,17 +38,27 @@ function CustomTooltip({ active, payload }: TooltipContentProps<number | string,
   return null;
 }
 
-export default function DurationSplitPieChart({ date }: { date?: DateRange }) {
+export default function DurationSplitPieChart({
+  client_id = null,
+  org_id = null,
+  dateRange,
+}: {
+  dateRange?: DateRange;
+} & TClientsParams) {
   const { data: raw } = useQuery({
     queryKey: [
       "durationSplit",
-      date?.from?.toISOString(),
-      date?.to?.toISOString(),
+      client_id,
+      org_id,
+      dateRange?.from?.toISOString(),
+      dateRange?.to?.toISOString(),
     ],
     queryFn: async () =>
       apiService.getAlertDurationPerHost({
-        start: date?.from?.toISOString(),
-        end: date?.to?.toISOString(),
+        client_id,
+        org_id,
+        start: dateRange?.from?.toISOString(),
+        end: dateRange?.to?.toISOString(),
       }),
   });
 

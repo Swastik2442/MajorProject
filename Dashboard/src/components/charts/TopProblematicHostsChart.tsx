@@ -13,6 +13,7 @@ import {
   Cell,
   type TooltipContentProps,
 } from "recharts";
+import type { TClientsParams } from "@/schemas/api";
 import { apiService } from "@/services/api";
 
 const colors = [
@@ -52,20 +53,26 @@ function CustomTooltip({ active, payload, label }: TooltipContentProps<number | 
 }
 
 export default function TopProblematicHostsChart({
-  date,
+  client_id = null,
+  org_id = null,
+  dateRange,
 }: {
-  date?: DateRange;
-}) {
+  dateRange?: DateRange;
+} & TClientsParams) {
   const { data: raw } = useQuery({
     queryKey: [
       "hostsProblemsCount",
-      date?.from?.toISOString(),
-      date?.to?.toISOString(),
+      client_id,
+      org_id,
+      dateRange?.from?.toISOString(),
+      dateRange?.to?.toISOString(),
     ],
     queryFn: async () =>
       apiService.getHostsProblemsCount({
-        start: date?.from?.toISOString(),
-        end: date?.to?.toISOString(),
+        client_id,
+        org_id,
+        start: dateRange?.from?.toISOString(),
+        end: dateRange?.to?.toISOString(),
       }),
   });
 

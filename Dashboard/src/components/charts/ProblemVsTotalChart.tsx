@@ -12,6 +12,7 @@ import {
   Legend,
   type TooltipContentProps
 } from "recharts";
+import type { TTimeIntervalParam, TClientsParams } from "@/schemas/api";
 import { apiService } from "@/services/api";
 
 interface TooltipPayload {
@@ -45,13 +46,31 @@ function CustomTooltip({ active, payload, label }: TooltipContentProps<number | 
   return null;
 }
 
-export default function ProblemVsTotalChart({ date }: { date?: DateRange }) {
+export default function ProblemVsTotalChart({
+  client_id = null,
+  org_id = null,
+  dateRange,
+  interval,
+}: {
+  dateRange?: DateRange;
+  interval?: TTimeIntervalParam;
+} & TClientsParams) {
   const { data: raw } = useQuery({
-    queryKey: ["problemVsTotal", date?.from?.toISOString(), date?.to?.toISOString()],
+    queryKey: [
+      "problemVsTotal",
+      client_id,
+      org_id,
+      dateRange?.from?.toISOString(),
+      dateRange?.to?.toISOString(),
+      interval
+    ],
     queryFn: async () =>
       apiService.getProblematicTriggerAlertTrends({
-        start: date?.from?.toISOString() ?? new Date().toISOString(),
-        end: date?.to?.toISOString() ?? new Date().toISOString(),
+        client_id,
+        org_id,
+        start: dateRange?.from?.toISOString() ?? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        end: dateRange?.to?.toISOString() ?? new Date().toISOString(),
+        interval
       }),
   });
 

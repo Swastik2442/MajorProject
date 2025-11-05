@@ -83,12 +83,12 @@
   - [x] About Section
   - [ ] Footer Links
 - [ ] Add the Charts required by Sir
-  - [ ] Bar Chart of No of Problems in Top 10 (change-able) Problematic Host/Service
+  - [x] Bar Chart of No of Problems in Top 10 (change-able) Problematic Host/Service
     - [x] Backend
-    - [ ] Frontend
-  - [ ] Bar Chart of Problem Alerts vs Total Alerts per given Time Period bin
+    - [x] Frontend
+  - [x] Bar Chart of Problem Alerts vs Total Alerts per given Time Period bin
     - [x] Backend
-    - [ ] Frontend
+    - [x] Frontend
   - [ ] Bar Chart of No of Problems with Duration > 4hrs (change-able) per Host/Service
     - [x] Backend
     - [ ] Frontend

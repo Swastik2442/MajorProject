@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import type { DateRange } from "react-day-picker";
 import {
   LineChart,
   Line,
@@ -10,18 +11,34 @@ import {
   CartesianGrid,
 } from "recharts";
 import { motion } from "framer-motion";
-import type { TClientsParams } from "@/schemas/api";
+import type { TClientsParams, TTimeIntervalParam } from "@/schemas/api";
 import { apiService } from "@/services/api";
 
-export default function TrendsChart({ client_id = null, org_id = null }: TClientsParams) {
+export default function TrendsChart({
+  client_id = null,
+  org_id = null,
+  dateRange,
+  interval,
+}: {
+  dateRange?: DateRange;
+  interval?: TTimeIntervalParam;
+} & TClientsParams) {
   const { data } = useQuery({
-    queryKey: ["alertTrends", client_id, org_id],
+    queryKey: [
+      "alertTrends",
+      client_id,
+      org_id,
+      dateRange?.from?.toISOString(),
+      dateRange?.to?.toISOString(),
+      interval
+    ],
     queryFn: () =>
       apiService.getCommonAlertTrends({
         client_id,
         org_id,
-        start: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-        interval: "hour"
+        start: dateRange?.from?.toISOString() ?? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        end: dateRange?.to?.toISOString() ?? new Date().toISOString(),
+        interval: interval ?? "hour"
     }),
     staleTime: 60 * 60 * 1000, // 1 hour
   });

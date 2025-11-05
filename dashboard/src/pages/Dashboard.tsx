@@ -46,9 +46,9 @@ export default function Dashboard() {
   const [view, setView] = useState<View>("Dashboard");
   const { organization } = useOrganization();
   const clients = useClientele((s) => s.clients);
-  const { range, setRange } = useDateRange(useShallow((s) => ({
-    range: s.range,
-    setRange: s.setRange
+  const { dateRange, setDateRange } = useDateRange(useShallow((s) => ({
+    dateRange: s.range,
+    setDateRange: s.setRange
   })));
 
   const pageTitle =
@@ -76,7 +76,7 @@ export default function Dashboard() {
       <nav className="flex justify-between items-center mb-6">
         <div className="flex gap-2">
           <SelectView view={view} setView={setView} />
-          <DateRangeFilter date={range} setDate={setRange} />
+          <DateRangeFilter dateRange={dateRange} setDateRange={setDateRange} />
         </div>
         <SetClientele />
       </nav>
@@ -106,7 +106,7 @@ export default function Dashboard() {
               exit={{ x: "100%", opacity: 0 }}
               transition={{ type: "spring", stiffness: 70, damping: 20 }}
             >
-              <ChartsDashboard />
+              <ChartsDashboard client_id={clientIds} org_id={organizationId} />
             </motion.div>
           )}
         </AnimatePresence>

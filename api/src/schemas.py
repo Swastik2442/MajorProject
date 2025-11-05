@@ -1,12 +1,14 @@
 from collections.abc import Sequence
 
+from logging import getLogger
 from typing import Self, Literal
 
 from fastapi import Query
-from pydantic import BaseModel, Field
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 from common.models.utils import MyDatetime, PyObjectId, none, now, Severity
+
+logger = getLogger(__name__)
 
 IntervalSeconds = {'hour': 3600, 'day': 86400, 'week': 604800, 'month': 2592000}
 
@@ -20,13 +22,19 @@ class TimePeriodParams(BaseModel):
     interval: Literal['hour', 'day', 'week', 'month'] = Query(default_factory=lambda: 'day', description="Time interval for aggregation")
 
     @model_validator(mode='after')
-    def check_end_time(self) -> Self:
-        if self.end is None:
-            return self
-        if self.end <= self.start:
-            raise ValueError('End time must be after start time')
-        if self.end > now():
-            raise ValueError('End time must not be in future')
+    def check_time(self) -> Self:
+        if self.end is not None:
+            if self.end <= self.start:
+                raise ValueError('End time must be after start time')
+            if self.end > now():
+                raise ValueError('End time must not be in future')
+
+        durationSeconds = ((self.end or now()) - self.start).total_seconds()
+        intervalSeconds = IntervalSeconds[self.interval]
+        if durationSeconds < intervalSeconds:
+            raise ValueError('Time range too small for the selected interval')
+        if durationSeconds / intervalSeconds > 1000:
+            logger.warning('Time range too large for the selected interval')
         return self
 
 class InfiniteTimePeriodParams(BaseModel):

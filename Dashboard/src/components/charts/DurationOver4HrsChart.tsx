@@ -13,6 +13,7 @@ import {
   Cell,
   type TooltipContentProps
 } from "recharts";
+import type { TClientsParams } from "@/schemas/api";
 import { apiService } from "@/services/api";
 
 function CustomTooltip({ active, payload, label }: TooltipContentProps<number | string, string>) {
@@ -40,17 +41,27 @@ function CustomTooltip({ active, payload, label }: TooltipContentProps<number | 
   return null;
 }
 
-export default function DurationOver4HrsChart({ date }: { date?: DateRange }) {
+export default function DurationOver4HrsChart({
+  client_id = null,
+  org_id = null,
+  dateRange,
+}: {
+  dateRange?: DateRange;
+} & TClientsParams) {
   const { data: raw } = useQuery({
     queryKey: [
       "durationOver4hrs",
-      date?.from?.toISOString(),
-      date?.to?.toISOString(),
+      client_id,
+      org_id,
+      dateRange?.from?.toISOString(),
+      dateRange?.to?.toISOString(),
     ],
     queryFn: async () =>
       apiService.getAlertDurationPerHost({
-        start: date?.from?.toISOString(),
-        end: date?.to?.toISOString(),
+        client_id,
+        org_id,
+        start: dateRange?.from?.toISOString(),
+        end: dateRange?.to?.toISOString(),
       }),
   });
 

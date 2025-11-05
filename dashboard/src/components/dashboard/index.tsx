@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { useShallow } from "zustand/shallow";
 import type { TClientsParams } from "@/schemas/api";
+import useDateRange from "@/stores/dateRange";
 import StatusCards from "./StatusCards";
 import ActivityStream from "./ActivityStream";
 import SeverityMatrix from "./SeverityMatrix";
@@ -9,6 +11,10 @@ import KPIring from "./KPIring";
 
 export default function Dashboard({ client_id = null, org_id = null }: TClientsParams) {
   const [mounted, setMounted] = useState(false);
+  const { dateRange, interval } = useDateRange(useShallow((s) => ({
+    dateRange: s.range,
+    interval: s.interval
+  })));
 
   // small mount animation to avoid a flash
   useEffect(() => {
@@ -38,7 +44,7 @@ export default function Dashboard({ client_id = null, org_id = null }: TClientsP
 
         {/* Right Side */}
         <div className="col-span-12 lg:col-span-4 space-y-6">
-          <TrendsChart client_id={client_id} org_id={org_id} />
+          <TrendsChart client_id={client_id} org_id={org_id} dateRange={dateRange} interval={interval} />
           <SeverityMatrix />
           <KPIring client_id={client_id} org_id={org_id} />
         </div>

@@ -37,9 +37,12 @@ const quickRanges: { label: string; range: () => Required<DateRange> }[] = [
   { label: "This year", range: () => ({ from: startOfYear(new Date()), to: min([new Date(), endOfYear(new Date())]) }) },
 ];
 
-export default function DateRangeFilter({ date, setDate }: {
-  date: DateRange | undefined;
-  setDate: (range: DateRange | undefined) => void;
+export default function DateRangeFilter({
+  dateRange,
+  setDateRange
+}: {
+  dateRange: DateRange | undefined;
+  setDateRange: (dateRange: DateRange | undefined) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [openCustom, setOpenCustom] = useState(false);
@@ -84,12 +87,12 @@ export default function DateRangeFilter({ date, setDate }: {
             {quickRanges.map((item) => {
               const range = item.range();
               const isActive =
-                date?.from &&
-                date.to &&
+                dateRange?.from &&
+                dateRange.to &&
                 range.from &&
                 // range.to &&
-                date.from.toDateString() === range.from.toDateString() &&
-                date.to.toDateString() === range.to.toDateString();
+                dateRange.from.toDateString() === range.from.toDateString() &&
+                dateRange.to.toDateString() === range.to.toDateString();
 
               return (
                 <Button
@@ -97,7 +100,7 @@ export default function DateRangeFilter({ date, setDate }: {
                   variant={isActive ? "default" : "outline"}
                   className="text-xs px-2 py-1 hover:scale-[1.02] transition"
                   onClick={() => {
-                    setDate(range);
+                    setDateRange(range);
                     setOpen(false);
                   }}
                 >
@@ -129,7 +132,7 @@ export default function DateRangeFilter({ date, setDate }: {
                     className="hover:cursor-pointer"
                     aria-label="Clear Selection"
                     onClick={() => {
-                      setDate(undefined);
+                      setDateRange(undefined);
                     }}
                   >
                     <RotateCcwIcon />
@@ -153,8 +156,8 @@ export default function DateRangeFilter({ date, setDate }: {
                   min={1}
                   excludeDisabled={true}
                   disabled={{ after: new Date() }}
-                  selected={date}
-                  onSelect={setDate}
+                  selected={dateRange}
+                  onSelect={setDateRange}
                 />
               </PopoverContent>
             </Popover>
