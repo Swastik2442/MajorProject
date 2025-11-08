@@ -3,7 +3,7 @@
 from collections.abc import Sequence
 from typing import Literal
 
-from pydantic import AliasChoices, Field, MongoDsn, RedisDsn
+from pydantic import AliasChoices, Field, MongoDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
@@ -24,15 +24,6 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices('MONGO_URI', 'MONGO_CONNECTION_URI', 'MONGODB_URI', 'MONGODB_CONNECTION_URI'),
     )
     DB_NAME: str = Field("nms")
-
-    REDIS_URL: RedisDsn | None = Field(
-        default=None,
-        validation_alias=AliasChoices('REDIS_URL', 'REDIS_URI'),
-    )
-
-    CLERK_ISSUER: str
-    CLERK_JWKS_URL: str
-    CLERK_SECRET_KEY: str
 
     ALLOWED_ORIGINS: Sequence[str] = Field(
         default_factory=lambda: ["http://localhost:5173"],
