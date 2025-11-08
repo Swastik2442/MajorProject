@@ -10,17 +10,18 @@ classifiers = [
     "Private :: Do Not Upload",
 ]
 dependencies = [
-    "common[caching,db]",
+    "common[caching]",
     "langchain>=1.0.3",
     "langchain-openai>=1.0.2",
     "langgraph-cli>=0.4.7",
     "pydantic>=2.12.4",
+    "pydantic-settings>=2.11.0",
 ]
-
-[tool.uv.sources]
-common = { path = "../common" }
 
 [dependency-groups]
 dev = [
     "langgraph-cli[inmem]>=0.4.7",
 ]
+
+[tool.uv.sources]
+common = { path = "../common" }
