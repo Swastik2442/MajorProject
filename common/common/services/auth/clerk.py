@@ -4,14 +4,24 @@ from collections.abc import Callable
 from logging import getLogger
 from typing import Annotated
 
-from clerk_backend_api import Clerk
 from fastapi import Depends
-import jwt
+
+try:
+    from clerk_backend_api import Clerk
+    import jwt
+except ImportError as e:
+    raise ImportError(
+        "To work with Authentication service, please install using 'pip install common[auth]'."
+    ) from e
 
 from common.services import Service
-from common.services.hishel import hishel_service
 
 logger = getLogger(__name__)
+
+try:
+    from common.services.hishel import hishel_service
+except ImportError:
+    logger.warning("Packages required for Caching not found, disabling caching.")
 
 class ClerkService(Service):
     def __init__(self) -> None:
@@ -45,11 +55,15 @@ class ClerkService(Service):
         if bearer_auth is None or jwks_url is None or issuer is None:
             raise ValueError("Bearer auth, JWKS URL, and issuer must be provided for ClerkService")
 
-        self._clerk_client = Clerk(
-            bearer_auth=bearer_auth,
-            client=hishel_service.get_cache_client(),
-            async_client=hishel_service.get_async_cache_client()
-        )
+        if 'hishel_service' in globals():
+            self._clerk_client = Clerk(
+                bearer_auth=bearer_auth,
+                client=hishel_service.get_cache_client(),            # type: ignore
+                async_client=hishel_service.get_async_cache_client() # type: ignore
+            )
+        else:
+            self._clerk_client = Clerk(bearer_auth=bearer_auth)
+
         self._jwks_client = jwt.PyJWKClient(jwks_url)
         self._issuer = issuer
         logger.info("Clerk client initialized")

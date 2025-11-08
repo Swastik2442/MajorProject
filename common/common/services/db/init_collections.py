@@ -1,7 +1,10 @@
 """Initialize database collections"""
 
-from pymongo import ASCENDING
-from pymongo.asynchronous.database import AsyncDatabase
+try:
+    from pymongo import ASCENDING
+    from pymongo.asynchronous.database import AsyncDatabase
+except ImportError as e:
+    raise ImportError("To work with Database service, please install using 'pip install common[db]'.") from e
 
 from common.models import Client, Problem, Service
 from common.models.utils import fields

@@ -4,9 +4,13 @@ from dataclasses import dataclass
 import secrets
 from typing import Annotated
 
-import bcrypt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import APIKeyCookie, APIKeyHeader
+
+try:
+    import bcrypt
+except ImportError as e:
+    raise ImportError("To work with Authentication service, please install using 'pip install common[auth]'.") from e
 
 SEPARATOR = ":::"
 
