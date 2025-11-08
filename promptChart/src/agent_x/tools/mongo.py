@@ -2,12 +2,19 @@
 
 from typing import Annotated
 
-from langchain.tools import InjectedToolArg, tool
+from pydantic import BaseModel
+from langchain.tools import tool, ToolRuntime
+
+from common.models import Problem, Service
+
+class MongoDBAggContext(BaseModel):
+    """Context for MongoDB aggregation tool."""
+    client_ids: list[str]
 
 # TODO: Add actual MongoDB interaction logic here
 @tool
 def run_mongodb_aggregation(
-    client_ids: Annotated[list[str], InjectedToolArg],
+    runtime: ToolRuntime[MongoDBAggContext],
     collection_name: str,
     aggregation_pipeline: list[dict]
 ) -> list[dict]:

@@ -1,11 +1,21 @@
 [project]
 name = "promptchart"
-version = "0.1.0"
+version = "0.1.1"
 description = "LangChain-based application to generate charts based on user prompts"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "common[caching,db]",
     "langchain>=1.0.3",
     "langchain-openai>=1.0.2",
+    "langgraph-cli>=0.4.7",
     "pydantic>=2.12.4",
+]
+
+[tool.uv.sources]
+common = { path = "../common" }
+
+[dependency-groups]
+dev = [
+    "langgraph-cli[inmem]>=0.4.7",
 ]

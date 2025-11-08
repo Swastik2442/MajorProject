@@ -2,7 +2,8 @@
 
 from langchain_openai import ChatOpenAI
 
-model = ChatOpenAI(
+local_model = ChatOpenAI(
+    name="local_model",
     base_url="http://localhost:1234/v1",
     api_key="NO_NEED_HAHA", # type: ignore
     model="qwen/qwen3-4b-thinking-2507",

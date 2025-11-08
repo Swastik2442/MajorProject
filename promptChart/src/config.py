@@ -28,4 +28,9 @@ class Settings(BaseSettings):
     )
     MONGO_DB_NAME: str = Field("nms")
 
+    LANGSMITH_API_KEY: str = Field(
+        default="",
+        validation_alias=AliasChoices('LANGSMITH_API_KEY', 'LANGCHAIN_TRACING_V2_API_KEY'),
+    )
+
 config = Settings() # type: ignore[call-arg]
