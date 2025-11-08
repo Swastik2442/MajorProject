@@ -4,6 +4,11 @@ version = "0.1.1"
 description = "LangChain-based application to generate charts based on user prompts"
 readme = "README.md"
 requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Private :: Do Not Upload",
+]
 dependencies = [
     "common[caching,db]",
     "langchain>=1.0.3",

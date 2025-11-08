@@ -4,6 +4,11 @@ version = "0.5.0"
 description = "Common Modules for the NMS applications"
 readme = "README.md"
 requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Private :: Do Not Upload",
+]
 dependencies = [
     "bson>=0.5.10",
     "fastapi>=0.121.0",

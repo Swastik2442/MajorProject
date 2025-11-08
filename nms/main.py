@@ -9,10 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from common.exceptions import RequestValidationError as CustomRequestValidationError, http_exception_handler, validation_exception_handler
-from common.services.auth.clerk import clerk_service
 from common.services.db import db_service
-from common.services.hishel import hishel_service
-from common.services.redis import redis_service
 from common.schemas import Response as CustomResponse
 from src.config import config
 from src.routes import zabbix_router
@@ -23,16 +20,8 @@ logger = logging.getLogger()
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     await db_service.connect(dsn=config.MONGO_CONNECTION_URI, db_name=config.DB_NAME)
-    await redis_service.connect(dsn=config.REDIS_URL)
-    await hishel_service.connect()
-    await clerk_service.connect(bearer_auth=config.CLERK_SECRET_KEY, jwks_url=config.CLERK_JWKS_URL, issuer=config.CLERK_ISSUER)
-
     yield
-
     await db_service.disconnect()
-    await redis_service.disconnect()
-    await hishel_service.disconnect()
-    await clerk_service.disconnect()
 
 app = FastAPI(
     title="NMS API",
