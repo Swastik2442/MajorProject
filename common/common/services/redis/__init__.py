@@ -5,7 +5,11 @@ from typing import Annotated
 
 from fastapi import Depends
 from pydantic import RedisDsn
-import redis
+
+try:
+    import redis
+except ImportError as e:
+    raise ImportError("To work with Caching service, please install using 'pip install common[caching]'.") from e
 
 from common.services import Service
 

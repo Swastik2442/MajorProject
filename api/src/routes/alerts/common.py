@@ -167,8 +167,10 @@ async def get_common_alert_trends(
                 {fields(Problem).startedAt: {"$gte": min_time, "$lt": max_time}},
                 {
                     fields(Problem).startedAt: {"$lt": min_time},
-                    fields(Problem).status: {"$ne": "Recovered"},
-                    fields(Problem).recoveryAt: {"$gte": min_time}
+                    "$or": [
+                        {fields(Problem).status: {"$ne": "Recovered"}},
+                        {fields(Problem).recoveryAt: {"$gte": min_time}}
+                    ]
                 }
             ]
         }, {k: True for k in ProblemDatetimesAndStatus.model_fields.keys()})

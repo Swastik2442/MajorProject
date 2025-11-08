@@ -36,7 +36,7 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(
     title="NMS API",
-    version="0.4.0",
+    version="0.4.1",
     description="API Service to store Zabbix Alerts",
     lifespan=lifespan,
     exception_handlers={

@@ -1,18 +1,26 @@
 [project]
 name = "common"
-version = "0.4.2"
+version = "0.5.0"
 description = "Common Modules for the NMS applications"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "bson>=0.5.10",
+    "fastapi>=0.121.0",
+    "pydantic>=2.12.3",
+    "tzdata>=2025.2",
+]
+
+[project.optional-dependencies]
+auth = [
     "bcrypt>=5.0.0",
     "clerk-backend-api>=3.3.1",
-    "fastapi>=0.121.0",
-    "hishel[httpx]==0.1.4",
-    "pydantic>=2.12.3",
-    "pydantic-settings>=2.11.0",
     "pyjwt>=2.10.1",
-    "pymongo>=4.15.3",
+]
+caching = [
+    "hishel[httpx]==0.1.4",
     "redis>=7.0.1",
-    "tzdata>=2025.2",
+]
+db = [
+    "pymongo>=4.15.3",
 ]

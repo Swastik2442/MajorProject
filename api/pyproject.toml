@@ -5,7 +5,7 @@ description = "API Service to serve NMS Alerts"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "common",
+    "common[auth,caching,db]",
     "fastapi[standard]>=0.121.0",
     "pydantic>=2.12.3",
     "pydantic-settings>=2.11.0",
