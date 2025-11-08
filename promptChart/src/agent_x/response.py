@@ -14,10 +14,14 @@ class DataSeries(BaseModel):
     )
     color: str | None = Field(
         None,
-        description="The color associated with this data series, if any."
+        description="The RGB color code associated with this data series, if any."
     )
     data_type: Literal['number', 'string', 'date'] = Field(
         description="The data type of this data series."
+    )
+    multiple_entries: bool = Field(
+        True,
+        description="Indicates if this data series can have multiple values, as in an array of values, or just a single value."
     )
 
 class Chart(BaseModel):
