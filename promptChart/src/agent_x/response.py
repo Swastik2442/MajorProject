@@ -1,5 +1,6 @@
 """Response schema definitions for the agent."""
 
+from collections.abc import Sequence
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -32,13 +33,13 @@ class Chart(BaseModel):
     description: str = Field(
         description="A brief description of the chart."
     )
-    data_series: list[DataSeries] = Field(
+    data_series: Sequence[DataSeries] = Field(
         description="List of data series included in the chart."
     )
     collection_name: str = Field(
         description="The name of the data collection to query."
     )
-    mongodb_aggregation_pipeline: list[dict] = Field(
+    mongodb_aggregation_pipeline: Sequence[dict] = Field(
         description="The MongoDB aggregation pipeline to retrieve the data for the chart."
     )
 
@@ -47,7 +48,7 @@ class ResponseFormat(BaseModel):
     description: str = Field(
         description="A brief description of the response."
     )
-    charts: list[Chart] | None = Field(
+    charts: Sequence[Chart] | None = Field(
         None,
         description="A list of charts to be generated, if any."
     )

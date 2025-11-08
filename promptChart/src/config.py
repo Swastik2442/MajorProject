@@ -2,7 +2,7 @@
 
 from typing import Literal
 
-from pydantic import AliasChoices, Field, MongoDsn, PostgresDsn
+from pydantic import AliasChoices, Field, MongoDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
@@ -18,10 +18,6 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices('ENV', 'ENVIRONMENT', 'APP_ENV', 'APPLICATION_ENV'),
     )
     DEBUG: bool = Field(default=False)
-
-    DATABASE_URL: PostgresDsn = Field(
-        validation_alias=AliasChoices('DATABASE_URL', 'POSTGRESQL_URL', 'POSTGRES_DSN'),
-    )
 
     MONGO_CONNECTION_URI: MongoDsn = Field(
         validation_alias=AliasChoices('MONGO_URI', 'MONGO_CONNECTION_URI', 'MONGODB_URI', 'MONGODB_CONNECTION_URI'),
