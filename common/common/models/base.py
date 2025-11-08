@@ -30,7 +30,3 @@ class BaseInterface(abc.ABC, BaseModel):
         @abc.abstractmethod
         def collection_name(cls) -> str:
             return cls.__qualname__.split('.', maxsplit=1)[0]
-        @classmethod
-        @abc.abstractmethod
-        def collection_description(cls) -> str:
-            return cls.__doc__ if cls.__doc__ is not None else "No description provided."

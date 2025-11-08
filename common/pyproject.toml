@@ -10,9 +10,9 @@ classifiers = [
     "Private :: Do Not Upload",
 ]
 dependencies = [
-    "bson>=0.5.10",
     "fastapi>=0.121.0",
     "pydantic>=2.12.3",
+    "pymongo>=4.15.3",
     "tzdata>=2025.2",
 ]
 
@@ -25,7 +25,4 @@ auth = [
 caching = [
     "hishel[httpx]==0.1.4",
     "redis>=7.0.1",
-]
-db = [
-    "pymongo>=4.15.3",
 ]
