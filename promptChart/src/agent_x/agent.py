@@ -3,7 +3,7 @@
 from langchain.agents import create_agent
 
 from src.agent_x.response import ResponseFormat
-from src.agent_x.tools import tools, tools_description
+from src.agent_x.tools import ContextSchema, tools, tools_description
 from src.models.local_model import local_model
 
 SYSTEM_PROMPT = f"""\
@@ -19,8 +19,9 @@ Use these tools to construct your responses. Do not generate anything when the u
 agent_x = create_agent(
     model=local_model,
     tools=tools,
-    response_format=ResponseFormat,
+    # response_format=ResponseFormat, # BUG: Using this causes the <thinking></thinking> portion to be used as output, omitting the rest of the response
+    context_schema=ContextSchema,
     system_prompt=SYSTEM_PROMPT,
 )
 
-__all__ = ["agent_x", "ResponseFormat"]
+__all__ = ["agent_x", "ResponseFormat", "ContextSchema"]

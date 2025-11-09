@@ -1,16 +1,21 @@
 """Tools for MongoDB aggregation operations."""
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
+from pymongo.asynchronous.database import AsyncDatabase
 from langchain.tools import tool, ToolRuntime
 
 from common.models import Problem, Service
-from common.services.db import db_service
 
+AVAILABLE_COLLECTIONS = [Problem, Service]
+
+# Ref: https://github.com/langchain-ai/langchain-mongodb/blob/main/libs/langchain-mongodb/langchain_mongodb/agent_toolkit/tool.py#L20
 class MongoDBAggContext(BaseModel):
     """Context for MongoDB aggregation tool."""
+    db: AsyncDatabase = Field(exclude=True)
     client_ids: list[str]
 
-# TODO: Add actual MongoDB interaction logic here
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
 @tool
 async def run_mongodb_aggregation(
     runtime: ToolRuntime[MongoDBAggContext],
@@ -18,32 +23,36 @@ async def run_mongodb_aggregation(
     aggregation_pipeline: list[dict]
 ) -> list[dict]:
     """Run a MongoDB aggregation pipeline on the specified collection."""
-    db = await db_service.get_db()
-    try:
-        result = await db[collection_name].aggregate(aggregation_pipeline)
-        documents = await result.to_list(length=None)
-        return documents
-    except Exception as e:
-        return [{"error": str(e)}]
-    # # Mocked response for demonstration purposes
-    # return [{"mocked_key": "mocked_value - aggregation result is being mocked for now"}]
+    if collection_name not in [m.Meta.collection_name() for m in AVAILABLE_COLLECTIONS]:
+        return [{"error": f"Collection '{collection_name}' is not available."}]
 
-@tool
+    client_ids = runtime.context.client_ids
+    db = runtime.context.db
+    try:
+        result = await db[collection_name].aggregate([
+            {"$match": {"clientId": {"$in": client_ids}}}, # Only allow access to specified client IDs
+            *aggregation_pipeline
+        ])
+        documents = await result.to_list(length=None)
+        return documents # TODO: Only let the model read a summary, not the actual documents
+    except Exception as e:
+        return [{"error": f"An error occurred while running the aggregation pipeline: {e}"}]
+
+# @tool
 def get_available_collections() -> dict[str, str]:
-    """Retrieve the list of available MongoDB collections."""
+    """Retrieve a map of available MongoDB collections and their descriptions."""
     return {
-        m.Meta.collection_name(): m.__doc__ if m.__doc__ is not None else "No description provided."
-        for m in [Problem, Service]
+        m.Meta.collection_name(): (m.__doc__ if m.__doc__ is not None else "No description")
+        for m in AVAILABLE_COLLECTIONS
     }
 
 @tool
-def get_collection_schema(collection_name: str) -> dict:
+def get_collection_schema(collection_name: str) -> dict | None:
     """Retrieve the schema of the specified MongoDB collection."""
-    # Mocked response for demonstration purposes
     return {
         m.Meta.collection_name(): m.model_json_schema()
-        for m in [Problem, Service]
-    }.get(collection_name, {})
+        for m in AVAILABLE_COLLECTIONS
+    }.get(collection_name)
 
 tools = [
     run_mongodb_aggregation,
@@ -52,6 +61,6 @@ tools = [
 ]
 tools_description = """\
 - run_mongodb_aggregation: Run a MongoDB aggregation pipeline on the specified collection.
-- get_available_collections: Retrieve map of available MongoDB collections and their descriptions.
+- get_available_collections: Retrieve a map of available MongoDB collections and their descriptions.
 - get_collection_schema: Retrieve the schema of the specified MongoDB collection.
 """
