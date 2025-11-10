@@ -1,6 +1,7 @@
 """Main entry point to invoke the agent."""
 
 import asyncio
+import logging
 
 from langchain_core.runnables import RunnableConfig
 
@@ -8,6 +9,8 @@ from common.services.db import db_service
 
 from src.agent_x import agent_x, ContextSchema
 from src.config import config
+
+logging.basicConfig(level=logging.INFO)
 
 # TODO: Add a way to let other parts of system invoke the agents (e.g., via API calls or direct function calls)
 async def main():
@@ -17,11 +20,11 @@ async def main():
         client_ids=["client_123"]
     )
 
-    agent_config = RunnableConfig(configurable={"thread_id": "1"})
+    agent_config = RunnableConfig(configurable={"thread_id": "1"}, recursion_limit=100)
 
     response = await agent_x.ainvoke(
         {"messages": [{"role": "user", "content": "create a chart showing the top 10 most common problems reported."}]},
-        config=agent_config, # type: ignore
+        config=agent_config,
         context=context
     )
     print(response)

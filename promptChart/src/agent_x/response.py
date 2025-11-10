@@ -27,7 +27,7 @@ class DataSeries(BaseModel):
 
 class Chart(BaseModel):
     """Schema for chart information in the response."""
-    type: Literal['bar', 'line', 'pie'] = Field(
+    type: Literal['bar', 'box', 'line', 'pie', 'scatter'] = Field(
         description="The type of chart to be generated."
     )
     description: str = Field(
@@ -52,3 +52,31 @@ class ResponseFormat(BaseModel):
         None,
         description="A list of charts to be generated, if any."
     )
+
+response_format_text = """\
+{
+    "description": "<string - brief description of the response>",
+    "charts": null OR [
+        {
+            "type": "bar" | "box" | "line" | "pie" | "scatter",
+            "description": "<string - brief description of this chart>",
+            "data_series": [
+                {
+                    "key": "<string - key in the data>",
+                    "label": "<string - human-friendly label>",
+                    "color": "<string|null - RGB color code, e.g. '#RRGGBB'>",
+                    "data_type": "number" | "string" | "date",
+                    "multiple_entries": <boolean>
+                },
+                ...
+            ],
+            "collection_name": "<string - name of the MongoDB collection>",
+            "mongodb_aggregation_pipeline": [
+                { "<aggregation stage>": { /* stage spec */ } },
+                ...
+            ]
+        },
+        ...
+    ]
+}\
+"""

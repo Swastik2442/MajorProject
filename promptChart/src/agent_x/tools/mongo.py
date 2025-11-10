@@ -5,6 +5,7 @@ from pymongo.asynchronous.database import AsyncDatabase
 from langchain.tools import tool, ToolRuntime
 
 from common.models import Problem, Service
+from common.models.utils import PyObjectId
 
 AVAILABLE_COLLECTIONS = [Problem, Service]
 
@@ -12,7 +13,7 @@ AVAILABLE_COLLECTIONS = [Problem, Service]
 class MongoDBAggContext(BaseModel):
     """Context for MongoDB aggregation tool."""
     db: AsyncDatabase = Field(exclude=True)
-    client_ids: list[str]
+    client_ids: list[PyObjectId]
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -33,12 +34,12 @@ async def run_mongodb_aggregation(
             {"$match": {"clientId": {"$in": client_ids}}}, # Only allow access to specified client IDs
             *aggregation_pipeline
         ])
-        documents = await result.to_list(length=None)
+        documents = await result.to_list()
         return documents # TODO: Only let the model read a summary, not the actual documents
     except Exception as e:
         return [{"error": f"An error occurred while running the aggregation pipeline: {e}"}]
 
-# @tool
+@tool
 def get_available_collections() -> dict[str, str]:
     """Retrieve a map of available MongoDB collections and their descriptions."""
     return {

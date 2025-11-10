@@ -8,6 +8,5 @@ local_model = ChatOpenAI(
     api_key="NO_NEED_HAHA", # type: ignore
     # model="qwen/qwen3-4b-thinking-2507",
     # model="dolphin3.0-llama3.1-8b@q4_k_s",
-    model="openai/gpt-oss-20b",
-    extra_body={"ttl": 300}, # Auto-evict model after 5 minutes of inactivity
+    model="openai/gpt-oss-20b"
 )
