@@ -10,6 +10,7 @@ import Metadata from "@/components/Metadata";
 import SetClientele from "@/components/SetClientele";
 import ChartsDashboard from "@/components/charts";
 import DateRangeFilter from "@/components/DateRangeFilter";
+import { PromptBox, PromptOutput } from "@/components/ai";
 import {
   Select,
   SelectContent,
@@ -50,6 +51,20 @@ export default function Dashboard() {
     dateRange: s.range,
     setDateRange: s.setRange
   })));
+
+  const [aiOutput, setAiOutput] = useState<string | null>(null);
+  const [isAiLoading, setIsAiLoading] = useState(false);
+
+    const handlePromptSubmit = (prompt: string): void => {
+    setIsAiLoading(true);
+    setTimeout(() => {
+      setAiOutput(
+        `🔍 AI Analysis Result:\n\nYou asked: "${prompt}"\n\nHere’s a summary or predicted insight based on your query.`
+      );
+      setIsAiLoading(false);
+    }, 1500);
+};  
+
 
   const pageTitle =
     clients === null
@@ -98,6 +113,7 @@ export default function Dashboard() {
               <DashboardComponent client_id={clientIds} org_id={organizationId} />
             </motion.div>
           )}
+          
           {view === "Charts" && (
             <motion.div
               key="charts-dashboard"
@@ -107,6 +123,24 @@ export default function Dashboard() {
               transition={{ type: "spring", stiffness: 70, damping: 20 }}
             >
               <ChartsDashboard client_id={clientIds} org_id={organizationId} />
+            </motion.div>
+          )}
+
+          {/* AI View */}
+          {view === "AI" && (
+            <motion.div
+              key="ai-dashboard"
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -50, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 70, damping: 20 }}
+              className="px-6 pb-10"
+            >
+              <div className="space-y-6">
+                <h1 className="text-2xl font-semibold mb-4">AI Assistant</h1>
+                <PromptBox onSubmit={handlePromptSubmit} />
+                <PromptOutput output={aiOutput} isLoading={isAiLoading} />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
