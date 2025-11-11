@@ -10,7 +10,7 @@ import Metadata from "@/components/Metadata";
 import SetClientele from "@/components/SetClientele";
 import ChartsDashboard from "@/components/charts";
 import DateRangeFilter from "@/components/DateRangeFilter";
-import { PromptBox, PromptOutput } from "@/components/ai";
+import { PromptBox, PromptOutput, PromptHistory } from "@/components/ai";
 import {
   Select,
   SelectContent,
@@ -22,14 +22,14 @@ import {
 const Views = ["Dashboard", "Charts", "AI"] as const;
 type View = (typeof Views)[number];
 
-const SelectView = ({ view, setView }: {
-  view: View;
-  setView: (view: View) => void;
-}) => (
-  <Select value={view} onValueChange={(v) => {
-    if (!Views.includes(v as View)) throw new Error(`Invalid view selected: ${v}`);
-    setView(v as View);
-  }}>
+const SelectView = ({ view, setView }: { view: View; setView: (view: View) => void }) => (
+  <Select
+    value={view}
+    onValueChange={(v) => {
+      if (!Views.includes(v as View)) throw new Error(`Invalid view selected: ${v}`);
+      setView(v as View);
+    }}
+  >
     <SelectTrigger className="w-32">
       <SelectValue placeholder="View" />
     </SelectTrigger>
@@ -47,24 +47,36 @@ export default function Dashboard() {
   const [view, setView] = useState<View>("Dashboard");
   const { organization } = useOrganization();
   const clients = useClientele((s) => s.clients);
-  const { dateRange, setDateRange } = useDateRange(useShallow((s) => ({
-    dateRange: s.range,
-    setDateRange: s.setRange
-  })));
+  const { dateRange, setDateRange } = useDateRange(
+    useShallow((s) => ({
+      dateRange: s.range,
+      setDateRange: s.setRange
+    }))
+  );
 
   const [aiOutput, setAiOutput] = useState<string | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [history, setHistory] = useState<
+    { id: string; prompt: string; response: string; timestamp: string }[]
+  >([]);
 
-    const handlePromptSubmit = (prompt: string): void => {
+  const handlePromptSubmit = (prompt: string): void => {
     setIsAiLoading(true);
     setTimeout(() => {
-      setAiOutput(
-        `🔍 AI Analysis Result:\n\nYou asked: "${prompt}"\n\nHere’s a summary or predicted insight based on your query.`
-      );
+      const response = `🔍 AI Analysis Result:\n\nYou asked: "${prompt}"\n\nHere’s a summary or predicted insight based on your query.`;
+      setAiOutput(response);
       setIsAiLoading(false);
+      setHistory((prev) => [
+        {
+          id: crypto.randomUUID(),
+          prompt,
+          response,
+          timestamp: new Date().toISOString()
+        },
+        ...prev
+      ]);
     }, 1500);
-};  
-
+  };
 
   const pageTitle =
     clients === null
@@ -73,21 +85,19 @@ export default function Dashboard() {
       ? `${view} - Selected Clients`
       : `${view} - ${clients.name}`;
 
-  const clientIds =
-    Array.isArray(clients)
-      ? clients.map((c) => c._id).filter((id): id is string => id != null)
-      : (clients?._id ?? null);
+  const clientIds = Array.isArray(clients)
+    ? clients.map((c) => c._id).filter((id): id is string => id != null)
+    : clients?._id ?? null;
+
   const organizationId =
     clients === null ||
     (Array.isArray(clients) && clients.length === 0)
-      ? (organization?.id ?? null)
+      ? organization?.id ?? null
       : null;
 
   return (
     <>
       <Metadata title={`${pageTitle} | ${import.meta.env.VITE_APP_TITLE}`} />
-
-      {/* Top Navigation Bar */}
       <nav className="flex justify-between items-center mb-6">
         <div className="flex gap-2">
           <SelectView view={view} setView={setView} />
@@ -97,10 +107,7 @@ export default function Dashboard() {
       </nav>
 
       <div className="relative w-full min-h-screen no-scrollbar">
-        {/* Alert Banner */}
         <AlertBanner text="SQL Injection on DB-SRV01 - High" />
-
-        {/* View Switcher */}
         <AnimatePresence mode="wait" initial={false}>
           {view === "Dashboard" && (
             <motion.div
@@ -113,7 +120,7 @@ export default function Dashboard() {
               <DashboardComponent client_id={clientIds} org_id={organizationId} />
             </motion.div>
           )}
-          
+
           {view === "Charts" && (
             <motion.div
               key="charts-dashboard"
@@ -126,7 +133,6 @@ export default function Dashboard() {
             </motion.div>
           )}
 
-          {/* AI View */}
           {view === "AI" && (
             <motion.div
               key="ai-dashboard"
@@ -140,6 +146,7 @@ export default function Dashboard() {
                 <h1 className="text-2xl font-semibold mb-4">AI Assistant</h1>
                 <PromptBox onSubmit={handlePromptSubmit} />
                 <PromptOutput output={aiOutput} isLoading={isAiLoading} />
+                <PromptHistory history={history} />
               </div>
             </motion.div>
           )}
