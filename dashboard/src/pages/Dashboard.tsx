@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type JSX } from "react";
 import { useOrganization } from "@clerk/clerk-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useShallow } from "zustand/shallow";
@@ -10,19 +10,25 @@ import Metadata from "@/components/Metadata";
 import SetClientele from "@/components/SetClientele";
 import ChartsDashboard from "@/components/charts";
 import DateRangeFilter from "@/components/DateRangeFilter";
-import { PromptBox, PromptOutput, PromptHistory } from "@/components/ai";
+import { LLMChatPage } from "@/components/ai";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@/components/ui/select";
 
 const Views = ["Dashboard", "Charts", "AI"] as const;
 type View = (typeof Views)[number];
 
-const SelectView = ({ view, setView }: { view: View; setView: (view: View) => void }) => (
+const SelectView = ({
+  view,
+  setView,
+}: {
+  view: View;
+  setView: (view: View) => void;
+}) => (
   <Select
     value={view}
     onValueChange={(v) => {
@@ -43,40 +49,16 @@ const SelectView = ({ view, setView }: { view: View; setView: (view: View) => vo
   </Select>
 );
 
-export default function Dashboard() {
+export default function Dashboard(): JSX.Element {
   const [view, setView] = useState<View>("Dashboard");
   const { organization } = useOrganization();
   const clients = useClientele((s) => s.clients);
   const { dateRange, setDateRange } = useDateRange(
     useShallow((s) => ({
       dateRange: s.range,
-      setDateRange: s.setRange
+      setDateRange: s.setRange,
     }))
   );
-
-  const [aiOutput, setAiOutput] = useState<string | null>(null);
-  const [isAiLoading, setIsAiLoading] = useState(false);
-  const [history, setHistory] = useState<
-    { id: string; prompt: string; response: string; timestamp: string }[]
-  >([]);
-
-  const handlePromptSubmit = (prompt: string): void => {
-    setIsAiLoading(true);
-    setTimeout(() => {
-      const response = `🔍 AI Analysis Result:\n\nYou asked: "${prompt}"\n\nHere’s a summary or predicted insight based on your query.`;
-      setAiOutput(response);
-      setIsAiLoading(false);
-      setHistory((prev) => [
-        {
-          id: crypto.randomUUID(),
-          prompt,
-          response,
-          timestamp: new Date().toISOString()
-        },
-        ...prev
-      ]);
-    }, 1500);
-  };
 
   const pageTitle =
     clients === null
@@ -90,8 +72,7 @@ export default function Dashboard() {
     : clients?._id ?? null;
 
   const organizationId =
-    clients === null ||
-    (Array.isArray(clients) && clients.length === 0)
+    clients === null || (Array.isArray(clients) && clients.length === 0)
       ? organization?.id ?? null
       : null;
 
@@ -142,12 +123,7 @@ export default function Dashboard() {
               transition={{ type: "spring", stiffness: 70, damping: 20 }}
               className="px-6 pb-10"
             >
-              <div className="space-y-6">
-                <h1 className="text-2xl font-semibold mb-4">AI Assistant</h1>
-                <PromptBox onSubmit={handlePromptSubmit} />
-                <PromptOutput output={aiOutput} isLoading={isAiLoading} />
-                <PromptHistory history={history} />
-              </div>
+              <LLMChatPage />
             </motion.div>
           )}
         </AnimatePresence>

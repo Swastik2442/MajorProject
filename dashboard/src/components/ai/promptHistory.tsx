@@ -1,7 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageSquare, Bot } from "lucide-react";
+import { MessageSquare, Clock } from "lucide-react";
 
 export interface PromptHistoryItem {
   id: string;
@@ -15,64 +14,48 @@ interface PromptHistoryProps {
 }
 
 const PromptHistory: React.FC<PromptHistoryProps> = ({ history }) => {
-  if (history.length === 0) {
-    return (
-      <Card className="bg-[#101827] border border-gray-700 shadow-lg mt-6">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-100">
-            Prompt History
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-500 italic">No history yet. Try submitting a prompt!</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="mt-6"
+    <motion.aside
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.35 }}
+      className="bg-[#0e1620] border border-[#1f2933] rounded-xl p-4 shadow-md flex flex-col h-[78vh] overflow-hidden"
     >
-      <Card className="bg-[#101827] border border-gray-700 shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-100">
-            Prompt History
-          </CardTitle>
-        </CardHeader>
+      <h3 className="text-lg font-semibold text-gray-100 mb-3">Prompt History</h3>
 
-        <CardContent className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+      {history.length === 0 ? (
+        <p className="text-gray-400 text-sm italic flex-1 flex items-center justify-center text-center px-2">
+          No history yet. Try submitting a prompt.
+        </p>
+      ) : (
+        <div className="space-y-3 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent flex-1">
           {history.map((item) => (
-            <motion.div
+            <div
               key={item.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25 }}
-              className="border border-gray-700 rounded-lg p-3 bg-[#1E293B] shadow-sm"
+              className="w-full text-left p-3 rounded-lg bg-[#0f1a26] border border-[#1b2732] hover:border-indigo-600 transition-colors cursor-default"
             >
-              <div className="flex items-center gap-2 mb-1">
-                <MessageSquare className="w-4 h-4 text-indigo-400" />
-                <p className="text-gray-300 text-sm font-medium">
-                  {item.prompt}
-                </p>
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 flex-shrink-0 flex items-center justify-center bg-gradient-to-br from-indigo-600 to-cyan-400 rounded-md shadow">
+                  <MessageSquare className="w-4 h-4 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-100 font-medium truncate">{item.prompt}</p>
+                  <p className="text-[0.75rem] text-gray-400 line-clamp-2 break-words">
+                    {item.response}
+                  </p>
+                  <div className="flex items-center justify-end mt-1">
+                    <Clock className="w-3 h-3 text-gray-500 mr-1" />
+                    <span className="text-[0.7rem] text-gray-500">
+                      {new Date(item.timestamp).toLocaleTimeString()}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-start gap-2 mt-2">
-                <Bot className="w-4 h-4 text-emerald-400 mt-1" />
-                <p className="text-gray-400 text-sm whitespace-pre-wrap">
-                  {item.response}
-                </p>
-              </div>
-              <p className="text-[0.7rem] text-gray-500 mt-2 text-right">
-                {new Date(item.timestamp).toLocaleString()}
-              </p>
-            </motion.div>
+            </div>
           ))}
-        </CardContent>
-      </Card>
-    </motion.div>
+        </div>
+      )}
+    </motion.aside>
   );
 };
 
