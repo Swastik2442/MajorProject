@@ -1,7 +1,7 @@
 """Response schema definitions for the agent."""
 
 from collections.abc import Sequence
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -36,6 +36,9 @@ class Chart(BaseModel):
     data_series: Sequence[DataSeries] = Field(
         description="List of data series included in the chart."
     )
+
+class Mongo(BaseModel):
+    """Schema for MongoDB information in the response."""
     collection_name: str = Field(
         description="The name of the data collection to query."
     )
@@ -43,12 +46,31 @@ class Chart(BaseModel):
         description="The MongoDB aggregation pipeline to retrieve the data for the chart."
     )
 
+class ChartAndMongo(Chart, Mongo):
+    """Schema combining chart and MongoDB information."""
+
+class ChartAndData(Chart):
+    """Schema combining chart and data information."""
+    data: Any = Field(
+        description="The actual data to be used for generating the chart."
+    )
+
 class ChartAgg(BaseModel):
     """Response schema for the agent."""
     description: str = Field(
         description="A brief description of the response."
     )
-    charts: Sequence[Chart] | None = Field(
+    charts: Sequence[ChartAndMongo] | None = Field(
+        None,
+        description="A list of charts to be generated, if any."
+    )
+
+class ChartsData(BaseModel):
+    """Schema for the complete response including data and message."""
+    description: str = Field(
+        description="A brief description of the response."
+    )
+    charts: Sequence[ChartAndData] | None = Field(
         None,
         description="A list of charts to be generated, if any."
     )
