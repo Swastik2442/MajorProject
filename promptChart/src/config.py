@@ -20,6 +20,11 @@ class Settings(BaseSettings):
     )
     DEBUG: bool = Field(default=False)
 
+    OPENAI_COMPAT_API_URL : str = Field(
+        default="http://localhost:1234/v1",
+        validation_alias=AliasChoices('OPENAI_COMPAT_API_URL', 'OPENAI_API_URL', 'OPENAI_BASE_URL'),
+    )
+
     MONGO_CONNECTION_URI: MongoDsn = Field(
         validation_alias=AliasChoices('MONGO_URI', 'MONGO_CONNECTION_URI', 'MONGODB_URI', 'MONGODB_CONNECTION_URI'),
     )

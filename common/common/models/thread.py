@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 from common.schemas.chartAgg import ChartAgg
 
 from .base import BaseInterface
-from .utils import MyDatetime, now
+from .utils import MyDatetime, none, now
 
 class PromptResponse(BaseModel):
     """PromptResponse model representing a response in a Thread."""
@@ -15,7 +15,8 @@ class PromptResponse(BaseModel):
         title="Prompt",
         description="The prompt sent in the thread"
     )
-    response: ChartAgg = Field(
+    response: ChartAgg | None = Field(
+        default_factory=none,
         title="Response",
         description="The response received for the prompt"
     )
@@ -26,7 +27,7 @@ class PromptResponse(BaseModel):
     )
 
 class Thread(BaseInterface):
-    """Thread model representing an NMS server sending alerts."""
+    """Thread model representing an Agent Thread created by invoking an Agent."""
     class Meta(BaseInterface.Meta):
         @classmethod
         def collection_name(cls) -> str:
@@ -37,8 +38,22 @@ class Thread(BaseInterface):
         description="Identifier for the user associated with the thread"
     )
 
+    title: str = Field(
+        default_factory=lambda: "Untitled Thread",
+        title="Title",
+        description="Title of the thread"
+    )
+
     promptResponses: Sequence[PromptResponse] = Field(
         default_factory=list,
         title="Problem Updates",
         description="Updates done to the problem"
+    )
+
+class ThreadLean(BaseInterface):
+    """Lean representation of a Thread model."""
+    title: str = Field(
+        default_factory=lambda: "Untitled Thread",
+        title="Title",
+        description="Title of the thread"
     )

@@ -3,7 +3,7 @@
 from .client import Client, ClientCreate, ClientListItem, ClientUpdate, ClientOwnerUpdate
 from .problem import Problem, ProblemUpdate, ProblemDatetimesAndStatus, ProblemDatetimesStatusAndSeverity, ProblemClientIdAndHostname
 from .service import Service, ServiceUpdate, ServiceDatetimesAndStatus, ServiceDatetimesStatusAndSeverity, ServiceClientIdAndServiceName
-from .thread import Thread
+from .thread import Thread, ThreadLean
 
 __all__ = [
     "Client",
@@ -22,4 +22,5 @@ __all__ = [
     "ServiceDatetimesStatusAndSeverity",
     "ServiceClientIdAndServiceName",
     "Thread",
+    "ThreadLean",
 ]
