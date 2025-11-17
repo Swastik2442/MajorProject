@@ -3,7 +3,7 @@
 from pymongo import ASCENDING
 from pymongo.asynchronous.database import AsyncDatabase
 
-from common.models import Client, Problem, Service
+from common.models import Client, Problem, Service, Thread
 from common.models.utils import fields
 
 async def init_collections(db: AsyncDatabase) -> None:
@@ -23,5 +23,9 @@ async def init_collections(db: AsyncDatabase) -> None:
     await db[Service.Meta.collection_name()].create_index([
         (fields(Service).zid, ASCENDING), (fields(Service).clientId, ASCENDING)
     ], unique=True)
+
+    await db[Thread.Meta.collection_name()].create_index([
+        (fields(Thread).userId, ASCENDING)
+    ])
 
 __all__ = ["init_collections"]

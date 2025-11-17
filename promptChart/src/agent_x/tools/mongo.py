@@ -5,7 +5,6 @@ from pymongo.asynchronous.database import AsyncDatabase
 from langchain.tools import tool, ToolRuntime
 
 from common.models import Problem, Service
-from common.models.utils import PyObjectId
 
 AVAILABLE_COLLECTIONS = [Problem, Service]
 
@@ -13,7 +12,6 @@ AVAILABLE_COLLECTIONS = [Problem, Service]
 class MongoDBAggContext(BaseModel):
     """Context for MongoDB aggregation tool."""
     db: AsyncDatabase = Field(exclude=True)
-    client_ids: list[PyObjectId]
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -27,13 +25,9 @@ async def run_mongodb_aggregation(
     if collection_name not in [m.Meta.collection_name() for m in AVAILABLE_COLLECTIONS]:
         return [{"error": f"Collection '{collection_name}' is not available."}]
 
-    client_ids = runtime.context.client_ids
     db = runtime.context.db
     try:
-        result = await db[collection_name].aggregate([
-            {"$match": {"clientId": {"$in": client_ids}}}, # Only allow access to specified client IDs
-            *aggregation_pipeline
-        ])
+        result = await db[collection_name].aggregate(aggregation_pipeline)
         documents = await result.to_list()
         return documents # TODO: Only let the model read a summary, not the actual documents
     except Exception as e:

@@ -3,7 +3,7 @@
 from langchain.agents import create_agent
 from langchain.agents.middleware import ToolRetryMiddleware
 
-from src.agent_x.response import ResponseFormat, response_format_text
+from common.schemas.chartAgg import ChartAgg as ResponseFormat, chart_agg_format_text as response_format_text
 from src.agent_x.tools import ContextSchema, tools, tools_description
 from src.middlewares import LoggingMiddleware, VerifyResponseMiddleware
 from src.models.local_model import local_model

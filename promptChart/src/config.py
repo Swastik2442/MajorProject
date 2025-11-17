@@ -1,5 +1,6 @@
 "Configuration for the application"
 
+from collections.abc import Sequence
 from typing import Literal
 
 from pydantic import AliasChoices, Field, MongoDsn
@@ -24,9 +25,9 @@ class Settings(BaseSettings):
     )
     MONGO_DB_NAME: str = Field("nms")
 
-    LANGSMITH_API_KEY: str = Field(
-        default="",
-        validation_alias=AliasChoices('LANGSMITH_API_KEY', 'LANGCHAIN_TRACING_V2_API_KEY'),
+    ALLOWED_ORIGINS: Sequence[str] = Field(
+        default_factory=lambda: ["http://localhost:5000"],
+        validation_alias=AliasChoices('ALLOWED_ORIGINS', 'ALLOW_ORIGINS', 'CORS_ALLOW_ORIGINS', 'ORIGINS'),
     )
 
 config = Settings() # type: ignore[call-arg]

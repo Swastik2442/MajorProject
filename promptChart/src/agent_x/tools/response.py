@@ -4,7 +4,7 @@ from typing import Literal
 from langchain.tools import tool
 from pydantic import ValidationError
 
-from src.agent_x.response import ResponseFormat
+from common.schemas.chartAgg import ChartAgg as ResponseFormat
 
 @tool
 def get_response_format() -> dict[str, str]:

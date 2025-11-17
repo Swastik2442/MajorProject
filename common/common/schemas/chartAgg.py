@@ -43,7 +43,7 @@ class Chart(BaseModel):
         description="The MongoDB aggregation pipeline to retrieve the data for the chart."
     )
 
-class ResponseFormat(BaseModel):
+class ChartAgg(BaseModel):
     """Response schema for the agent."""
     description: str = Field(
         description="A brief description of the response."
@@ -53,7 +53,7 @@ class ResponseFormat(BaseModel):
         description="A list of charts to be generated, if any."
     )
 
-response_format_text = """\
+chart_agg_format_text = """\
 {
     "description": "<string - brief description of the response>",
     "charts": null OR [
