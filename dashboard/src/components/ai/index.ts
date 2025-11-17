@@ -1,2 +1,4 @@
 import LLMChatPage from "./LLMChatPage";
-export { LLMChatPage };
+import PromptHistory from "./promptHistory";
+
+export { LLMChatPage, PromptHistory };

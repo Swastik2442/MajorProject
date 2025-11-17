@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { MessageSquare, Clock } from "lucide-react";
+import { MessageSquare, Clock, Trash2 } from "lucide-react";
 
 export interface PromptHistoryItem {
   id: string;
@@ -11,9 +11,10 @@ export interface PromptHistoryItem {
 
 interface PromptHistoryProps {
   history: PromptHistoryItem[];
+  onClear?: () => void;
 }
 
-const PromptHistory: React.FC<PromptHistoryProps> = ({ history }) => {
+const PromptHistory: React.FC<PromptHistoryProps> = ({ history, onClear }) => {
   return (
     <motion.aside
       initial={{ opacity: 0, x: -10 }}
@@ -21,7 +22,19 @@ const PromptHistory: React.FC<PromptHistoryProps> = ({ history }) => {
       transition={{ duration: 0.35 }}
       className="bg-[#0e1620] border border-[#1f2933] rounded-xl p-4 shadow-md flex flex-col h-[78vh] overflow-hidden"
     >
-      <h3 className="text-lg font-semibold text-gray-100 mb-3">Prompt History</h3>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-lg font-semibold text-gray-100">Prompt History</h3>
+
+        {history.length > 0 && (
+          <button
+            onClick={onClear}
+            className="flex items-center gap-1 text-xs text-gray-400 hover:text-red-400 transition"
+          >
+            <Trash2 className="w-3 h-3" />
+            Clear
+          </button>
+        )}
+      </div>
 
       {history.length === 0 ? (
         <p className="text-gray-400 text-sm italic flex-1 flex items-center justify-center text-center px-2">
