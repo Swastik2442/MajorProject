@@ -17,16 +17,16 @@ import type { TClientsParams } from "@/schemas/api";
 import { apiService } from "@/services/api";
 
 const colors = [
-  "#06b6d4",
-  "#0ea5e9",
   "#3b82f6",
-  "#6366f1",
-  "#8b5cf6",
-  "#a855f7",
-  "#d946ef",
-  "#ec4899",
-  "#f43f5e",
-  "#fb7185",
+  "#2563eb",
+  "#1d4ed8",
+  "#1e40af",
+  "#1e3a8a",
+  "#0ea5e9",
+  "#0284c7",
+  "#0369a1",
+  "#0c4a6e",
+  "#164e63",
 ] as const;
 
 function CustomTooltip({ active, payload, label }: TooltipContentProps<number | string, string>) {
@@ -98,11 +98,11 @@ export default function TopProblematicHostsChart({
       <ResponsiveContainer width="100%" height={320}>
         <BarChart data={chartData} barSize={28}>
           <defs>
-            <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#06b6d4" stopOpacity={0.9} />
-              <stop offset="100%" stopColor="#0f172a" stopOpacity={0.2} />
-            </linearGradient>
-          </defs>
+  <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.95} />
+    <stop offset="100%" stopColor="#1e3a8a" stopOpacity={0.35} />
+  </linearGradient>
+</defs>
           <CartesianGrid strokeDasharray="4 4" opacity={0.2} vertical={false} />
           <XAxis
             dataKey="name"
