@@ -5,10 +5,14 @@ from logging import getLogger
 from typing import Annotated
 
 from fastapi import Depends
-import hishel
+
+try:
+    import hishel
+    from common.services.redis import redis_service
+except ImportError as e:
+    raise ImportError("To work with Caching service, please install using 'pip install common[caching]'.") from e
 
 from common.services import Service
-from common.services.redis import redis_service
 
 Storage = hishel.FileStorage | hishel.RedisStorage | None
 AsyncStorage = hishel.AsyncFileStorage | hishel.AsyncRedisStorage | None

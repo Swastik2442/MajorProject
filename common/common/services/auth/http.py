@@ -5,9 +5,14 @@ from typing import Annotated, Any
 
 from fastapi import HTTPException, Depends, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-import jwt
 
-from .clerk import clerk_service
+try:
+    import jwt
+    from .clerk import clerk_service
+except ImportError as e:
+    raise ImportError(
+        "To work with Authentication service, please install using 'pip install common[auth]'."
+    ) from e
 
 logger = getLogger(__name__)
 

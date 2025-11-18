@@ -5,6 +5,7 @@ from typing import Annotated, Any
 
 from fastapi import Depends
 from pydantic import MongoDsn
+
 from pymongo import AsyncMongoClient
 from pymongo.asynchronous.database import AsyncDatabase
 

@@ -136,6 +136,11 @@ class StatServiceAlertCount(StatAlertCount, frozen=True):
 class StatAlertDurations(BaseModel):
     durationSeconds: Sequence[int | Literal["Infinity"]] = Field()
 
+class PromptParams(BaseModel):
+    prompt: str = Field(min_length=3, max_length=5000)
+class ThreadParams(BaseModel):
+    thread_id: PyObjectId
+
 __all__ = [
     "IntervalSeconds",
     "StatCounts",
@@ -147,5 +152,7 @@ __all__ = [
     "StatAlertCount",
     "StatHostAlertCount",
     "StatServiceAlertCount",
-    "StatAlertDurations"
+    "StatAlertDurations",
+    "PromptParams",
+    "ThreadParams",
 ]

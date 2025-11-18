@@ -51,7 +51,7 @@ name = "api"
 version = "0.4.1"
 source = { virtual = "." }
 dependencies = [
-    { name = "common" },
+    { name = "common", extra = ["auth", "caching"] },
     { name = "fastapi", extra = ["standard"] },
     { name = "pydantic" },
     { name = "pydantic-settings" },
@@ -60,7 +60,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "common", directory = "../common" },
+    { name = "common", extras = ["auth", "caching"], directory = "../common" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.121.0" },
     { name = "pydantic", specifier = ">=2.12.3" },
     { name = "pydantic-settings", specifier = ">=2.11.0" },
@@ -238,34 +238,39 @@ wheels = [
 
 [[package]]
 name = "common"
-version = "0.4.2"
+version = "0.5.2"
 source = { directory = "../common" }
 dependencies = [
+    { name = "fastapi" },
+    { name = "pydantic" },
+    { name = "pymongo" },
+    { name = "tzdata" },
+]
+
+[package.optional-dependencies]
+auth = [
     { name = "bcrypt" },
     { name = "clerk-backend-api" },
-    { name = "fastapi" },
-    { name = "hishel", extra = ["httpx"] },
-    { name = "pydantic" },
-    { name = "pydantic-settings" },
     { name = "pyjwt" },
-    { name = "pymongo" },
+]
+caching = [
+    { name = "hishel", extra = ["httpx"] },
     { name = "redis" },
-    { name = "tzdata" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "bcrypt", specifier = ">=5.0.0" },
-    { name = "clerk-backend-api", specifier = ">=3.3.1" },
+    { name = "bcrypt", marker = "extra == 'auth'", specifier = ">=5.0.0" },
+    { name = "clerk-backend-api", marker = "extra == 'auth'", specifier = ">=3.3.1" },
     { name = "fastapi", specifier = ">=0.121.0" },
-    { name = "hishel", extras = ["httpx"], specifier = "==0.1.4" },
+    { name = "hishel", extras = ["httpx"], marker = "extra == 'caching'", specifier = "==0.1.4" },
     { name = "pydantic", specifier = ">=2.12.3" },
-    { name = "pydantic-settings", specifier = ">=2.11.0" },
-    { name = "pyjwt", specifier = ">=2.10.1" },
+    { name = "pyjwt", marker = "extra == 'auth'", specifier = ">=2.10.1" },
     { name = "pymongo", specifier = ">=4.15.3" },
-    { name = "redis", specifier = ">=7.0.1" },
+    { name = "redis", marker = "extra == 'caching'", specifier = ">=7.0.1" },
     { name = "tzdata", specifier = ">=2025.2" },
 ]
+provides-extras = ["auth", "caching"]
 
 [[package]]
 name = "cryptography"

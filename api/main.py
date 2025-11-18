@@ -15,7 +15,7 @@ from common.services.hishel import hishel_service
 from common.services.redis import redis_service
 from common.schemas import Response as CustomResponse
 from src.config import config
-from src.routes import alerts_router, clients_router, sse_router
+from src.routes import alerts_router, clients_router, prompt_chart_router, sse_router
 
 logging.basicConfig(level=logging.DEBUG if config.DEBUG else None)
 logger = logging.getLogger()
@@ -73,4 +73,5 @@ def favicon():
 
 app.include_router(alerts_router)
 app.include_router(clients_router)
+app.include_router(prompt_chart_router)
 app.include_router(sse_router)

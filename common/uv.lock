@@ -196,34 +196,39 @@ wheels = [
 
 [[package]]
 name = "common"
-version = "0.4.2"
+version = "0.5.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "fastapi" },
+    { name = "pydantic" },
+    { name = "pymongo" },
+    { name = "tzdata" },
+]
+
+[package.optional-dependencies]
+auth = [
     { name = "bcrypt" },
     { name = "clerk-backend-api" },
-    { name = "fastapi" },
-    { name = "hishel", extra = ["httpx"] },
-    { name = "pydantic" },
-    { name = "pydantic-settings" },
     { name = "pyjwt" },
-    { name = "pymongo" },
+]
+caching = [
+    { name = "hishel", extra = ["httpx"] },
     { name = "redis" },
-    { name = "tzdata" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "bcrypt", specifier = ">=5.0.0" },
-    { name = "clerk-backend-api", specifier = ">=3.3.1" },
+    { name = "bcrypt", marker = "extra == 'auth'", specifier = ">=5.0.0" },
+    { name = "clerk-backend-api", marker = "extra == 'auth'", specifier = ">=3.3.1" },
     { name = "fastapi", specifier = ">=0.121.0" },
-    { name = "hishel", extras = ["httpx"], specifier = "==0.1.4" },
+    { name = "hishel", extras = ["httpx"], marker = "extra == 'caching'", specifier = "==0.1.4" },
     { name = "pydantic", specifier = ">=2.12.3" },
-    { name = "pydantic-settings", specifier = ">=2.11.0" },
-    { name = "pyjwt", specifier = ">=2.10.1" },
+    { name = "pyjwt", marker = "extra == 'auth'", specifier = ">=2.10.1" },
     { name = "pymongo", specifier = ">=4.15.3" },
-    { name = "redis", specifier = ">=7.0.1" },
+    { name = "redis", marker = "extra == 'caching'", specifier = ">=7.0.1" },
     { name = "tzdata", specifier = ">=2025.2" },
 ]
+provides-extras = ["auth", "caching"]
 
 [[package]]
 name = "cryptography"
@@ -487,20 +492,6 @@ wheels = [
 ]
 
 [[package]]
-name = "pydantic-settings"
-version = "2.11.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pydantic" },
-    { name = "python-dotenv" },
-    { name = "typing-inspection" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/20/c5/dbbc27b814c71676593d1c3f718e6cd7d4f00652cefa24b75f7aa3efb25e/pydantic_settings-2.11.0.tar.gz", hash = "sha256:d0e87a1c7d33593beb7194adb8470fc426e95ba02af83a0f23474a04c9a08180", size = 188394, upload-time = "2025-09-24T14:19:11.764Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/83/d6/887a1ff844e64aa823fb4905978d882a633cfe295c32eacad582b78a7d8b/pydantic_settings-2.11.0-py3-none-any.whl", hash = "sha256:fe2cea3413b9530d10f3a5875adffb17ada5c1e1bab0b2885546d7310415207c", size = 48608, upload-time = "2025-09-24T14:19:10.015Z" },
-]
-
-[[package]]
 name = "pyjwt"
 version = "2.10.1"
 source = { registry = "https://pypi.org/simple" }
@@ -558,15 +549,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/5b/fe/7a6a6b331d9f2024ab171028ab53d5d9026959b1d713fe170be591a4d9a8/pymongo-4.15.3-cp314-cp314t-win32.whl", hash = "sha256:e7cde58ef6470c0da922b65e885fb1ffe04deef81e526bd5dea429290fa358ca", size = 1043993, upload-time = "2025-10-07T21:57:28.727Z" },
     { url = "https://files.pythonhosted.org/packages/70/c8/bc64321711e19bd48ea3371f0082f10295c433833245d73e7606d3b9afbe/pymongo-4.15.3-cp314-cp314t-win_amd64.whl", hash = "sha256:fae552767d8e5153ed498f1bca92d905d0d46311d831eefb0f06de38f7695c95", size = 1078481, upload-time = "2025-10-07T21:57:30.372Z" },
     { url = "https://files.pythonhosted.org/packages/39/31/2bb2003bb978eb25dfef7b5f98e1c2d4a86e973e63b367cc508a9308d31c/pymongo-4.15.3-cp314-cp314t-win_arm64.whl", hash = "sha256:47ffb068e16ae5e43580d5c4e3b9437f05414ea80c32a1e5cac44a835859c259", size = 1051179, upload-time = "2025-10-07T21:57:31.829Z" },
-]
-
-[[package]]
-name = "python-dotenv"
-version = "1.2.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/f0/26/19cadc79a718c5edbec86fd4919a6b6d3f681039a2f6d66d14be94e75fb9/python_dotenv-1.2.1.tar.gz", hash = "sha256:42667e897e16ab0d66954af0e60a9caa94f0fd4ecf3aaf6d2d260eec1aa36ad6", size = 44221, upload-time = "2025-10-26T15:12:10.434Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/14/1b/a298b06749107c305e1fe0f814c6c74aea7b2f1e10989cb30f544a1b3253/python_dotenv-1.2.1-py3-none-any.whl", hash = "sha256:b81ee9561e9ca4004139c6cbba3a238c32b03e4894671e181b671e8cb8425d61", size = 21230, upload-time = "2025-10-26T15:12:09.109Z" },
 ]
 
 [[package]]
