@@ -13,6 +13,18 @@ services:
     volumes:
       - mongodb_data:/data/db
 
+  # PostgreSQL Database for LangChain Checkpoints
+  postgres:
+    image: postgres:15
+    container_name: langchain-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: langchain
+      POSTGRES_PASSWORD: langchain_pass
+      POSTGRES_DB: langchain
+    volumes:
+      - langchain_pg_data:/var/lib/postgresql/data
+
   # NMS Server
   nms:
     build:
@@ -28,6 +40,25 @@ services:
     ports:
       - "5000:5000"
     depends_on:
+      - mongodb
+
+  # promptChart Server
+  prompt-chart:
+    build:
+      context: .
+      dockerfile: promptChart/Dockerfile
+    container_name: prompt-chart
+    restart: unless-stopped
+    environment:
+      - ENV=${ENV}
+      - DEBUG=${DEBUG}
+      - DB_URI=postgresql://langchain:langchain_pass@langchain-postgres/postgres?sslmode=disable
+      - MONGO_CONNECTION_URI=mongodb://root:password@db:27017/
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+    ports:
+      - "4200:4200"
+    depends_on:
+      - postgres
       - mongodb
 
   # API Server
@@ -50,6 +81,8 @@ services:
       - "2442:2442"
     depends_on:
       - mongodb
+      - prompt-chart
 
 volumes:
   mongodb_data:
+  langchain_pg_data:

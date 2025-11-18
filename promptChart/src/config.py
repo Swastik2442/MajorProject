@@ -3,7 +3,7 @@
 from collections.abc import Sequence
 from typing import Literal
 
-from pydantic import AliasChoices, Field, MongoDsn
+from pydantic import AliasChoices, Field, MongoDsn, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
@@ -19,6 +19,10 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices('ENV', 'ENVIRONMENT', 'APP_ENV', 'APPLICATION_ENV'),
     )
     DEBUG: bool = Field(default=False)
+
+    DB_URI: PostgresDsn = Field(
+        validation_alias=AliasChoices('DATABASE_URL', 'DB_URI', 'POSTGRES_URI', 'POSTGRES_DSN'),
+    )
 
     OPENAI_COMPAT_API_URL : str = Field(
         default="http://localhost:1234/v1",
