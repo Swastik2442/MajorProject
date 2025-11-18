@@ -94,11 +94,13 @@ export default function DurationOverThresholdChart({
       <ResponsiveContainer width="100%" height={320}>
         <BarChart data={chartData} barSize={28}>
           <defs>
-            <linearGradient id="barGradientYellow" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.9} />
-              <stop offset="100%" stopColor="#78350f" stopOpacity={0.25} />
-            </linearGradient>
-          </defs>
+  <linearGradient id="barGradientYellow" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stopColor="#fbbf24" stopOpacity={1} />
+    <stop offset="60%" stopColor="#f59e0b" stopOpacity={0.9} />
+    <stop offset="100%" stopColor="#78350f" stopOpacity={0.7} />
+  </linearGradient>
+</defs>
+
 
           <CartesianGrid strokeDasharray="4 4" opacity={0.2} vertical={false} />
           <XAxis
