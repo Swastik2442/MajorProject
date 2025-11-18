@@ -38,14 +38,17 @@ async def get_user_threads(
     threads = [ThreadLean(**thread_doc) async for thread_doc in threads_cursor]
     return PaginatedDataResponse(data=threads, page=query.page, limit=query.limit)
 
-@router.get("{thread_id}/response", response_model=DataResponse[ResponseFormat])
-@router.get("{thread_id}/response/{index}", response_model=DataResponse[ResponseFormat])
+@router.get("{user_id}/{thread_id}/response", response_model=DataResponse[ResponseFormat])
+@router.get("{user_id}/{thread_id}/response/{index}", response_model=DataResponse[ResponseFormat])
 async def get_thread_response(
-    thread_id: PyObjectId,
+    user_id: Annotated[str, Path()],
+    thread_id: Annotated[PyObjectId, Path()],
     db: Database,
-    index: int = -1,
+    index: Annotated[int, Path()] | Annotated[int | None, Query()] = -1,
 ) -> DataResponse[ResponseFormat]:
-    thread = await db[Thread.Meta.collection_name()].find_one({"_id": thread_id})
+    thread = await db[Thread.Meta.collection_name()].find_one(
+        {"_id": thread_id, fields(Thread).userId: user_id}
+    )
     if thread is None:
         return DataResponse(message="No such thread ID found")
 
@@ -53,6 +56,8 @@ async def get_thread_response(
     if len(thread.promptResponses) == 0:
         return DataResponse(message="No responses found for the given thread ID")
 
+    if index is None:
+        index = -1
     if index < -len(thread.promptResponses) or index >= len(thread.promptResponses):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Index out of bounds for prompt responses.")
 

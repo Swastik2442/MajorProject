@@ -61,6 +61,7 @@ async def start_agent_x(
             _id=thread_id,
             userId=user_id,
             title=prompt,
+            numberOfPrompts=1,
             promptResponses=[
                 PromptResponse(prompt=prompt, response=finalResponse)
             ]
@@ -68,9 +69,15 @@ async def start_agent_x(
     else:
         await db[Thread.Meta.collection_name()].update_one(
             {"_id": thread_id},
-            {"$push": {
-                fields(Thread).promptResponses: to_doc(PromptResponse(prompt=prompt, response=finalResponse))
-            }}
+            {
+                "$push": {
+                    fields(Thread).promptResponses: to_doc(PromptResponse(
+                        prompt=prompt,
+                        response=finalResponse
+                    ))
+                },
+                "$inc": {fields(Thread).numberOfPrompts: 1}
+            }
         )
 
 # TODO: Add Langfuse for tracing

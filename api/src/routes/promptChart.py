@@ -31,10 +31,13 @@ async def start_prompt_chart(
     user_id: JwtUserId,
     hishel: HishelAsyncCacheClient
 ):
-    req = await hishel.post(f"{config.LANGCHAIN_API_URL}/agents/x/invoke", data={
-        "user_id": str(user_id),
-        "prompt": body.prompt
-    })
+    req = await hishel.post(
+        f"{config.LANGCHAIN_API_URL}/agents/x/invoke",
+        data={
+            "user_id": str(user_id),
+            "prompt": body.prompt
+        }
+    )
     req.raise_for_status()
     res = await req.json()
 
@@ -52,11 +55,14 @@ async def continue_prompt_chart(
     user_id: JwtUserId,
     hishel: HishelAsyncCacheClient
 ):
-    req = await hishel.post(f"{config.LANGCHAIN_API_URL}/agents/x/invoke", data={
-        "user_id": str(user_id),
-        "prompt": body.prompt,
-        "thread_id": body.thread_id
-    })
+    req = await hishel.post(
+        f"{config.LANGCHAIN_API_URL}/agents/x/invoke",
+        data={
+            "user_id": str(user_id),
+            "prompt": body.prompt,
+            "thread_id": body.thread_id
+        }
+    )
     req.raise_for_status()
     return JSONResponse(
         {"message": "Execution started"},
@@ -69,18 +75,23 @@ async def get_prompt_chart_threads(
     user_id: JwtUserId,
     hishel: HishelAsyncCacheClient
 ):
-    req = await hishel.get(f"{config.LANGCHAIN_API_URL}/threads", params={
-        "user_id": str(user_id),
-        "page": query.page,
-        "limit": query.limit,
-    })
+    req = await hishel.get(
+        f"{config.LANGCHAIN_API_URL}/threads",
+        params={
+            "user_id": str(user_id),
+            "page": query.page,
+            "limit": query.limit,
+        }
+    )
     req.raise_for_status()
     res = await req.json()
 
-    return JSONResponse(
-        {"data": res['data'], "page": res['page'], "limit": res['limit'], "message": "Threads fetched successfully"},
-        status_code=status.HTTP_200_OK,
-    )
+    return {
+        "data": res['data'],
+        "page": res['page'],
+        "limit": res['limit'],
+        "message": "Threads fetched successfully"
+    }
 
 async def run_aggregation_pipeline(
     clients: ClientsFromQuery,
@@ -91,7 +102,7 @@ async def run_aggregation_pipeline(
     result = await db[collection_name].aggregate([
         {"$match": {"clientId": {"$in": [c.id for c in clients if c.id is not None]}}},
         *pipeline
-    ])
+    ], comment="AI-Generated Pipeline Execution")
     return await result.to_list()
 
 @router.get("/threads/{thread_id}", response_model=DataResponse[ChartsData])
@@ -104,15 +115,18 @@ async def get_prompt_chart_thread_details(
     db: Database,
     index: Annotated[int, Path()] | None = -1,
 ):
-    req = await hishel.get(f"{config.LANGCHAIN_API_URL}/threads/{thread_id}/response/{index}", params={
-        "user_id": str(user_id),
-    })
+    if index is None:
+        index = -1
+    req = await hishel.get(
+        f"{config.LANGCHAIN_API_URL}/threads/{user_id}/{thread_id}/response/{index}"
+    )
     req.raise_for_status()
     res = await req.json()
     if res['data'] is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=res.get('message', 'No data found'))
-    res=ChartAgg(**res['data'])
-    ret=ChartsData(
+        raise HTTPException(status.HTTP_404_NOT_FOUND, res.get('message', 'No data found'))
+    res = ChartAgg(**res['data'])
+
+    return {"data": ChartsData(
         description=res.description,
         charts=[
             ChartAndData(
@@ -127,9 +141,4 @@ async def get_prompt_chart_thread_details(
                 )
             ) for chart in res.charts or []
         ]
-    )
-
-    return JSONResponse(
-        {"data": ret, "message": "Thread details fetched successfully"},
-        status_code=status.HTTP_200_OK,
-    )
+    )}

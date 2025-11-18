@@ -44,6 +44,11 @@ class Thread(BaseInterface):
         description="Title of the thread"
     )
 
+    numberOfPrompts: int = Field(
+        default_factory=lambda: 0,
+        title="Number of Prompts",
+        description="Total number of prompts in the thread"
+    )
     promptResponses: Sequence[PromptResponse] = Field(
         default_factory=list,
         title="Problem Updates",
@@ -56,4 +61,9 @@ class ThreadLean(BaseInterface):
         default_factory=lambda: "Untitled Thread",
         title="Title",
         description="Title of the thread"
+    )
+    numberOfPrompts: int = Field(
+        default_factory=lambda: 0,
+        title="Number of Prompts",
+        description="Total number of prompts in the thread"
     )
