@@ -1,11 +1,12 @@
-import React, { useEffect, useRef, useState, type JSX } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import PromptHistory from "./promptHistory";
 import { Send, Bot } from "lucide-react";
+import type { TClientsParams } from "@/schemas/api";
+import PromptHistory from "./PromptHistory";
 
-export default function LLMChatPage(): JSX.Element {
+export default function LLMChatPage({ client_id = null, org_id = null }: TClientsParams) {
   const [history, setHistory] = useState<
-    { id: string; prompt: string; response: string; timestamp: string }[]
+    { id: string; prompt: string; response: string; timestamp: Date }[]
   >([]);
   const [prompt, setPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -23,27 +24,8 @@ export default function LLMChatPage(): JSX.Element {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [history, isLoading]);
 
-  // Keyboard shortcut: Ctrl + L clears chat
-  useEffect(() => {
-    const listener = (e: KeyboardEvent): void => {
-      if (e.ctrlKey && e.key === "l") {
-        e.preventDefault();
-        setHistory([]);
-      }
-    };
-
-    window.addEventListener("keydown", listener);
-    return () => {
-      window.removeEventListener("keydown", listener);
-    };
-  }, []);
-
   // Handle submitting a prompt
-  const handleSubmit = (e?: React.FormEvent): void => {
-    if (e) {
-      e.preventDefault();
-    }
-
+  const handleSubmit = (): void => {
     const trimmed = prompt.trim();
     if (!trimmed || isLoading) {
       return;
@@ -62,7 +44,7 @@ export default function LLMChatPage(): JSX.Element {
             id,
             prompt: trimmed,
             response: resp,
-            timestamp: new Date().toISOString()
+            timestamp: new Date()
           },
           ...prev
         ];
@@ -90,7 +72,7 @@ export default function LLMChatPage(): JSX.Element {
             <Bot className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-100">AI Chat Assistant</h2>
+            <h2 className="text-xl font-semibold text-gray-100">AI Assistant</h2>
             <p className="text-sm text-gray-400">
               Ask about network stats, predictions, or analytics insights.
             </p>
@@ -118,15 +100,12 @@ export default function LLMChatPage(): JSX.Element {
                 <div className="flex justify-end">
                   <div className="max-w-[75%] bg-[#111c2b] border border-[#1f2b3b] text-gray-100 rounded-xl px-4 py-2 shadow-sm break-words">
                     <p className="text-sm whitespace-pre-wrap">{item.prompt}</p>
-                    <div className="text-[0.7rem] text-gray-500 text-right mt-1">You</div>
+                    <div className="text-[0.7rem] text-gray-500 text-right mt-1">{item.timestamp.toLocaleString()}</div>
                   </div>
                 </div>
 
                 {/* AI RESPONSE */}
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-md bg-gradient-to-br from-indigo-600 to-cyan-400 flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-4 h-4 text-white" />
-                  </div>
+                <div className="flex">
                   <div className="bg-[#071522] border border-[#0d2940] rounded-xl px-4 py-3 shadow max-w-[80%] break-words">
                     <p className="text-gray-200 text-sm whitespace-pre-wrap">
                       {item.response}

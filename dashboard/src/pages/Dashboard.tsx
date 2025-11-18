@@ -10,7 +10,7 @@ import Metadata from "@/components/Metadata";
 import SetClientele from "@/components/SetClientele";
 import ChartsDashboard from "@/components/charts";
 import DateRangeFilter from "@/components/DateRangeFilter";
-import { LLMChatPage } from "@/components/ai";
+import AIChat from "@/components/ai";
 import {
   Select,
   SelectContent,
@@ -87,7 +87,7 @@ export default function Dashboard(): JSX.Element {
         <SetClientele />
       </nav>
 
-      <div className="relative w-full min-h-screen no-scrollbar">
+      <div className="relative w-full no-scrollbar">
         <AlertBanner text="SQL Injection on DB-SRV01 - High" />
         <AnimatePresence mode="wait" initial={false}>
           {view === "Dashboard" && (
@@ -117,13 +117,12 @@ export default function Dashboard(): JSX.Element {
           {view === "AI" && (
             <motion.div
               key="ai-dashboard"
-              initial={{ y: 50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -50, opacity: 0 }}
+              initial={{ x: "100%", opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: "100%", opacity: 0 }}
               transition={{ type: "spring", stiffness: 70, damping: 20 }}
-              className="px-6 pb-10"
             >
-              <LLMChatPage />
+              <AIChat client_id={clientIds} org_id={organizationId} />
             </motion.div>
           )}
         </AnimatePresence>
