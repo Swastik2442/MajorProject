@@ -1,23 +1,26 @@
 import axios from "axios";
-import type {
-  ApiService,
-  TDataResponseClientListItem,
-  TDataResponseStr,
-  TPaginatedClientListItemDataResponse,
-  TPaginatedProblemDataResponse,
-  TPaginatedProblemOrServiceDataResponse,
-  TPaginatedServiceDataResponse,
-  TResponse,
-  TStatCommonCountsDataResponse,
-  TStatCommonTrendsDataResponse,
-  TStatCountsDataResponse,
-  TStatHealthScoresDataResponse,
-  TStatHostsProblemsCountDataResponse,
-  TStatTrendsDataResponse,
-  TStatProblematicAlertTrendsDataResponse,
-  TStatAlertDurationPerHostDataResponse,
-  TStatAlertDurationPerServiceDataResponse,
-  TStatServicesProblemsCountDataResponse,
+import {
+  type ApiService,
+  DataResponseClientListItemSchema,
+  DataResponseStrSchema,
+  PaginatedClientListItemDataResponseSchema,
+  PaginatedProblemDataResponseSchema,
+  PaginatedProblemOrServiceDataResponseSchema,
+  PaginatedServiceDataResponseSchema,
+  ResponseSchema,
+  StatCommonCountsDataResponseSchema,
+  StatCommonTrendsDataResponseSchema,
+  StatCountsDataResponseSchema,
+  StatHealthScoresDataResponseSchema,
+  StatHostsProblemsCountDataResponseSchema,
+  StatTrendsDataResponseSchema,
+  StatProblematicAlertTrendsDataResponseSchema,
+  StatAlertDurationPerHostDataResponseSchema,
+  StatAlertDurationPerServiceDataResponseSchema,
+  StatServicesProblemsCountDataResponseSchema,
+  DataResponseThreadParamsSchema,
+  PaginatedThreadLeanDataResponseSchema,
+  DataResponseChartsDataSchema,
 } from "@/schemas/api";
 
 const BASE = import.meta.env.VITE_API_URL || "/api";
@@ -50,193 +53,232 @@ export const apiService: ApiService = {
   // --- PROBLEMS ---
 
   getTriggerAlerts: async (params) => {
-    const response = await api.get<TPaginatedProblemDataResponse>(
+    const response = await api.get(
       "/alerts/triggers/",
       { params }
     );
-    return response.data;
+    return PaginatedProblemDataResponseSchema.parse(response.data);
   },
 
   getTriggerAlertsCount: async (params) => {
-    const response = await api.get<TStatCountsDataResponse>(
+    const response = await api.get(
       "/alerts/triggers/count",
       { params }
     );
-    return response.data;
+    return StatCountsDataResponseSchema.parse(response.data);
   },
 
   getTriggerAlertTrends: async (params) => {
-    const response = await api.get<TStatTrendsDataResponse>(
+    const response = await api.get(
       "/alerts/triggers/trends",
       { params }
     );
-    return response.data;
+    return StatTrendsDataResponseSchema.parse(response.data);
   },
 
   getHostsHealthScores: async (params) => {
-    const response = await api.get<TStatHealthScoresDataResponse>(
+    const response = await api.get(
       "/alerts/triggers/hosts/health",
       { params }
     );
-    return response.data;
+    return StatHealthScoresDataResponseSchema.parse(response.data);
   },
 
   getHostsProblemsCount: async (params) => {
-    const response = await api.get<TStatHostsProblemsCountDataResponse>(
+    const response = await api.get(
       "/alerts/triggers/hosts/count",
       { params }
     );
-    return response.data;
+    return StatHostsProblemsCountDataResponseSchema.parse(response.data);
   },
 
   getProblematicTriggerAlertTrends: async (params) => {
-    const response = await api.get<TStatProblematicAlertTrendsDataResponse>(
+    const response = await api.get(
       "/alerts/triggers/trends/problematic-alerts",
       { params }
     );
-    return response.data;
+    return StatProblematicAlertTrendsDataResponseSchema.parse(response.data);
   },
 
   getAlertDurationPerHost: async (params) => {
-    const response = await api.get<TStatAlertDurationPerHostDataResponse>(
+    const response = await api.get(
       "/alerts/triggers/hosts/duration",
       { params }
     );
-    return response.data;
+    return StatAlertDurationPerHostDataResponseSchema.parse(response.data);
   },
 
   // --- SERVICE ALERTS ---
 
   getServiceAlerts: async (params) => {
-    const response = await api.get<TPaginatedServiceDataResponse>(
+    const response = await api.get(
       "/alerts/services/",
       { params }
     );
-    return response.data;
+    return PaginatedServiceDataResponseSchema.parse(response.data);
   },
 
   getServiceAlertsCount: async (params) => {
-    const response = await api.get<TStatCountsDataResponse>(
+    const response = await api.get(
       "/alerts/services/count",
       { params }
     );
-    return response.data;
+    return StatCountsDataResponseSchema.parse(response.data);
   },
 
   getServiceAlertTrends: async (params) => {
-    const response = await api.get<TStatTrendsDataResponse>(
+    const response = await api.get(
       "/alerts/services/trends",
       { params }
     );
-    return response.data;
+    return StatTrendsDataResponseSchema.parse(response.data);
   },
 
   getServicesHealthScores: async (params) => {
-    const response = await api.get<TStatHealthScoresDataResponse>(
+    const response = await api.get(
       "/alerts/services/health",
       { params }
     );
-    return response.data;
+    return StatHealthScoresDataResponseSchema.parse(response.data);
   },
 
   getServicesProblemsCount: async (params) => {
-    const response = await api.get<TStatServicesProblemsCountDataResponse>(
+    const response = await api.get(
       "/alerts/services/count/services",
       { params }
     );
-    return response.data;
+    return StatServicesProblemsCountDataResponseSchema.parse(response.data);
   },
 
   getProblematicServiceAlertTrends: async (params) => {
-    const response = await api.get<TStatProblematicAlertTrendsDataResponse>(
+    const response = await api.get(
       "/alerts/services/trends/problematic-alerts",
       { params }
     );
-    return response.data;
+    return StatProblematicAlertTrendsDataResponseSchema.parse(response.data);
   },
 
   getAlertDurationPerService: async (params) => {
-    const response = await api.get<TStatAlertDurationPerServiceDataResponse>(
+    const response = await api.get(
       "/alerts/services/duration",
       { params }
     );
-    return response.data;
+    return StatAlertDurationPerServiceDataResponseSchema.parse(response.data);
   },
 
   // --- COMMON ALERTS ---
 
   getCommonAlerts: async (params) => {
-    const response = await api.get<TPaginatedProblemOrServiceDataResponse>(
+    const response = await api.get(
       "/alerts/common/",
       { params }
     );
-    return response.data;
+    return PaginatedProblemOrServiceDataResponseSchema.parse(response.data);
   },
 
   getCommonAlertsCount: async (params) => {
-    const response = await api.get<TStatCommonCountsDataResponse>(
+    const response = await api.get(
       "/alerts/common/count",
       { params }
     );
-    return response.data;
+    return StatCommonCountsDataResponseSchema.parse(response.data);
   },
 
   getCommonAlertTrends: async (params) => {
-    const response = await api.get<TStatCommonTrendsDataResponse>(
+    const response = await api.get(
       "/alerts/common/trends",
       { params }
     );
-    return response.data;
+    return StatCommonTrendsDataResponseSchema.parse(response.data);
   },
 
   // --- CLIENT MANAGEMENT ---
 
   createClient: async (data) => {
-    const response = await api.post<TDataResponseStr>("/clients/", { ...data });
-    return response.data;
+    const response = await api.post(
+      "/clients/",
+      { ...data }
+    );
+    return DataResponseStrSchema.parse(response.data);
   },
 
   listClients: async (params) => {
-    const response = await api.get<TPaginatedClientListItemDataResponse>(
+    const response = await api.get(
       "/clients/",
       { params }
     );
-    return response.data;
+    return PaginatedClientListItemDataResponseSchema.parse(response.data);
   },
 
   getClient: async (client_id) => {
-    const response = await api.get<TDataResponseClientListItem>(
+    const response = await api.get(
       `/clients/${client_id}`
     );
-    return response.data;
+    return DataResponseClientListItemSchema.parse(response.data);
   },
 
   updateClient: async (client_id, data) => {
-    const response = await api.put<TResponse>(
+    const response = await api.put(
       `/clients/${client_id}`,
       { ...data }
     );
-    return response.data;
+    return ResponseSchema.parse(response.data);
   },
 
   deleteClient: async (client_id) => {
-    const response = await api.delete<TResponse>(`/clients/${client_id}`);
-    return response.data;
+    const response = await api.delete(`/clients/${client_id}`);
+    return ResponseSchema.parse(response.data);
   },
 
   regenerateClientApiKey: async (client_id) => {
-    const response = await api.put<TDataResponseStr>(
+    const response = await api.put(
       `/clients/${client_id}/regenerate_api_key`
     );
-    return response.data;
+    return DataResponseStrSchema.parse(response.data);
   },
 
   changeClientOwner: async (client_id, data) => {
-    const response = await api.put<TResponse>(
+    const response = await api.put(
       `/clients/${client_id}/change_owner`,
       { ...data }
     );
-    return response.data;
+    return ResponseSchema.parse(response.data);
+  },
+
+  // --- AI ---
+
+  startPromptChart: async (body) => {
+    const response = await api.post(
+      "/promptChart/start",
+      { ...body }
+    );
+    return DataResponseThreadParamsSchema.parse(response.data);
+  },
+
+  continuePromptChart: async (body) => {
+    const response = await api.post(
+      "/promptChart/continue",
+      { ...body }
+    );
+    return ResponseSchema.parse(response.data);
+  },
+
+  getPromptChartThreads: async (params) => {
+    const response = await api.get(
+      "/promptChart/threads",
+      { params }
+    );
+    return PaginatedThreadLeanDataResponseSchema.parse(response.data);
+  },
+
+  getPromptChartThreadDetails: async (params) => {
+    const response = await api.get(
+      (params.index !== undefined
+        ? `/promptChart/threads/${params.thread_id}/${params.index}`
+        : `/promptChart/threads/${params.thread_id}`),
+      { params: { client_id: params.client_id, org_id: params.org_id } }
+    );
+    return DataResponseChartsDataSchema.parse(response.data);
   },
 };
 

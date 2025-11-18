@@ -106,6 +106,34 @@ export const ServiceSchema = z.object({
   updates: z.array(UpdateSchema),
 });
 
+export const ThreadLeanSchema = z.object({
+  _id: z.string().min(1),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+  title: z.string().min(1),
+  numberOfPrompts: z.number().int().min(0),
+});
+
+export const DataSeriesSchema = z.object({
+  key: z.string().min(1),
+  label: z.string().min(1),
+  color: z.string().min(1),
+  data_type: z.enum(["number", "string", "date"]),
+  multiple_entries: z.boolean().default(true),
+});
+
+export const ChartAndDataSchema = z.object({
+  type: z.enum(["bar", "box", "line", "pie", "scatter"]),
+  description: z.string(),
+  dataSeries: z.array(DataSeriesSchema),
+  data: z.any(),
+});
+
+export const ChartsDataSchema = z.object({
+  description: z.string(),
+  charts: z.union([z.array(ChartAndDataSchema), z.null()]),
+});
+
 export const ProblemOrServiceSchema = z.union([ProblemSchema, ServiceSchema]);
 
 export const ProblemClientIdAndHostnameSchema = ProblemSchema.pick({
@@ -215,6 +243,19 @@ export const ClientsParamsSchema = z.object({
   ]).optional(),
 });
 
+export const PromptParamsSchema = z.object({
+  prompt: z.string().min(1),
+});
+export const ThreadParamsSchema = z.object({
+  thread_id: z.string().min(1),
+});
+export const IndexParamsSchema = z.object({
+  index: z.number().int().min(0).optional(),
+});
+
+export const PromptAndThreadParamsSchema = PromptParamsSchema.extend(ThreadParamsSchema.shape);
+export const ThreadAndIndexParamsSchema = ThreadParamsSchema.extend(IndexParamsSchema.shape);
+
 export const PaginationParamsSchema = z.object({
   page: z.number().int().min(1).default(1).optional(),
   limit: z.number().int().min(1).max(100).default(20).optional(),
@@ -230,6 +271,8 @@ export const InfiniteTimePeriodParamsSchema = z.object({
   start: z.union([z.iso.datetime(), z.null()]).optional(),
   end: z.union([z.iso.datetime(), z.null()]).optional(),
 });
+
+export const ThreadAndIndexWithClientsParamsSchema = ThreadAndIndexParamsSchema.extend(ClientsParamsSchema.shape);
 
 export const TimePeriodWithClientsParamsSchema = TimePeriodParamsSchema.extend(ClientsParamsSchema.shape);
 export const TimePeriodWithClientsAndSeverityParamsSchema = TimePeriodWithClientsParamsSchema.extend({
@@ -249,6 +292,10 @@ export const PaginationWithOwnerIdParamsSchema = PaginationParamsSchema.extend({
 export type TSeveritySchema = z.infer<typeof SeveritySchema>;
 export type TProblem = z.infer<typeof ProblemSchema>;
 export type TService = z.infer<typeof ServiceSchema>;
+export type TThreadLean = z.infer<typeof ThreadLeanSchema>;
+export type TDataSeries = z.infer<typeof DataSeriesSchema>;
+export type TChartAndData = z.infer<typeof ChartAndDataSchema>;
+export type TChartsData = z.infer<typeof ChartsDataSchema>;
 export type TProblemOrService = z.infer<typeof ProblemOrServiceSchema>;
 export type TProblemClientIdAndHostname = z.infer<typeof ProblemClientIdAndHostnameSchema>;
 export type TServiceClientIdAndServiceName = z.infer<typeof ServiceClientIdAndServiceNameSchema>;
@@ -280,6 +327,9 @@ export type TPaginatedProblemDataResponse = z.infer<typeof PaginatedProblemDataR
 
 export const PaginatedServiceDataResponseSchema = PaginatedDataResponseSchema(ServiceSchema);
 export type TPaginatedServiceDataResponse = z.infer<typeof PaginatedServiceDataResponseSchema>;
+
+export const PaginatedThreadLeanDataResponseSchema = PaginatedDataResponseSchema(ThreadLeanSchema);
+export type TPaginatedThreadLeanDataResponse = z.infer<typeof PaginatedThreadLeanDataResponseSchema>;
 
 export const PaginatedProblemOrServiceDataResponseSchema = PaginatedDataResponseSchema(ProblemOrServiceSchema);
 export type TPaginatedProblemOrServiceDataResponse = z.infer<typeof PaginatedProblemOrServiceDataResponseSchema>;
@@ -326,6 +376,12 @@ export type TPaginatedClientListItemDataResponse = z.infer<typeof PaginatedClien
 export const DataResponseClientListItemSchema = DataResponseSchema(ClientListItemSchema);
 export type TDataResponseClientListItem = z.infer<typeof DataResponseClientListItemSchema>;
 
+export const DataResponseThreadParamsSchema = DataResponseSchema(ThreadParamsSchema);
+export type TDataResponseThreadParams = z.infer<typeof DataResponseThreadParamsSchema>;
+
+export const DataResponseChartsDataSchema = DataResponseSchema(ChartsDataSchema);
+export type TDataResponseChartsData = z.infer<typeof DataResponseChartsDataSchema>;
+
 export const DataResponseStrSchema = DataResponseSchema(z.string());
 export type TDataResponseStr = z.infer<typeof DataResponseStrSchema>;
 
@@ -335,8 +391,14 @@ export type TIdParam = z.infer<typeof IdSchema>;
 export type TTimeIntervalParam = z.infer<typeof TimeIntervalSchema>;
 export type TClientParam = z.infer<typeof ClientParamSchema>;
 export type TClientsParams = z.infer<typeof ClientsParamsSchema>;
+export type TPromptParams = z.infer<typeof PromptParamsSchema>;
+export type TThreadParams = z.infer<typeof ThreadParamsSchema>;
+export type TIndexParams = z.infer<typeof IndexParamsSchema>;
+export type TPromptAndThreadParams = z.infer<typeof PromptAndThreadParamsSchema>;
+export type TThreadAndIndexParams = z.infer<typeof ThreadAndIndexParamsSchema>;
 export type TPaginationParams = z.infer<typeof PaginationParamsSchema>;
 export type TTimePeriodParams = z.infer<typeof TimePeriodParamsSchema>;
+export type TThreadAndIndexWithClientsParams = z.infer<typeof ThreadAndIndexWithClientsParamsSchema>;
 export type TTimePeriodWithClientsParams = z.infer<typeof TimePeriodWithClientsParamsSchema>;
 export type TTimePeriodWithClientsAndSeverityParams = z.infer<typeof TimePeriodWithClientsAndSeverityParamsSchema>;
 export type TInfiniteTimePeriodWithClientsParams = z.infer<typeof InfiniteTimePeriodWithClientsParamsSchema>;
@@ -346,10 +408,12 @@ export type TPaginationWithOwnerIdParams = z.infer<typeof PaginationWithOwnerIdP
 // --- API Service Interface ---
 
 export interface ApiService {
+  // Common Alert endpoints
   getCommonAlerts: (params: TPaginationWithClientsParams) => Promise<TPaginatedProblemOrServiceDataResponse>;
   getCommonAlertsCount: (params: TClientsParams) => Promise<TStatCommonCountsDataResponse>;
   getCommonAlertTrends: (params: TTimePeriodWithClientsParams) => Promise<TStatCommonTrendsDataResponse>;
 
+  // Problem Alert endpoints
   getTriggerAlerts: (params: TPaginationWithClientsParams) => Promise<TPaginatedProblemDataResponse>;
   getTriggerAlertsCount: (params: TClientsParams) => Promise<TStatCountsDataResponse>;
   getTriggerAlertTrends: (params: TTimePeriodWithClientsParams) => Promise<TStatTrendsDataResponse>;
@@ -358,6 +422,7 @@ export interface ApiService {
   getProblematicTriggerAlertTrends: (params: TTimePeriodWithClientsAndSeverityParams) => Promise<TStatProblematicAlertTrendsDataResponse>;
   getAlertDurationPerHost: (params: TInfiniteTimePeriodWithClientsParams) => Promise<TStatAlertDurationPerHostDataResponse>;
 
+  // Service Alert endpoints
   getServiceAlerts: (params: TPaginationWithClientsParams) => Promise<TPaginatedServiceDataResponse>;
   getServiceAlertsCount: (params: TClientsParams) => Promise<TStatCountsDataResponse>;
   getServiceAlertTrends: (params: TTimePeriodWithClientsParams) => Promise<TStatTrendsDataResponse>;
@@ -374,4 +439,10 @@ export interface ApiService {
   deleteClient: (client_id: string) => Promise<TResponse>;
   regenerateClientApiKey: (client_id: string) => Promise<TDataResponseStr>;
   changeClientOwner: (client_id: string, body: TClientOwnerUpdate) => Promise<TResponse>;
+
+  // AI endpoints
+  startPromptChart: (body: TPromptParams) => Promise<TDataResponseThreadParams>;
+  continuePromptChart: (body: TPromptAndThreadParams) => Promise<TResponse>;
+  getPromptChartThreads: (params: TPaginationParams) => Promise<TPaginatedThreadLeanDataResponse>;
+  getPromptChartThreadDetails: (params: TThreadAndIndexWithClientsParams) => Promise<TDataResponseChartsData>;
 }

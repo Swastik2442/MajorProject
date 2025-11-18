@@ -139,6 +139,6 @@ async def get_prompt_chart_thread_details(
                     chart.mongodb_aggregation_pipeline,
                     db
                 )
-            ) for chart in res.charts or []
+            ) for chart in (res.charts or [])
         ]
     )}
