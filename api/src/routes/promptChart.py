@@ -4,7 +4,7 @@ from collections.abc import Sequence
 from logging import getLogger
 from typing import Annotated
 
-from fastapi import APIRouter, Body, HTTPException, Path, status
+from fastapi import APIRouter, Body, HTTPException, Path, Query, status
 from fastapi.responses import JSONResponse
 
 from common.models import ThreadLean
@@ -31,18 +31,17 @@ async def start_prompt_chart(
     user_id: JwtUserId,
     hishel: HishelAsyncCacheClient
 ):
-    req = await hishel.post(
+    res = await hishel.post(
         f"{config.LANGCHAIN_API_URL}/agents/x/invoke",
-        data={
+        json={
             "user_id": str(user_id),
             "prompt": body.prompt
         }
     )
-    req.raise_for_status()
-    res = await req.json()
-
+    logger.warning("Response from hishel: %s", res.text)
+    res.raise_for_status()
     return JSONResponse(
-        {"data": {"thread_id": res['data']['thread_id']}, "message": "Execution started"},
+        res.json(),
         status_code=status.HTTP_202_ACCEPTED,
     )
 
@@ -55,15 +54,15 @@ async def continue_prompt_chart(
     user_id: JwtUserId,
     hishel: HishelAsyncCacheClient
 ):
-    req = await hishel.post(
+    res = await hishel.post(
         f"{config.LANGCHAIN_API_URL}/agents/x/invoke",
-        data={
+        json={
             "user_id": str(user_id),
             "prompt": body.prompt,
-            "thread_id": body.thread_id
+            "thread_id": str(body.thread_id)
         }
     )
-    req.raise_for_status()
+    res.raise_for_status()
     return JSONResponse(
         {"message": "Execution started"},
         status_code=status.HTTP_202_ACCEPTED,
@@ -71,27 +70,19 @@ async def continue_prompt_chart(
 
 @router.get("/threads", response_model=PaginatedDataResponse[Sequence[ThreadLean]])
 async def get_prompt_chart_threads(
-    query: PaginationParams,
+    query: Annotated[PaginationParams, Query()],
     user_id: JwtUserId,
     hishel: HishelAsyncCacheClient
 ):
-    req = await hishel.get(
-        f"{config.LANGCHAIN_API_URL}/threads",
+    res = await hishel.get(
+        f"{config.LANGCHAIN_API_URL}/threads/{user_id}",
         params={
-            "user_id": str(user_id),
             "page": query.page,
             "limit": query.limit,
         }
     )
-    req.raise_for_status()
-    res = await req.json()
-
-    return {
-        "data": res['data'],
-        "page": res['page'],
-        "limit": res['limit'],
-        "message": "Threads fetched successfully"
-    }
+    res.raise_for_status()
+    return res.json()
 
 async def run_aggregation_pipeline(
     clients: ClientsFromQuery,
@@ -117,17 +108,23 @@ async def get_prompt_chart_thread_details(
 ):
     if index is None:
         index = -1
-    req = await hishel.get(
+    res = await hishel.get(
         f"{config.LANGCHAIN_API_URL}/threads/{user_id}/{thread_id}/response/{index}"
     )
-    req.raise_for_status()
-    res = await req.json()
-    if res['data'] is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, res.get('message', 'No data found'))
-    res = ChartAgg(**res['data'])
+    data = res.json()
+
+    if res.status_code == status.HTTP_404_NOT_FOUND:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, data.get('message', 'No data found'))
+    if res.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, data.get('message', 'Unprocessable content'))
+    if data['data'] is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No response data found for the given thread and index.")
+    res.raise_for_status()
+
+    data = ChartAgg(**data['data'])
 
     return {"data": ChartsData(
-        description=res.description,
+        description=data.description,
         charts=[
             ChartAndData(
                 type=chart.type,
@@ -139,6 +136,6 @@ async def get_prompt_chart_thread_details(
                     chart.mongodb_aggregation_pipeline,
                     db
                 )
-            ) for chart in (res.charts or [])
+            ) for chart in (data.charts or [])
         ]
     )}

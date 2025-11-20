@@ -8,11 +8,16 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=api/uv.lock,target=uv.lock \
     --mount=type=bind,source=api/pyproject.toml,target=pyproject.toml \
     uv sync --locked --no-install-project --no-dev
-COPY api /app
+COPY promptChart /app
 RUN --mount=type=cache,target=/root/.cache/uv \
 uv sync --locked --no-dev
 
 FROM python:3.12-slim-bookworm
+
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN groupadd --system --gid 999 nonroot \
  && useradd --system --gid 999 --uid 999 --create-home nonroot

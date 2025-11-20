@@ -57,15 +57,14 @@ async def start_agent_x(
         {k: False for k in Thread.model_fields.keys()}
     )
     if thread_exists is None:
-        await db[Thread.Meta.collection_name()].insert_one(to_doc(Thread(
-            _id=thread_id,
+        await db[Thread.Meta.collection_name()].insert_one({**to_doc(Thread(
             userId=user_id,
             title=prompt,
             numberOfPrompts=1,
             promptResponses=[
                 PromptResponse(prompt=prompt, response=finalResponse)
             ]
-        )))
+        )), "_id": ObjectId(thread_id)})
     else:
         await db[Thread.Meta.collection_name()].update_one(
             {"_id": thread_id},
@@ -99,6 +98,6 @@ async def invoke_agent_x(
 
     background_tasks.add_task(start_agent_x, body.prompt, user_id, thread_id, context, db)
     return JSONResponse(
-        {"data": {"thread_id": thread_id}, "message": "Agent execution started in background."},
+        {"data": {"thread_id": str(thread_id)}, "message": "Agent execution started in background."},
         status_code=status.HTTP_202_ACCEPTED,
     )

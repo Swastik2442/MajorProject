@@ -23,6 +23,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "langgraph-cli[inmem]>=0.4.7",
+    "psycopg[binary]>=3.2.12",
 ]
 
 [tool.uv.sources]
