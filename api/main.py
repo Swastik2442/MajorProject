@@ -12,6 +12,7 @@ from common.exceptions import RequestValidationError as CustomRequestValidationE
 from common.services.auth.clerk import clerk_service
 from common.services.db import db_service
 from common.services.hishel import hishel_service
+from common.services.mq import mq_service
 from common.services.redis import redis_service
 from common.schemas import Response as CustomResponse
 from src.config import config
@@ -26,6 +27,7 @@ async def lifespan(_app: FastAPI):
     await redis_service.connect(dsn=config.REDIS_URL)
     await hishel_service.connect()
     await clerk_service.connect(bearer_auth=config.CLERK_SECRET_KEY, jwks_url=config.CLERK_JWKS_URL, issuer=config.CLERK_ISSUER)
+    await mq_service.connect(rabbit_host=config.RABBITMQ_HOST)
 
     yield
 
@@ -33,6 +35,7 @@ async def lifespan(_app: FastAPI):
     await redis_service.disconnect()
     await hishel_service.disconnect()
     await clerk_service.disconnect()
+    await mq_service.disconnect()
 
 app = FastAPI(
     title="NMS API",

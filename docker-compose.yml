@@ -25,6 +25,14 @@ services:
     volumes:
       - langchain_pg_data:/var/lib/postgresql/data
 
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
   # NMS Server
   nms:
     build:
@@ -61,6 +69,7 @@ services:
     depends_on:
       - postgres
       - mongodb
+      - rabbitmq
 
   # API Server
   api:
@@ -84,6 +93,7 @@ services:
     depends_on:
       - mongodb
       - prompt-chart
+      - rabbitmq
 
 volumes:
   mongodb_data:

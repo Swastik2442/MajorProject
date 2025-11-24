@@ -30,6 +30,11 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices('REDIS_URL', 'REDIS_URI'),
     )
 
+    RABBITMQ_HOST: str = Field(
+        default="localhost",
+        validation_alias=AliasChoices('RABBITMQ_HOST', 'RABBIT_HOST', 'RABBITMQ_URI', 'RABBIT_URI'),
+    )
+
     CLERK_ISSUER: str
     CLERK_JWKS_URL: str
     CLERK_SECRET_KEY: str

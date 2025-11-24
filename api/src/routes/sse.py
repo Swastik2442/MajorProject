@@ -1,34 +1,49 @@
 "API Routes for handling Server-Sent Events (SSE)"
 
-import json
-import logging
-from asyncio import sleep
+from asyncio import CancelledError
+from logging import getLogger
 
 from fastapi import APIRouter
-from sse_starlette.sse import EventSourceResponse
+from aio_pika import AMQPException
+from sse_starlette import EventSourceResponse, JSONServerSentEvent
 
 from common.services.auth import JwtUserId
-from src.middlewares.client import ClientsFromQuery
+from common.services.mq import MQAioPikaConnection
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 router = APIRouter(
     prefix="/sse",
     tags=["other"],
 )
 
-async def event_getter():
-    waypoints = open('waypoints.json')
-    waypoints = json.load(waypoints)
-    for waypoint in waypoints[0: 10]:
-        data = json.dumps(waypoint)
-        yield f"event: locationUpdate\ndata: {data}\n\n"
-        await sleep(1)
+async def event_generator(
+    mq_connection: MQAioPikaConnection,
+    queue_name: str
+):
+    channel = None
+    try:
+        channel = await mq_connection.channel()
+        queue = await channel.declare_queue(queue_name, auto_delete=True)
+
+        async with queue.iterator() as queue_iter:
+            async for message in queue_iter:
+                async with message.process(ignore_processed=True):
+                    await message.ack()
+                    yield JSONServerSentEvent({"data": message.body.decode()})
+
+    except AMQPException as e:
+        logger.error(f"Error connecting with RabbitMQ: {e}")
+    except CancelledError as e:
+        logger.info(f"Task cancelled: {e}")
+    finally:
+        if channel:
+            await channel.close()
 
 @router.get("")
 @router.get("/")
 def sse(
-    clients: ClientsFromQuery,
     user_id: JwtUserId,
+    mq_connection: MQAioPikaConnection
 ) -> EventSourceResponse:
-    return EventSourceResponse(event_getter())
+    return EventSourceResponse(event_generator(mq_connection, f"user_queue_{user_id}"))
