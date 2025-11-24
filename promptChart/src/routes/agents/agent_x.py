@@ -36,12 +36,16 @@ async def start_agent_x(
         recursion_limit=100
     )
 
-    aiResponse = await agent_x.ainvoke(
-        {"messages": [{"role": "user", "content": prompt}]},
-        config=agent_config,
-        context=context
-    )
-    aiContent = aiResponse["messages"][-1].content
+    try:
+        aiResponse = await agent_x.ainvoke(
+            {"messages": [{"role": "user", "content": prompt}]},
+            config=agent_config,
+            context=context
+        )
+        aiContent = aiResponse["messages"][-1].content
+    except Exception as e:
+        logger.error("Error while invoking Agent X for thread %s: %s", thread_id, str(e))
+        aiContent = None
 
     if aiContent is None or aiContent.strip() == "":
         finalResponse = None
@@ -53,7 +57,7 @@ async def start_agent_x(
 
     # save last response to database
     thread_exists = await db[Thread.Meta.collection_name()].find_one(
-        {"_id": thread_id, fields(Thread).userId: user_id},
+        {"_id": ObjectId(thread_id), fields(Thread).userId: user_id},
         {k: False for k in Thread.model_fields.keys()}
     )
     if thread_exists is None:
@@ -67,7 +71,7 @@ async def start_agent_x(
         )), "_id": ObjectId(thread_id)})
     else:
         await db[Thread.Meta.collection_name()].update_one(
-            {"_id": thread_id},
+            {"_id": ObjectId(thread_id)},
             {
                 "$push": {
                     fields(Thread).promptResponses: to_doc(PromptResponse(

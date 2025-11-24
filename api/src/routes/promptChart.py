@@ -8,11 +8,12 @@ from fastapi import APIRouter, Body, HTTPException, Path, Query, status
 from fastapi.responses import JSONResponse
 
 from common.models import ThreadLean
+from common.models.thread import PromptResponse
 from common.models.utils import PyObjectId
 from common.services.db import Database
 from common.services.auth import JwtUserId
 from common.services.hishel import HishelAsyncCacheClient
-from common.schemas import ChartAgg, ChartsData, ChartAndData, DataResponse, PaginatedDataResponse, Response as CustomResponse
+from common.schemas import ChartsData, ChartAndData, DataResponse, PaginatedDataResponse, Response as CustomResponse
 
 from src.config import config
 from src.middlewares.client import ClientsFromQuery
@@ -117,14 +118,15 @@ async def get_prompt_chart_thread_details(
         raise HTTPException(status.HTTP_404_NOT_FOUND, data.get('message', 'No data found'))
     if res.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, data.get('message', 'Unprocessable content'))
-    if data['data'] is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No response data found for the given thread and index.")
     res.raise_for_status()
 
-    data = ChartAgg(**data['data'])
+    data = PromptResponse(**data['data'])
+    logger.warning("Fetched PromptResponse: %s", data)
 
     return {"data": ChartsData(
-        description=data.description,
+        createdAt=data.createdAt,
+        prompt=data.prompt,
+        description=data.response.description if data.response is not None else "",
         charts=[
             ChartAndData(
                 type=chart.type,
@@ -136,6 +138,6 @@ async def get_prompt_chart_thread_details(
                     chart.mongodb_aggregation_pipeline,
                     db
                 )
-            ) for chart in (data.charts or [])
-        ]
+            ) for chart in (data.response.charts or []) # pylint: disable=E1101
+        ] if data.response is not None else None
     )}

@@ -5,6 +5,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
+from common.models.utils import MyDatetime
+
 class DataSeries(BaseModel):
     """Schema for individual data keys in the chart."""
     key: str = Field(
@@ -67,6 +69,12 @@ class ChartAgg(BaseModel):
 
 class ChartsData(BaseModel):
     """Schema for the complete response including data and message."""
+    prompt: str = Field(
+        description="The prompt associated with the response."
+    )
+    createdAt: MyDatetime = Field(
+        description="The creation timestamp of the response."
+    )
     description: str = Field(
         description="A brief description of the response."
     )

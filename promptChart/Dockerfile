@@ -30,7 +30,7 @@ USER nonroot
 
 WORKDIR /app
 
-RUN mkdir /app/.cache
+RUN mkdir -p /app/.cache
 
 EXPOSE 4200
 

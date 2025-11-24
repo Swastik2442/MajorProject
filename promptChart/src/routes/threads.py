@@ -9,9 +9,10 @@ from fastapi import APIRouter, HTTPException, Path, Query, status
 from pymongo import DESCENDING
 
 from common.models import Thread, ThreadLean
+from common.models.thread import PromptResponse
 from common.models.utils import fields, PyObjectId
 from common.services.db import Database
-from common.schemas import ChartAgg as ResponseFormat, DataResponse, PaginatedDataResponse
+from common.schemas import DataResponse, PaginatedDataResponse
 
 from src.schemas import PaginationParams
 
@@ -39,15 +40,14 @@ async def get_user_threads(
     threads = [ThreadLean(**thread_doc) async for thread_doc in threads_cursor]
     return PaginatedDataResponse(data=threads, page=query.page, limit=query.limit)
 
-@router.get("/{user_id}/{thread_id}/response", response_model=DataResponse[ResponseFormat])
-@router.get("/{user_id}/{thread_id}/response/{index}", response_model=DataResponse[ResponseFormat])
+@router.get("/{user_id}/{thread_id}/response", response_model=DataResponse[PromptResponse])
+@router.get("/{user_id}/{thread_id}/response/{index}", response_model=DataResponse[PromptResponse])
 async def get_thread_response(
     user_id: Annotated[str, Path()],
     thread_id: Annotated[PyObjectId, Path()],
     db: Database,
     index: Annotated[int, Path()] | Annotated[int | None, Query()] = -1,
-) -> DataResponse[ResponseFormat]:
-    logger.warning("Fetching response for thread_id: %s, user_id: %s, index: %s", thread_id, user_id, index)
+) -> DataResponse[PromptResponse]:
     thread = await db[Thread.Meta.collection_name()].find_one(
         {"_id": ObjectId(thread_id), fields(Thread).userId: user_id}
     )
@@ -63,4 +63,4 @@ async def get_thread_response(
     if index < -len(thread.promptResponses) or index >= len(thread.promptResponses):
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Index out of bounds for prompt responses.")
 
-    return DataResponse(data=thread.promptResponses[index].response)
+    return DataResponse(data=thread.promptResponses[index])
