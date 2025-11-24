@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Send, Bot } from "lucide-react";
 import type { TClientsParams, TDataResponseThreadParams, TResponse } from "@/schemas/api";
 import { apiService } from "@/services/api";
+import ChartMaker from "./ChartMaker";
 import PromptHistory from "./PromptHistory";
 
 // TODO: This is just a testing implementation and should be improved for actual use.
@@ -115,9 +116,9 @@ export default function LLMChatPage({ client_id = null, org_id = null }: TClient
                 {/* AI RESPONSE */}
                 <div className="flex">
                   <div className="bg-[#071522] border border-[#0d2940] rounded-xl px-4 py-3 shadow break-words">
-                    <p className="text-gray-200 text-sm whitespace-pre-wrap">
-                      {JSON.stringify(data.charts)}
-                    </p>
+                    {data.charts?.map((chart, idx) => (
+                      <ChartMaker key={`chart-${idx}`} data={chart} />
+                    )) ?? "No charts generated. Please refine your prompt."}
                   </div>
                 </div>
               </motion.div>
