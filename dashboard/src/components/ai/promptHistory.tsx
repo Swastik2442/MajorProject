@@ -1,21 +1,17 @@
-import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Trash2 } from "lucide-react";
+import { apiService } from "@/services/api";
 import { Button } from "@/components/ui/button";
 
-export interface PromptHistoryItem {
-  id: string;
-  prompt: string;
-  response: string;
-  timestamp: Date;
-}
+const PromptHistory = ({ setThreadId }: { setThreadId: (id: string | null) => void }) => {
+  const { data: raw } = useQuery({
+    queryKey: ["promptHistory"],
+    queryFn: () => apiService.getPromptChartThreads({ limit: 50 }),
+    staleTime: 60 * 1000, // 1 minute
+  });
+  const history = raw?.data ?? [];
 
-interface PromptHistoryProps {
-  history: PromptHistoryItem[];
-  onClear?: () => void;
-}
-
-const PromptHistory: React.FC<PromptHistoryProps> = ({ history }) => {
   return (
     <motion.aside
       initial={{ opacity: 0, x: -10 }}
@@ -31,16 +27,24 @@ const PromptHistory: React.FC<PromptHistoryProps> = ({ history }) => {
         </p>
       ) : (
         <div className="space-y-3 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent flex-1">
+          <div
+            onClick={() => {setThreadId(null)}}
+            className="w-full text-left p-3 rounded-lg bg-[#0f1a26] border border-[#1b2732] hover:border-indigo-600 transition-colors cursor-default"
+          >
+            <p aria-label="New Chat" className="text-sm text-gray-100 font-medium truncate">New Chat</p>
+          </div>
           {history.map((item) => (
             <div
-              key={item.id}
-              className="w-full text-left p-3 rounded-lg bg-[#0f1a26] border border-[#1b2732] hover:border-indigo-600 transition-colors cursor-default"
+              key={item._id}
+              onClick={() => {setThreadId(item._id)}}
+              className="w-full text-left p-3 rounded-lg bg-[#0f1a26] border border-[#1b2732] hover:border-indigo-600 transition-colors cursor-default group"
             >
-              <div className="flex justify-between items-center group">
-                <p title={item.prompt} className="text-sm text-gray-100 font-medium truncate">
-                  {item.prompt}
+              <div className="flex justify-between items-center gap-1">
+                <p title={item.title} className="text-sm text-gray-100 font-medium truncate">
+                  {item.title}
                 </p>
                 <div className="invisible group-hover:visible">
+                  {/* TODO: Add thread delete functionality */}
                   <Button
                     variant="ghost"
                     size="icon-sm"

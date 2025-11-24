@@ -7,8 +7,8 @@ import { LoadingSpinner } from "@/components/ui/icons";
 
 function MiniSpark({ data = [] }: { data: { v: number }[] }) {
   return (
-    <div style={{ width: 80, height: 28 }}>
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="w-[80px] h-[28px]">
+      <ResponsiveContainer width={80} height={28}>
         <LineChart data={data}>
           <Line
             type="monotone"
@@ -94,7 +94,7 @@ export default function ActivityStream({ client_id = null, org_id = null }: TCli
             </div>
 
             {/* Right side: spark + duration */}
-            <div className="flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-3">
               <MiniSpark
                 data={[0, 1, 0, 2, 1, 0].map((v) => ({ v }))}
               />

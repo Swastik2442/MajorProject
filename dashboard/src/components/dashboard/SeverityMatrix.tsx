@@ -162,7 +162,7 @@ export default function SeverityMatrix({
       </div>
 
       <div className="w-full h-[240px]">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height={240}>
           <BarChart
             data={data}
             layout="vertical"

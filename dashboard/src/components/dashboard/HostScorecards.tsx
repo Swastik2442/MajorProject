@@ -32,7 +32,7 @@ export default function HostScorecards({ client_id = null, org_id = null }: TCli
                 <div className="text-sm text-muted-foreground">Score</div>
               </div>
               <div className="w-[140px] h-[60px]">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width={140} height={60}>
                   <BarChart data={[h]}>
                     <Bar dataKey="notClassified" fill="#3b82f6" />
                     <Bar dataKey="information" fill="#3b82f6" />

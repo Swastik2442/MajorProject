@@ -79,7 +79,7 @@ export default function Dashboard(): JSX.Element {
   return (
     <>
       <Metadata title={`${pageTitle} | ${import.meta.env.VITE_APP_TITLE}`} />
-      <nav className="flex justify-between items-center mb-6">
+      <nav className="flex flex-col md:flex-row gap-2 justify-between items-center mb-6">
         <div className="flex gap-2">
           <SelectView view={view} setView={setView} />
           <DateRangeFilter dateRange={dateRange} setDateRange={setDateRange} />

@@ -69,7 +69,7 @@ export default function TrendsChart({
 
       {/* Chart */}
       <div className="w-full h-[260px]">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height={260}>
           <LineChart data={trends}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--muted)" />
             <XAxis

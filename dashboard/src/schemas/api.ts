@@ -130,6 +130,8 @@ export const ChartAndDataSchema = z.object({
 });
 
 export const ChartsDataSchema = z.object({
+  prompt: z.string(),
+  createdAt: z.iso.datetime(),
   description: z.string(),
   charts: z.union([z.array(ChartAndDataSchema), z.null()]),
 });
