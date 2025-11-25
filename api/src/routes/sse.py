@@ -33,9 +33,9 @@ async def event_generator(
                     yield JSONServerSentEvent({"data": message.body.decode()})
 
     except AMQPException as e:
-        logger.error(f"Error connecting with RabbitMQ: {e}")
+        logger.error("Error connecting with RabbitMQ: %s", e)
     except CancelledError as e:
-        logger.info(f"Task cancelled: {e}")
+        logger.info("Task cancelled: %s", e)
     finally:
         if channel:
             await channel.close()
