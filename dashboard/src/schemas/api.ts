@@ -125,7 +125,7 @@ export const DataSeriesSchema = z.object({
 export const ChartAndDataSchema = z.object({
   type: z.enum(["bar", "box", "line", "pie", "scatter"]),
   description: z.string(),
-  dataSeries: z.array(DataSeriesSchema),
+  data_series: z.array(DataSeriesSchema),
   data: z.any(),
 });
 
