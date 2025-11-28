@@ -61,6 +61,7 @@ services:
       - ENV=${ENV}
       - DEBUG=${DEBUG}
       - DB_URI=postgresql://langchain:langchain_pass@langchain-postgres/postgres?sslmode=disable
+      - RABBITMQ_HOST=rabbitmq
       - MONGO_CONNECTION_URI=mongodb://root:password@db:27017/
       - OPENAI_COMPAT_API_URL=http://host.docker.internal:1234/v1
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
@@ -84,6 +85,7 @@ services:
       - MONGO_CONNECTION_URI=mongodb://root:password@db:27017/
       - REDIS_URL=${REDIS_URL}
       - LANGCHAIN_API_URL=http://prompt-chart:4200
+      - RABBITMQ_HOST=rabbitmq
       - CLERK_ISSUER=${CLERK_ISSUER}
       - CLERK_JWKS_URL=${CLERK_JWKS_URL}
       - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
