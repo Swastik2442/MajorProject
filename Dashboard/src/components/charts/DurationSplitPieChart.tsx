@@ -81,7 +81,6 @@ export default function DurationSplitPieChart({
     return acc + n;
   }, 0);
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
   const thresholdAsWords = ms(threshold * 1000, { long: true });
   const chartData = [
     { name: `< ${thresholdAsWords}`, value: less4 },
@@ -98,19 +97,18 @@ export default function DurationSplitPieChart({
       <ResponsiveContainer width="100%" height={320}>
         <PieChart>
           <defs>
-  <radialGradient id="greenGradient" cx="0.5" cy="0.5" r="0.8">
-    <stop offset="0%" stopColor="#16f2a5" stopOpacity={1} />
-    <stop offset="70%" stopColor="#0fb981" stopOpacity={0.9} />
-    <stop offset="100%" stopColor="#046d4b" stopOpacity={0.85} />
-  </radialGradient>
+            <radialGradient id="greenGradient" cx="0.5" cy="0.5" r="0.8">
+              <stop offset="0%" stopColor="#16f2a5" stopOpacity={1} />
+              <stop offset="70%" stopColor="#0fb981" stopOpacity={0.9} />
+              <stop offset="100%" stopColor="#046d4b" stopOpacity={0.85} />
+            </radialGradient>
 
-  <radialGradient id="redGradient" cx="0.5" cy="0.5" r="0.8">
-    <stop offset="0%" stopColor="#ff4d4d" stopOpacity={1} />
-    <stop offset="70%" stopColor="#e11d48" stopOpacity={0.9} />
-    <stop offset="100%" stopColor="#7f1d1d" stopOpacity={0.85} />
-  </radialGradient>
-</defs>
-
+            <radialGradient id="redGradient" cx="0.5" cy="0.5" r="0.8">
+              <stop offset="0%" stopColor="#ff4d4d" stopOpacity={1} />
+              <stop offset="70%" stopColor="#e11d48" stopOpacity={0.9} />
+              <stop offset="100%" stopColor="#7f1d1d" stopOpacity={0.85} />
+            </radialGradient>
+          </defs>
 
           <Pie
             data={chartData}

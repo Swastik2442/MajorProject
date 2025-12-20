@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Send, Bot } from "lucide-react";
+import { Send, Bot, ChevronLeft, ChevronRight } from "lucide-react";
 import type { TClientsParams, TDataResponseThreadParams, TResponse } from "@/schemas/api";
 import { apiService } from "@/services/api";
+import { Button } from "@/components/ui/button";
 import ChartMaker from "./ChartMaker";
 import PromptHistory from "./PromptHistory";
 
@@ -113,12 +114,29 @@ export default function LLMChatPage({ client_id = null, org_id = null }: TClient
                 </div>
 
                 {/* AI RESPONSE */}
-                <div className="flex">
+                <div className="flex relative">
                   <div className="bg-[#071522] border border-[#0d2940] rounded-xl px-4 py-3 shadow break-words">
                     {data.charts?.map((chart, idx) => (
                       <ChartMaker key={`chart-${idx}`} data={chart} />
                     )) ?? "No charts generated. Please refine your prompt."}
                   </div>
+                  {index !== null && <div className="flex justify-center items-center absolute -bottom-5 z-10">
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => {console.log("Not Implemented Yet")}}
+                    >
+                      <ChevronLeft />
+                    </Button>
+                    <span>{index}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => {console.log("Not Implemented Yet")}}
+                    >
+                      <ChevronRight />
+                    </Button>
+                  </div>}
                 </div>
               </motion.div>
             )}

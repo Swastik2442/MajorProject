@@ -19,18 +19,18 @@ import {
 } from "recharts";
 import type { TChartAndData } from "@/schemas/api";
 
-// Truncate long labels but show full in tooltip
+/** Truncate long labels but show full in tooltip */
 const formatLabel = (value: string) => {
   if (!value) return "";
   return value.length > 10 ? `${value.slice(0, 10)}…` : value;
 };
 
+const glowShadow: React.CSSProperties = {
+  filter: "drop-shadow(0 0 6px rgba(0, 255, 180, 0.35))",
+};
+
 export function ChartMaker({ data }: { data: TChartAndData }) {
   const colors = data.data_series.map((s) => s.color || "#4ade80");
-
-  const glowShadow = {
-    filter: "drop-shadow(0 0 6px rgba(0, 255, 180, 0.35))",
-  };
 
   return (
     <div className="space-y-3">
@@ -46,7 +46,7 @@ export function ChartMaker({ data }: { data: TChartAndData }) {
               {colors.map((color, i) => (
                 <linearGradient
                   key={i}
-                  id={`grad-${i}`}
+                  id={`grad${i}`}
                   x1="0"
                   y1="0"
                   x2="0"
@@ -89,7 +89,8 @@ export function ChartMaker({ data }: { data: TChartAndData }) {
                   <Bar
                     key={s.key}
                     dataKey={s.key}
-                    fill="red"
+                    fill={colors[i]}
+                    // fill={`url(#grad${i % colors.length})`}
                     radius={[10, 10, 0, 0]}
                     style={glowShadow}
                   />
@@ -127,7 +128,7 @@ export function ChartMaker({ data }: { data: TChartAndData }) {
                     key={s.key}
                     dataKey={s.key}
                     type="monotone"
-                    stroke={`url(#grad-${i})`}
+                    stroke={`url(#grad${i})`}
                     strokeWidth={3}
                     dot={{ r: 4, strokeWidth: 2, stroke: colors[i] }}
                     activeDot={{ r: 7, style: glowShadow }}
@@ -150,7 +151,8 @@ export function ChartMaker({ data }: { data: TChartAndData }) {
                 <Legend verticalAlign="top" height={36} />
                 <Pie
                   data={data.data}
-                  dataKey={data.data_series[0]?.key}
+                  dataKey={data.data_series[1]?.key}
+                  nameKey={data.data_series[0]?.key}
                   outerRadius={120}
                   paddingAngle={4}
                   animationBegin={100}

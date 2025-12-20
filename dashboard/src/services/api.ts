@@ -278,8 +278,7 @@ export const apiService: ApiService = {
         : `/promptChart/threads/${params.thread_id}`),
       { params: { client_id: params.client_id, org_id: params.org_id } }
     );
-    console.log("API response for thread details:", response.data);
-    return (response.data);
+    return DataResponseChartsDataSchema.parse(response.data);
   },
 };
 

@@ -82,19 +82,19 @@
   - [x] Features Section
   - [x] About Section
   - [ ] Footer Links
-- [ ] Add the Charts required by Sir
+- [x] Add the Charts required by Sir
   - [x] Bar Chart of No of Problems in Top 10 (change-able) Problematic Host/Service
     - [x] Backend
     - [x] Frontend
   - [x] Bar Chart of Problem Alerts vs Total Alerts per given Time Period bin
     - [x] Backend
     - [x] Frontend
-  - [ ] Bar Chart of No of Problems with Duration > 4hrs (change-able) per Host/Service
+  - [x] Bar Chart of No of Problems with Duration > 4hrs (change-able) per Host/Service
     - [x] Backend
-    - [ ] Frontend
-  - [ ] Pie Chart of Percentage of Problems with Duration < 4hrs (change-able) vs Problems with more than that
+    - [x] Frontend
+  - [x] Pie Chart of Percentage of Problems with Duration < 4hrs (change-able) vs Problems with more than that
     - [x] Backend
-    - [ ] Frontend
+    - [x] Frontend
 - [ ] Show Alert details Modal when User clicks on Alert
   - [x] Backend
   - [ ] Frontend
@@ -107,7 +107,20 @@
 - [ ] Add a Select dropdown to choose the Components to be shown on the Dashboard
 - [ ] Create Server-Side Events Stream to give events as soon as new Alerts come
   - [ ] Backend (<https://medium.com/@nandagopal05/server-sent-events-with-python-fastapi-f1960e0c8e4b>)
-    - [ ] Setup RabbitMQ/Celery
+    - [x] Setup RabbitMQ
     - [ ] Create Event Producer
     - [ ] Create Event Consumer (Client Id -> List of monitoring Users)
   - [ ] Frontend
+- [ ] Add AI Chart Creator
+  - [ ] Backend
+    - [x] LangChain API
+    - [x] Add Chat and Threads Logic
+    - [ ] Integrate with SSE
+  - [ ] Frontend
+    - [ ] Create Chart from Data
+      - [x] Line Chart
+      - [x] Bar Chart
+      - [ ] Pie Chart
+      - [ ] Scatter Chart
+    - [x] Add Chat and Threads UI
+    - [ ] Integrate with SSE
