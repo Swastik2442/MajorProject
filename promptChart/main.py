@@ -15,7 +15,8 @@ from common.schemas import Response as CustomResponse
 from src.config import config
 from src.routes import agents_router, threads_router
 
-logging.basicConfig(level=logging.DEBUG if config.DEBUG else None)
+if config.DEBUG:
+    logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()
 
 @asynccontextmanager
