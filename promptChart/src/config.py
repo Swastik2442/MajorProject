@@ -3,7 +3,7 @@
 from collections.abc import Sequence
 from typing import Literal
 
-from pydantic import AliasChoices, Field, MongoDsn, PostgresDsn
+from pydantic import AliasChoices, Field, MongoDsn, PostgresDsn, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
@@ -24,9 +24,18 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices('DATABASE_URL', 'DB_URI', 'POSTGRES_URI', 'POSTGRES_DSN'),
     )
 
-    OPENAI_COMPAT_API_URL : str = Field(
+    OPENAI_COMPAT_API_URL: str = Field(
         default="http://localhost:1234/v1",
         validation_alias=AliasChoices('OPENAI_COMPAT_API_URL', 'OPENAI_API_URL', 'OPENAI_BASE_URL'),
+    )
+
+    AWS_BEDROCK_OPENAI_COMPAT_API_URL: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices('AWS_BEDROCK_OPENAI_COMPAT_API_URL', 'AWS_BEDROCK_API_URL', 'AWS_BEDROCK_BASE_URL'),
+    )
+    AWS_BEDROCK_API_KEY: SecretStr | None = Field(
+        default=None,
+        validation_alias=AliasChoices('AWS_BEDROCK_API_KEY', 'AWS_BEDROCK_KEY'),
     )
 
     MONGO_CONNECTION_URI: MongoDsn = Field(

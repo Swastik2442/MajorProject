@@ -37,7 +37,11 @@ async def event_generator(
             async for message in queue_iter:
                 async with message.process(ignore_processed=True):
                     await message.ack()
-                    yield JSONServerSentEvent({"data": message.body.decode()})
+                    yield JSONServerSentEvent(
+                        data={"data": message.body.decode()},
+                        event=message.type or "message",
+                        id=message.message_id
+                    )
 
     except AMQPException as e:
         logger.error("Error connecting with RabbitMQ: %s", e)
