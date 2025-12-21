@@ -210,6 +210,34 @@ export const StatAlertDurationPerHostSchema = StatAlertDurationsSchema.extend(Pr
 
 export const StatAlertDurationPerServiceSchema = StatAlertDurationsSchema.extend(ServiceClientIdAndServiceNameSchema.shape);
 
+export const AiEventSchema = z.object({
+  thread_id: z.string(),
+  user_id: z.string(),
+  entity_type: z.enum(["agent", "model", "tool"]),
+  entity_name: z.string().nullable().default(null),
+  entity_state: z.enum(["start", "end"]),
+  message: z.string().nullable().default(null),
+});
+
+const JsonStringSchema = <T extends z.ZodType>(dataSchema: T) => z.string().transform((val, ctx) => {
+  try {
+    const parsedJson: unknown = JSON.parse(val);
+    return dataSchema.parse(parsedJson);
+  } catch (err) {
+    console.error("JSON parsing error:", err);
+    ctx.addIssue({
+      code: "custom",
+      message: "Invalid JSON string",
+      fatal: true,
+    });
+    return z.NEVER;
+  }
+});
+
+export const SseResponseSchema = <T extends z.ZodType>(dataSchema: T) => JsonStringSchema(z.object({
+  data: JsonStringSchema(dataSchema),
+}));
+
 export const DataResponseSchema = <T extends z.ZodType>(dataSchema: T) =>
   z.object({
     status: z.enum(["success", "error"]),
@@ -313,6 +341,7 @@ export type TStatProblematicAlertTrends = z.infer<typeof StatProblematicAlertTre
 export type TStatAlertDurations = z.infer<typeof StatAlertDurationsSchema>;
 export type TStatAlertDurationPerHost = z.infer<typeof StatAlertDurationPerHostSchema>;
 export type TStatAlertDurationPerService = z.infer<typeof StatAlertDurationPerServiceSchema>;
+export type TAiEvent = z.infer<typeof AiEventSchema>;
 
 export type TClient = z.infer<typeof ClientSchema>;
 export type TClientCreate = z.infer<typeof ClientCreateSchema>;
@@ -386,6 +415,9 @@ export type TDataResponseChartsData = z.infer<typeof DataResponseChartsDataSchem
 
 export const DataResponseStrSchema = DataResponseSchema(z.string());
 export type TDataResponseStr = z.infer<typeof DataResponseStrSchema>;
+
+export const SSEResponseAiEventSchema = SseResponseSchema(AiEventSchema);
+export type TSSEResponseAiEvent = z.infer<typeof SSEResponseAiEventSchema>;
 
 // --- API Parameters Types ---
 

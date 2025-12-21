@@ -7,13 +7,13 @@ import { apiService } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import ChartMaker from "./ChartMaker";
 import PromptHistory from "./PromptHistory";
+import AiEventShowcase from "./AiEventShowcase";
 
 // TODO: This is just a testing implementation and should be improved for actual use.
 export default function LLMChatPage({ client_id = null, org_id = null }: TClientsParams) {
   const [threadId, setThreadId] = useState<string | null>(null);
   const [index, setIndex] = useState<number | null>(null);
   const [prompt, setPrompt] = useState("");
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
   const { data } = useQuery({
@@ -141,30 +141,10 @@ export default function LLMChatPage({ client_id = null, org_id = null }: TClient
               </motion.div>
             )}
 
-            {/* LOADING ANIMATION */}
-            {isPending && (
-              <div className="flex items-start gap-3 mt-2">
-                <div className="w-9 h-9 rounded-md bg-[#081523] flex items-center justify-center">
-                  <Bot className="w-4 h-4 text-blue-400 animate-pulse" />
-                </div>
-                <div className="bg-[#071522] border border-[#0d2940] rounded-xl px-4 py-3">
-                  <p className="text-gray-300 text-sm">Generating response...</p>
-                  <div className="flex gap-1 mt-2">
-                    {[0, 1, 2].map((i) => (
-                      <motion.span
-                        key={i}
-                        animate={{ y: ["0%", "-40%", "0%"] }}
-                        transition={{ repeat: Infinity, duration: 0.9, delay: i * 0.15 }}
-                        className="w-2 h-2 rounded-full bg-blue-400"
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
+            {isPending && <LoadingAnimation />}
           </div>
+
+          {threadId ? <AiEventShowcase threadId={threadId} /> : <div className="mt-4"></div>}
 
           {/* INPUT BAR */}
           <form
@@ -172,7 +152,7 @@ export default function LLMChatPage({ client_id = null, org_id = null }: TClient
               e.preventDefault();
               handleSubmit();
             }}
-            className="mt-4 flex items-center gap-3 flex-shrink-0"
+            className="flex items-center gap-3 flex-shrink-0"
           >
             <textarea
               ref={inputRef}
@@ -208,3 +188,24 @@ export default function LLMChatPage({ client_id = null, org_id = null }: TClient
     </div>
   );
 }
+
+const LoadingAnimation = () => (
+  <div className="flex items-start gap-3 mt-2">
+    <div className="w-9 h-9 rounded-md bg-[#081523] flex items-center justify-center">
+      <Bot className="w-4 h-4 text-blue-400 animate-pulse" />
+    </div>
+    <div className="bg-[#071522] border border-[#0d2940] rounded-xl px-4 py-3">
+      <p className="text-gray-300 text-sm">Generating response...</p>
+      <div className="flex gap-1 mt-2">
+        {[0, 1, 2].map((i) => (
+          <motion.span
+            key={i}
+            animate={{ y: ["0%", "-40%", "0%"] }}
+            transition={{ repeat: Infinity, duration: 0.9, delay: i * 0.15 }}
+            className="w-2 h-2 rounded-full bg-blue-400"
+          />
+        ))}
+      </div>
+    </div>
+  </div>
+);
