@@ -9,7 +9,7 @@ from common.schemas.chartAgg import ChartAgg as ResponseFormat, chart_agg_format
 
 from src.agent_x.tools import ToolContextSchema, tools, tools_description
 from src.config import config
-from src.middlewares import LoggingMiddleware, VerifyResponseMiddleware
+from src.middlewares import LoggingMiddleware, VerifyResponseMiddleware, EmitToUserMiddleware, UserMiddlewareContext
 from src.models import aws_model, local_model
 
 SYSTEM_PROMPT = f"""\
@@ -25,11 +25,12 @@ You have access to the following tools:
 Make sure to use these tools to construct and verify your responses. Make sure to check that the result of the pipeline you created has the same format you provide in the chart definitions. The aggregation pipelines should be optimized for performance and accuracy. Test your created pipeline by calling the aggregation pipeline tool.\
 """
 
-class ContextSchema(ToolContextSchema):
+class ContextSchema(ToolContextSchema, UserMiddlewareContext):
     """Context schema for the agent."""
 
 middlewares = [
     LoggingMiddleware("Agent X"),
+    EmitToUserMiddleware("Agent X"),
     ToolRetryMiddleware(),
     VerifyResponseMiddleware(
         response_schema=ResponseFormat,

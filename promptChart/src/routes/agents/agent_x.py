@@ -114,7 +114,7 @@ async def invoke_agent_x(
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "user_id is required either in query params or in body.")
 
     # Start agent in background
-    context = ContextSchema(db=db)
+    context = ContextSchema(db=db, user_id=user_id, thread_id=str(thread_id))
     background_tasks.add_task(start_agent_x, body.prompt, user_id, thread_id, context, db)
 
     return JSONResponse(

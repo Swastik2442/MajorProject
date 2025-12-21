@@ -117,7 +117,7 @@ export const ThreadLeanSchema = z.object({
 export const DataSeriesSchema = z.object({
   key: z.string().min(1),
   label: z.string().min(1),
-  color: z.string().min(1),
+  color: z.string().min(1).nullable().default(null),
   data_type: z.enum(["number", "string", "date"]),
   multiple_entries: z.boolean().default(true),
 });

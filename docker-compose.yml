@@ -61,9 +61,9 @@ services:
       - ENV=${ENV}
       - DEBUG=${DEBUG}
       - DB_URI=postgresql://langchain:langchain_pass@langchain-postgres/postgres?sslmode=disable
-      - RABBITMQ_HOST=rabbitmq
       - MONGO_CONNECTION_URI=mongodb://root:password@db:27017/
       - OPENAI_COMPAT_API_URL=http://host.docker.internal:1234/v1
+      - RABBITMQ_HOST=rabbitmq
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
     ports:
       - "4200:4200"

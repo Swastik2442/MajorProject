@@ -30,7 +30,7 @@ const glowShadow: React.CSSProperties = {
 };
 
 export function ChartMaker({ data }: { data: TChartAndData }) {
-  const colors = data.data_series.map((s) => s.color || "#4ade80");
+  const colors = data.data_series.map((s) => s.color ?? "#4ade80");
 
   return (
     <div className="space-y-3">
@@ -42,21 +42,23 @@ export function ChartMaker({ data }: { data: TChartAndData }) {
         <ResponsiveContainer width="100%" height={320}>
           <>
             {/* Gradients */}
-            <defs>
-              {colors.map((color, i) => (
-                <linearGradient
-                  key={i}
-                  id={`grad${i}`}
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1"
-                >
-                  <stop offset="0%" stopColor={color} stopOpacity={0.9} />
-                  <stop offset="100%" stopColor={color} stopOpacity={0.25} />
-                </linearGradient>
-              ))}
-            </defs>
+            <svg>
+              <defs>
+                {colors.map((color, i) => (
+                  <linearGradient
+                    key={i}
+                    id={`grad${i}`}
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="0%" stopColor={color} stopOpacity={0.9} />
+                    <stop offset="100%" stopColor={color} stopOpacity={0.25} />
+                  </linearGradient>
+                ))}
+              </defs>
+            </svg>
 
             {/* ---------------- BAR CHART ---------------- */}
             {data.type === "bar" && (
