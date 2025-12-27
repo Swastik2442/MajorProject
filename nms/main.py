@@ -10,6 +10,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from common.exceptions import RequestValidationError as CustomRequestValidationError, http_exception_handler, validation_exception_handler
 from common.services.db import db_service
+from common.services.mq import mq_service
 from common.schemas import Response as CustomResponse
 from src.config import config
 from src.routes import zabbix_router
@@ -21,8 +22,10 @@ logger = logging.getLogger()
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     await db_service.connect(dsn=config.MONGO_CONNECTION_URI, db_name=config.DB_NAME)
+    await mq_service.connect(rabbit_host=config.RABBITMQ_HOST)
     yield
     await db_service.disconnect()
+    await mq_service.disconnect()
 
 app = FastAPI(
     title="NMS API",

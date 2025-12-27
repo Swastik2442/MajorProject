@@ -3,7 +3,7 @@
 from datetime import datetime
 import logging
 
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, BackgroundTasks, Request, status
 from fastapi.exceptions import HTTPException
 
 from common.exceptions import HTTPException as CustomHTTPException
@@ -28,7 +28,8 @@ async def receive_alert(
     req: Request,
     alert: ZabbixAlert,
     client: ClientFromApiKey,
-    db: Database
+    db: Database,
+    background_tasks: BackgroundTasks
 ):
     if req.client is None or client.id is None:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Cannot determine client")

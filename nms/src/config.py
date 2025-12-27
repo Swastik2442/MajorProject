@@ -25,6 +25,11 @@ class Settings(BaseSettings):
     )
     DB_NAME: str = Field("nms")
 
+    RABBITMQ_HOST: str = Field(
+        default="localhost",
+        validation_alias=AliasChoices('RABBITMQ_HOST', 'RABBIT_HOST', 'RABBITMQ_URI', 'RABBIT_URI'),
+    )
+
     ALLOWED_ORIGINS: Sequence[str] = Field(
         default_factory=lambda: ["http://localhost:5173"],
         validation_alias=AliasChoices('ALLOWED_ORIGINS', 'ALLOW_ORIGINS', 'CORS_ALLOW_ORIGINS', 'ORIGINS'),
