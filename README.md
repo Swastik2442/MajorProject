@@ -1,19 +1,24 @@
-# Intelligent Attack Detection System
+# INTELLIGENT NETWORK STATUS ANALYSIS SYSTEM USING NMS DATA, INTERACTIVE DASHBOARD, AND LLMS
 
 **Short Description**:
-A prototype system that ingests real-time Network Management System (NMS) telemetry (Zabbix), preprocesses and analyzes it with machine learning / LLMs to detect anomalies and potential attacks, and visualizes findings via an interactive dashboard for network administrators.
+The Intelligent Network Status Analysis System is a prototype platform that ingests telemetry data from a Network Management System (NMS) such as Zabbix, processes and stores it efficiently, and presents meaningful insights through an interactive real-time dashboard.
+
 
 ## Key objectives
-- Collect and aggregate real-time metrics and logs from Zabbix (NMS).
-- Clean, normalize and transform network telemetry into structured datasets.
-- Develop / fine-tune ML or LLM models to detect anomalies and potential attacks.
-- Implement an automated detection & alerting decision system.
-- Build a realtime dashboard for visualization and incident response.
+- Collect and aggregate network telemetry data from Zabbix (currently batch-processed).
+- Store and manage structured and semi-structured NMS data efficiently.
+- Transform raw metrics into meaningful KPIs and trends.
+- Provide an interactive dashboard for real-time network visibility.
+- Integrate LLMs to:
+  - Interpret user queries
+  - Automate analytics and aggregation pipelines
+  - Generate predictive insights and summaries
+- Enable network administrators to proactively detect potential downtimes and performance degradation.
 
 ## Tech Stack
 - Network monitoring & ingestion: **Zabbix**, **FastAPI**
 - Storage: **PostgreSQL**, **MongoDB**
-- Model development: **TensorFlow**, **HuggingFace**
+- LLM: **gpt-oss-20B**
 - Frontend/dashboard: **React** (connects to FastAPI backend)
 
 ## Quick Start
