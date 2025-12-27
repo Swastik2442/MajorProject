@@ -1,8 +1,8 @@
 "Middlewares for the API"
 
-from .client import get_client_from_api_key, ClientFromApiKey
+from .client import ClientFromApiKey, get_client_from_api_key
 
 __all__ = [
-    "get_client_from_api_key",
     "ClientFromApiKey",
+    "get_client_from_api_key",
 ]

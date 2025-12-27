@@ -1,10 +1,7 @@
 "API Routes for receiving Zabbix Alerts"
 
 from datetime import datetime
-import logging
-
-from fastapi import APIRouter, BackgroundTasks, Request, status
-from fastapi.exceptions import HTTPException
+from logging import getLogger
 
 from common.exceptions import HTTPException as CustomHTTPException
 from common.models import Problem, ProblemUpdate, Service, ServiceUpdate
@@ -13,10 +10,15 @@ from common.models.service import Update as SUpdate
 from common.models.utils import fields, to_doc
 from common.schemas import Response as CustomResponse
 from common.services.db import Database
+from fastapi import APIRouter, BackgroundTasks, Request, status
+from fastapi.exceptions import HTTPException
+
+from src.events import (Event, ServiceProblem, ServiceProblemRecovery, ServiceProblemUpdate, TriggerAlert, TriggerAlertRecovery, TriggerAlertUpdate,
+                        send_event)
 from src.middlewares.client import ClientFromApiKey
 from src.templates import ZABBIX_DATETIME_FORMAT, ZabbixAlert, parse_json_message
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 router = APIRouter(
     prefix="/zabbix",
@@ -45,7 +47,7 @@ async def receive_alert(
     # Insert/Update in the Database
     match data.type:
         case "problem":
-            await db[Problem.Meta.collection_name()].insert_one(to_doc(Problem(
+            problem = Problem(
                 clientId=client.id,
                 zid=data.event.id,
                 name=data.event.name,
@@ -53,15 +55,19 @@ async def receive_alert(
                 startedAt=datetime.strptime(f"{data.event.date} {data.event.time}", ZABBIX_DATETIME_FORMAT),
                 hostname=data.host.name,
                 status="Started"
-            )))
+            )
+            ins = await db[Problem.Meta.collection_name()].insert_one(to_doc(problem))
+            problem.id = ins.inserted_id
+            event_data = TriggerAlert.model_validate({**problem.model_dump()})
         case "problem_recovery":
-            problem = await db[Problem.Meta.collection_name()].find_one({
+            docFilter = {
                 fields(Problem).clientId: client.id,
                 fields(Problem).zid: data.event.id
-            })
+            }
+            problemExists = await db[Problem.Meta.collection_name()].find_one(docFilter)
             recTime = datetime.strptime(f"{data.event.recovery.date} {data.event.recovery.time}", ZABBIX_DATETIME_FORMAT)
-            if problem is None:
-                problem = await db[Problem.Meta.collection_name()].insert_one(to_doc(Problem(
+            if problemExists is None:
+                problem = Problem(
                     clientId=client.id,
                     zid=data.event.id,
                     name=data.event.name,
@@ -71,29 +77,43 @@ async def receive_alert(
                     duration=data.event.duration,
                     hostname=data.host.name,
                     status="Recovered"
-                )))
-            else:
-                await db[Problem.Meta.collection_name()].update_one(
-                    {fields(Problem).zid: data.event.id},
-                    {"$set": to_doc(ProblemUpdate(
-                        severity=data.event.severity,
-                        recoveryAt=recTime,
-                        duration=data.event.duration,
-                        status="Recovered"
-                    )), "$push": {fields(Problem).updates: to_doc(PUpdate( # type: ignore
-                        action="Recovered",
-                        message=alert.subject,
-                        timestamp=recTime
-                    ))}}
                 )
+                ins = await db[Problem.Meta.collection_name()].insert_one(to_doc(problem))
+                problem.id = ins.inserted_id
+                event_data = TriggerAlert.model_validate({**problem.model_dump()})
+            else:
+                problemUpdate = ProblemUpdate(
+                    severity=data.event.severity,
+                    recoveryAt=recTime,
+                    duration=data.event.duration,
+                    status="Recovered"
+                )
+                updateItem = PUpdate(
+                    action="Recovered",
+                    message=alert.subject,
+                    timestamp=recTime
+                )
+                await db[Problem.Meta.collection_name()].update_one(
+                    docFilter,
+                    {
+                        "$set": to_doc(problemUpdate),
+                        "$push": {fields(Problem).updates: to_doc(updateItem)}
+                    }
+                )
+                event_data = TriggerAlertRecovery.model_validate({
+                    **problemUpdate.model_dump(),
+                    "id": problemExists._id,
+                    "update": updateItem
+                })
         case "problem_update":
-            problem = await db[Problem.Meta.collection_name()].find_one({
+            docFilter = {
                 fields(Problem).clientId: client.id,
                 fields(Problem).zid: data.event.id
-            })
+            }
+            problemExists = await db[Problem.Meta.collection_name()].find_one(docFilter)
             updateTime = datetime.strptime(f"{data.event.update.date} {data.event.update.time}", ZABBIX_DATETIME_FORMAT)
-            if problem is None:
-                problem = await db[Problem.Meta.collection_name()].insert_one(to_doc(Problem(
+            if problemExists is None:
+                problem = Problem(
                     clientId=client.id,
                     zid=data.event.id,
                     name=data.event.name,
@@ -102,19 +122,35 @@ async def receive_alert(
                     hostname="Unknown",
                     age=data.event.age,
                     status=data.event.status
-                )))
-            else:
-                await db[Problem.Meta.collection_name()].update_one(
-                    {fields(Problem).zid: data.event.id},
-                    {"$push": {fields(Problem).updates: to_doc(PUpdate( # type: ignore
-                        action=data.event.update.action,
-                        timestamp=updateTime,
-                        message=data.event.update.message,
-                        username=data.user.fullname
-                    ))}}
                 )
+                ins = await db[Problem.Meta.collection_name()].insert_one(to_doc(problem))
+                problem.id = ins.inserted_id
+                event_data = TriggerAlert.model_validate({**problem.model_dump()})
+            else:
+                problemUpdate = ProblemUpdate(
+                    status=data.event.status,
+                    severity="Not classified", # BUG: Zabbix does not send severity in update events
+                )
+                updateItem = PUpdate(
+                    action=data.event.update.action,
+                    timestamp=updateTime,
+                    message=data.event.update.message,
+                    username=data.user.fullname
+                )
+                await db[Problem.Meta.collection_name()].update_one(
+                    docFilter,
+                    {
+                        "$set": to_doc(problemUpdate),
+                        "$push": {fields(Problem).updates: to_doc(updateItem)}
+                    }
+                )
+                event_data = TriggerAlertUpdate.model_validate({
+                    **problemUpdate.model_dump(),
+                    "id": problemExists._id,
+                    "update": updateItem
+                })
         case "service":
-            await db[Service.Meta.collection_name()].insert_one(to_doc(Service(
+            service = Service(
                 clientId=client.id,
                 zid=data.event.id,
                 name=data.event.name,
@@ -124,15 +160,19 @@ async def receive_alert(
                 rootcause=data.service.rootcause,
                 startedAt=datetime.strptime(f"{data.event.date} {data.event.time}", ZABBIX_DATETIME_FORMAT),
                 severity=data.event.severity
-            )))
+            )
+            ins = await db[Service.Meta.collection_name()].insert_one(to_doc(service))
+            service.id = ins.inserted_id
+            event_data = ServiceProblem.model_validate({**service.model_dump()})
         case "service_recovery":
-            service = await db[Service.Meta.collection_name()].find_one({
+            docFilter = {
                 fields(Service).clientId: client.id,
                 fields(Service).zid: data.event.id
-            })
+            }
+            serviceExists = await db[Service.Meta.collection_name()].find_one(docFilter)
             recTime = datetime.strptime(f"{data.event.recovery.date} {data.event.recovery.time}", ZABBIX_DATETIME_FORMAT)
-            if service is None:
-                await db[Service.Meta.collection_name()].insert_one(to_doc(Service(
+            if serviceExists is None:
+                service = Service(
                     clientId=client.id,
                     zid=data.event.id,
                     name=data.event.name,
@@ -143,29 +183,43 @@ async def receive_alert(
                     startedAt=recTime,
                     recoveryAt=recTime,
                     severity=data.event.severity
-                )))
-            else:
-                await db[Service.Meta.collection_name()].update_one(
-                    {fields(Problem).zid: data.event.id},
-                    {"$set": to_doc(ServiceUpdate(
-                        recoveryAt=recTime,
-                        status="Recovered",
-                        severity=data.event.severity,
-                        duration=data.event.duration
-                    )), "$push": {fields(Service).updates: to_doc(SUpdate( # type: ignore
-                        action="Recovered",
-                        message=alert.subject,
-                        timestamp=recTime
-                    ))}}
                 )
+                ins = await db[Service.Meta.collection_name()].insert_one(to_doc(service))
+                service.id = ins.inserted_id
+                event_data = ServiceProblem.model_validate({**service.model_dump()})
+            else:
+                serviceUpdate = ServiceUpdate(
+                    recoveryAt=recTime,
+                    status="Recovered",
+                    severity=data.event.severity,
+                    duration=data.event.duration
+                )
+                updateItem = SUpdate(
+                    action="Recovered",
+                    message=alert.subject,
+                    timestamp=recTime
+                )
+                await db[Service.Meta.collection_name()].update_one(
+                    docFilter,
+                    {
+                        "$set": to_doc(serviceUpdate),
+                        "$push": {fields(Service).updates: to_doc(updateItem)}
+                    }
+                )
+                event_data = ServiceProblemRecovery.model_validate({
+                    **serviceUpdate.model_dump(),
+                    "id": serviceExists._id,
+                    "update": updateItem
+                })
         case "service_update":
-            service = await db[Service.Meta.collection_name()].find_one({
+            docFilter = {
                 fields(Service).clientId: client.id,
                 fields(Service).zid: data.event.id
-            })
+            }
+            serviceExists = await db[Service.Meta.collection_name()].find_one(docFilter)
             updateTime = datetime.strptime(f"{data.event.update.date} {data.event.update.time}", ZABBIX_DATETIME_FORMAT)
-            if service is None:
-                await db[Service.Meta.collection_name()].insert_one(to_doc(Service(
+            if serviceExists is None:
+                service = Service(
                     clientId=client.id,
                     zid=data.event.id,
                     name=data.event.name,
@@ -175,22 +229,36 @@ async def receive_alert(
                     rootcause=data.service.rootcause,
                     startedAt=updateTime,
                     severity=data.event.update.severity
-                )))
-            else:
-                await db[Service.Meta.collection_name()].update_one(
-                    {fields(Problem).zid: data.event.id},
-                    {"$set": to_doc(ServiceUpdate(
-                        status=data.event.status,
-                        severity=data.event.update.severity,
-                        age=data.event.age
-                    )), "$push": {fields(Service).updates: to_doc(SUpdate( # type: ignore
-                        action="Updated",
-                        message=alert.subject,
-                        timestamp=updateTime
-                    ))}}
                 )
+                ins = await db[Service.Meta.collection_name()].insert_one(to_doc(service))
+                service.id = ins.inserted_id
+                event_data = ServiceProblem.model_validate({**service.model_dump()})
+            else:
+                serviceUpdate = ServiceUpdate(
+                    status=data.event.status,
+                    severity=data.event.update.severity,
+                    age=data.event.age
+                )
+                updateItem = SUpdate(
+                    action="Updated",
+                    message=alert.subject,
+                    timestamp=updateTime
+                )
+                await db[Service.Meta.collection_name()].update_one(
+                    docFilter,
+                    {
+                        "$set": to_doc(serviceUpdate),
+                        "$push": {fields(Service).updates: to_doc(updateItem)}
+                    }
+                )
+                event_data = ServiceProblemUpdate.model_validate({
+                    **serviceUpdate.model_dump(),
+                    "id": serviceExists._id,
+                    "update": updateItem
+                })
         case _:
             logger.warning("Unknown Alert Type: %s", data.type)
             raise HTTPException(status.HTTP_400_BAD_REQUEST, "Unknown alert type")
 
+    background_tasks.add_task(send_event, Event(data=event_data, client_id=client.id))
     return CustomResponse()

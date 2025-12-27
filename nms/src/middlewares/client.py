@@ -2,12 +2,12 @@
 
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, status
-
 from common.models import Client
 from common.models.utils import fields
 from common.services.auth import SplitApiKey, verify_secret
 from common.services.db import Database
+from fastapi import Depends, HTTPException, status
+
 
 async def get_client_from_api_key(db: Database, idAndSecret: SplitApiKey) -> Client:
     client = await db[Client.Meta.collection_name()].find_one(
@@ -23,6 +23,6 @@ async def get_client_from_api_key(db: Database, idAndSecret: SplitApiKey) -> Cli
 ClientFromApiKey = Annotated[Client, Depends(get_client_from_api_key)]
 
 __all__ = [
-    "get_client_from_api_key",
     "ClientFromApiKey",
+    "get_client_from_api_key",
 ]
