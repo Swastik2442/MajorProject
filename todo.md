@@ -109,5 +109,18 @@
   - [ ] Backend (<https://medium.com/@nandagopal05/server-sent-events-with-python-fastapi-f1960e0c8e4b>)
     - [ ] Setup RabbitMQ/Celery
     - [ ] Create Event Producer
-    - [ ] Create Event Consumer (Client Id -> List of monitoring Users)
+    - [x] Create Event Consumer (Client Id -> List of monitoring Users)
   - [ ] Frontend
+- [ ] Add AI Chart Creator
+  - [x] Backend
+    - [x] LangChain API
+    - [x] Add Chat and Threads Logic
+    - [x] Integrate with SSE
+  - [ ] Frontend
+    - [ ] Create Chart from Data
+      - [x] Line Chart
+      - [x] Bar Chart
+      - [ ] Pie Chart
+      - [ ] Scatter Chart
+    - [x] Add Chat and Threads UI
+    - [x] Integrate with SSE
