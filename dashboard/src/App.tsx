@@ -1,18 +1,19 @@
+import { lazy } from "react";
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ClerkProvider, SignedIn, SignedOut } from "@clerk/clerk-react";
 
 import { UserEventsProvider } from "@/contexts/userEvents";
-import PrivateRoutes from "@/components/PrivateRoutes";
-import RootErrorBoundary from "@/components/RootErrorBoundary";
-import AppLayout from "@/layouts/AppLayout";
+const PrivateRoutes = lazy(() => import("@/components/PrivateRoutes"));
+const RootErrorBoundary = lazy(() => import("@/components/RootErrorBoundary"));
+const AppLayout = lazy(() => import("@/layouts/AppLayout"));
 
-import Dashboard from "@/pages/Dashboard";
-import Home from "@/pages/Home";
-import About from "@/pages/About";
-import Login from "@/pages/Login";
-import NewClient from "@/pages/NewClient";
+const Dashboard = lazy(() => import("@/pages/Dashboard"));
+const Home = lazy(() => import("@/pages/Home"));
+const About = lazy(() => import("@/pages/About"));
+const Login = lazy(() => import("@/pages/Login"));
+const NewClient = lazy(() => import("@/pages/NewClient"));
 
 import "@/globals.css";
 

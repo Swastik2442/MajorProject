@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import eyeImage from "/eyeImage.png";
 
 export default function PredictiveAnalysisVisual() {

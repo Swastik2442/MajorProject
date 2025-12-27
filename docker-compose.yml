@@ -97,6 +97,24 @@ services:
       - prompt-chart
       - rabbitmq
 
+  dashboard:
+    build:
+      context: .
+      dockerfile: dashboard/Dockerfile
+    container_name: dashboard
+    restart: unless-stopped
+    environment:
+      - VITE_APP_TITLE=${VITE_APP_TITLE}
+      - VITE_NMS_URL=http://nms:5000
+      - VITE_API_URL=http://api:2442
+      - VITE_APP_URL=http://dashboard:5173
+      - VITE_CLERK_PUBLISHABLE_KEY=${VITE_CLERK_PUBLISHABLE_KEY}
+    ports:
+      - "5173:5173"
+    depends_on:
+      - nms
+      - api
+
 volumes:
   mongodb_data:
   langchain_pg_data:

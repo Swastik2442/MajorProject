@@ -1,16 +1,13 @@
-import { useState } from "react";
+import { lazy, useState } from "react";
 import { useOrganization } from "@clerk/clerk-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useShallow } from "zustand/shallow";
 import useClientele from "@/stores/clientele";
 import useDateRange from "@/stores/dateRange";
-import DashboardComponent from "@/components/dashboard";
 // import AlertBanner from "@/components/AlertBanner";
+import DateRangeFilter from "@/components/DateRangeFilter";
 import Metadata from "@/components/Metadata";
 import SetClientele from "@/components/SetClientele";
-import ChartsDashboard from "@/components/charts";
-import DateRangeFilter from "@/components/DateRangeFilter";
-import AIChat from "@/components/ai";
 import {
   Select,
   SelectContent,
@@ -18,6 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+const DashboardComponent = lazy(() => import("@/components/dashboard"));
+const ChartsDashboard = lazy(() => import("@/components/charts"));
+const AIChat = lazy(() => import("@/components/ai"));
 
 const DASHBOARD_VIEW_KEY = "nms.dashboard.view";
 const Views = ["Dashboard", "Charts", "AI"] as const;
