@@ -5,7 +5,8 @@ import { Send, Bot } from "lucide-react";
 import type { TClientsParams, TDataResponseThreadParams, TResponse } from "@/schemas/api";
 import { apiService } from "@/services/api";
 import ChartMaker from "./ChartMaker";
-import PromptHistory from "./PromptHistory";
+import PromptHistory from "./promptHistory";
+import AiEventShowcase from "./AiEventShowcase";
 
 // TODO: This is just a testing implementation and should be improved for actual use.
 export default function LLMChatPage({ client_id = null, org_id = null }: TClientsParams) {

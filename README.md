@@ -20,9 +20,9 @@ The system integrates **Large Language Models (LLMs)** to interpret alerts, mana
 
 ### Screenshots
 
-![Dashboard Alerts](./.github/assets/nms-dashboard.png)
-
-![LLM Charts](./.github/assets/llm-charts.png)
+![Dashboard Alerts](./.github/assets/dashboard.webp)
+![Charts](./.github/assets/charts.webp)
+![LLM Charts](./.github/assets/llm-charts.webp)
 
 ### System Architecture
 
