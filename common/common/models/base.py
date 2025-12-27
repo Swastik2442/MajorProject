@@ -2,9 +2,10 @@ import abc
 
 from pydantic import BaseModel, Field
 
-from .utils import PyObjectId, MyDatetime, none, now
+from .utils import MyDatetime, PyObjectId, none, now
 
-class BaseInterface(abc.ABC, BaseModel):
+
+class BaseInterface(BaseModel, abc.ABC):
     """Base Interface for all models (collections)"""
 
     id: PyObjectId | None = Field(

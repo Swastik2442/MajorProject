@@ -13,8 +13,8 @@ from common.services.db import Database
 from fastapi import APIRouter, BackgroundTasks, Request, status
 from fastapi.exceptions import HTTPException
 
-from src.events import (Event, ServiceProblem, ServiceProblemRecovery, ServiceProblemUpdate, TriggerAlert, TriggerAlertRecovery, TriggerAlertUpdate,
-                        send_event)
+from src.events.dispatch import send_event
+from src.events.models import ServiceProblem, ServiceProblemRecovery, ServiceProblemUpdate, TriggerAlert, TriggerAlertRecovery, TriggerAlertUpdate
 from src.middlewares.client import ClientFromApiKey
 from src.templates import ZABBIX_DATETIME_FORMAT, ZabbixAlert, parse_json_message
 
@@ -58,7 +58,7 @@ async def receive_alert(
             )
             ins = await db[Problem.Meta.collection_name()].insert_one(to_doc(problem))
             problem.id = ins.inserted_id
-            event_data = TriggerAlert.model_validate({**problem.model_dump()})
+            event_data = TriggerAlert.from_problem(problem, client_id=client.id)
         case "problem_recovery":
             docFilter = {
                 fields(Problem).clientId: client.id,
@@ -80,7 +80,7 @@ async def receive_alert(
                 )
                 ins = await db[Problem.Meta.collection_name()].insert_one(to_doc(problem))
                 problem.id = ins.inserted_id
-                event_data = TriggerAlert.model_validate({**problem.model_dump()})
+                event_data = TriggerAlert.from_problem(problem, client_id=client.id)
             else:
                 problemUpdate = ProblemUpdate(
                     severity=data.event.severity,
@@ -100,11 +100,12 @@ async def receive_alert(
                         "$push": {fields(Problem).updates: to_doc(updateItem)}
                     }
                 )
-                event_data = TriggerAlertRecovery.model_validate({
-                    **problemUpdate.model_dump(),
-                    "id": problemExists._id,
-                    "update": updateItem
-                })
+                event_data = TriggerAlertRecovery.from_problem_update(
+                    problemUpdate,
+                    id=problemExists._id,
+                    client_id=client.id,
+                    update_item=updateItem
+                )
         case "problem_update":
             docFilter = {
                 fields(Problem).clientId: client.id,
@@ -125,7 +126,7 @@ async def receive_alert(
                 )
                 ins = await db[Problem.Meta.collection_name()].insert_one(to_doc(problem))
                 problem.id = ins.inserted_id
-                event_data = TriggerAlert.model_validate({**problem.model_dump()})
+                event_data = TriggerAlert.from_problem(problem, client_id=client.id)
             else:
                 problemUpdate = ProblemUpdate(
                     status=data.event.status,
@@ -144,11 +145,12 @@ async def receive_alert(
                         "$push": {fields(Problem).updates: to_doc(updateItem)}
                     }
                 )
-                event_data = TriggerAlertUpdate.model_validate({
-                    **problemUpdate.model_dump(),
-                    "id": problemExists._id,
-                    "update": updateItem
-                })
+                event_data = TriggerAlertUpdate.from_problem_update(
+                    problemUpdate,
+                    id=problemExists._id,
+                    client_id=client.id,
+                    update_item=updateItem
+                )
         case "service":
             service = Service(
                 clientId=client.id,
@@ -163,7 +165,7 @@ async def receive_alert(
             )
             ins = await db[Service.Meta.collection_name()].insert_one(to_doc(service))
             service.id = ins.inserted_id
-            event_data = ServiceProblem.model_validate({**service.model_dump()})
+            event_data = ServiceProblem.from_service(service, client_id=client.id)
         case "service_recovery":
             docFilter = {
                 fields(Service).clientId: client.id,
@@ -186,7 +188,7 @@ async def receive_alert(
                 )
                 ins = await db[Service.Meta.collection_name()].insert_one(to_doc(service))
                 service.id = ins.inserted_id
-                event_data = ServiceProblem.model_validate({**service.model_dump()})
+                event_data = ServiceProblem.from_service(service, client_id=client.id)
             else:
                 serviceUpdate = ServiceUpdate(
                     recoveryAt=recTime,
@@ -206,11 +208,12 @@ async def receive_alert(
                         "$push": {fields(Service).updates: to_doc(updateItem)}
                     }
                 )
-                event_data = ServiceProblemRecovery.model_validate({
-                    **serviceUpdate.model_dump(),
-                    "id": serviceExists._id,
-                    "update": updateItem
-                })
+                event_data = ServiceProblemRecovery.from_service_update(
+                    serviceUpdate,
+                    id=serviceExists._id,
+                    client_id=client.id,
+                    update_item=updateItem
+                )
         case "service_update":
             docFilter = {
                 fields(Service).clientId: client.id,
@@ -232,7 +235,7 @@ async def receive_alert(
                 )
                 ins = await db[Service.Meta.collection_name()].insert_one(to_doc(service))
                 service.id = ins.inserted_id
-                event_data = ServiceProblem.model_validate({**service.model_dump()})
+                event_data = ServiceProblem.from_service(service, client_id=client.id)
             else:
                 serviceUpdate = ServiceUpdate(
                     status=data.event.status,
@@ -251,14 +254,15 @@ async def receive_alert(
                         "$push": {fields(Service).updates: to_doc(updateItem)}
                     }
                 )
-                event_data = ServiceProblemUpdate.model_validate({
-                    **serviceUpdate.model_dump(),
-                    "id": serviceExists._id,
-                    "update": updateItem
-                })
+                event_data = ServiceProblemUpdate.from_service_update(
+                    serviceUpdate,
+                    id=serviceExists._id,
+                    client_id=client.id,
+                    update_item=updateItem
+                )
         case _:
             logger.warning("Unknown Alert Type: %s", data.type)
             raise HTTPException(status.HTTP_400_BAD_REQUEST, "Unknown alert type")
 
-    background_tasks.add_task(send_event, Event(data=event_data, client_id=client.id))
+    background_tasks.add_task(send_event, event_data)
     return CustomResponse()
