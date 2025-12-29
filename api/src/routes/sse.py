@@ -4,12 +4,11 @@ from asyncio import CancelledError, shield
 from collections.abc import Sequence
 from logging import getLogger
 
-from fastapi import APIRouter
 from aio_pika import AMQPException, ExchangeType
-from sse_starlette import EventSourceResponse, JSONServerSentEvent
-
 from common.services.auth import JwtUserId
 from common.services.mq import MQAioPikaConnection
+from fastapi import APIRouter
+from sse_starlette import EventSourceResponse, JSONServerSentEvent
 
 from src.middlewares.client import ClientsFromQuery
 
@@ -52,7 +51,7 @@ async def event_generator(
             try:
                 await shield(channel.close())
             except CancelledError:
-                pass
+                logger.debug("Channel close was cancelled; ignoring during cleanup.")
 
 @router.get("")
 @router.get("/")

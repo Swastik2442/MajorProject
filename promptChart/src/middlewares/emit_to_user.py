@@ -6,9 +6,11 @@ from logging import getLogger
 from typing import Any, Literal
 
 import aio_pika
-from langchain_core.messages import ToolMessage
+from common.models.utils import none
+from common.services.mq import mq_service
 from langchain.agents.middleware import AgentMiddleware, AgentState
 from langchain.tools.tool_node import ToolCallRequest
+from langchain_core.messages import ToolMessage
 from langgraph.runtime import Runtime
 from langgraph.types import Command
 from pika import BasicProperties, BlockingConnection
@@ -16,9 +18,6 @@ from pika.adapters.blocking_connection import BlockingChannel
 from pika.exceptions import AMQPError
 from pika.exchange_type import ExchangeType
 from pydantic import BaseModel, Field
-
-from common.models.utils import none
-from common.services.mq import mq_service
 
 logger = getLogger(__name__)
 
@@ -41,6 +40,8 @@ class EventBody(BaseModel):
     entity_state: Literal["start", "end"]
     message: str | None = Field(default_factory=none)
 
+# TODO: Add better error handling and retries for RabbitMQ connections
+# TODO: Split up send_event functions for connecting and sending messages
 class EmitToUserMiddleware(AgentMiddleware[AgentState, UserMiddlewareContext]):
     """Middleware to emit agent and model interactions to the user."""
 
@@ -53,12 +54,6 @@ class EmitToUserMiddleware(AgentMiddleware[AgentState, UserMiddlewareContext]):
         self._pika_channel: BlockingChannel | None = None
         self._aiopika_channel: aio_pika.abc.AbstractChannel | None = None
         self._aiopika_exchange: aio_pika.abc.AbstractExchange | None = None
-
-    def __del__(self) -> None:
-        if self._pika_channel and not self._pika_channel.is_closed:
-            self._pika_channel.close()
-        if self._aiopika_channel and not self._aiopika_channel.is_closed:
-            asyncio.create_task(self._aiopika_channel.close()) # type: ignore
 
     def _send_event(self, event_type: str, body: EventBody, user_id: str) -> None:
         if self._pika_connection is None:
@@ -149,6 +144,10 @@ class EmitToUserMiddleware(AgentMiddleware[AgentState, UserMiddlewareContext]):
             runtime.context.user_id
         )
 
+        if self._pika_channel and not self._pika_channel.is_closed:
+            self._pika_channel.close()
+            self._pika_channel = None
+
     async def aafter_agent(self, state: AgentState, runtime: Runtime[UserMiddlewareContext]) -> dict[str, Any] | None:
         await self._send_event_async(
             EventType(runtime.context.thread_id, "out"),
@@ -162,6 +161,10 @@ class EmitToUserMiddleware(AgentMiddleware[AgentState, UserMiddlewareContext]):
             ),
             runtime.context.user_id
         )
+
+        if self._aiopika_channel and not self._aiopika_channel.is_closed:
+            await self._aiopika_channel.close()
+            self._aiopika_channel = None
 
     def before_model(self, state: AgentState, runtime: Runtime[UserMiddlewareContext]) -> dict[str, Any] | None:
         self._send_event(

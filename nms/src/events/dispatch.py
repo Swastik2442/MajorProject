@@ -31,10 +31,15 @@ async def send_event(event: BaseEventModel) -> None:
                 event.model_dump_json().encode(),
                 type=event.event_name,
             ),
-            routing_key=RoutingKey(event.client_id)
+            routing_key=RoutingKey(str(event.client_id))
         )
         logger.debug("Sent event '%s' to client %s with data: %s", event.event_name, event.client_id, event.model_dump())
     except aio_pika.AMQPException as e:
         logger.error("Error connecting with RabbitMQ: %s", e)
+    except Exception as e:
+        logger.error("Unexpected error when sending event: %s", e)
     finally:
-        await channel.close()
+        try:
+            await channel.close()
+        except Exception as e:
+            logger.error("Error closing channel: %s", e)
