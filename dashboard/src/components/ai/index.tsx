@@ -6,7 +6,7 @@ import type { TClientsParams, TDataResponseThreadParams, TResponse } from "@/sch
 import { apiService } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import ChartMaker from "./ChartMaker";
-import PromptHistory from "./PromptHistory";
+import PromptHistory from "./promptHistory";
 import AiEventShowcase from "./AiEventShowcase";
 
 // TODO: This is just a testing implementation and should be improved for actual use.

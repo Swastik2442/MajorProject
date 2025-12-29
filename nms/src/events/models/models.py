@@ -17,7 +17,7 @@ class TriggerAlert(BaseEventModel, Problem):
         cls,
         problem: Problem,
         *,
-        client_id: str
+        client_id: PyObjectId
     ) -> "TriggerAlert":
         """Create TriggerAlert from Problem."""
         return cls.model_validate({
@@ -35,7 +35,7 @@ class ServiceProblem(BaseEventModel, Service):
         cls,
         service: Service,
         *,
-        client_id: str
+        client_id: PyObjectId
     ) -> "ServiceProblem":
         """Create ServiceProblem from Service."""
         return cls.model_validate({
@@ -57,7 +57,7 @@ class TriggerAlertUpdate(BaseEventModel, ProblemUpdate):
         problem_update: ProblemUpdate,
         *,
         id: PyObjectId, # pylint: disable=redefined-builtin
-        client_id: str,
+        client_id: PyObjectId,
         update_item: PUpdate
     ) -> "TriggerAlertUpdate":
         """Create TriggerAlertUpdate from ProblemUpdate."""
@@ -82,7 +82,7 @@ class ServiceProblemUpdate(BaseEventModel, ServiceUpdate):
         service_update: ServiceUpdate,
         *,
         id: PyObjectId, # pylint: disable=redefined-builtin
-        client_id: str,
+        client_id: PyObjectId,
         update_item: SUpdate
     ) -> "ServiceProblemUpdate":
         """Create ServiceProblemUpdate from ServiceUpdate."""
@@ -107,7 +107,7 @@ class TriggerAlertRecovery(BaseEventModel, ProblemUpdate):
         problem_update: ProblemUpdate,
         *,
         id: PyObjectId, # pylint: disable=redefined-builtin
-        client_id: str,
+        client_id: PyObjectId,
         update_item: PUpdate
     ) -> "TriggerAlertRecovery":
         """Create TriggerAlertRecovery from ProblemUpdate."""
@@ -132,7 +132,7 @@ class ServiceProblemRecovery(BaseEventModel, ServiceUpdate):
         service_update: ServiceUpdate,
         *,
         id: PyObjectId, # pylint: disable=redefined-builtin
-        client_id: str,
+        client_id: PyObjectId,
         update_item: SUpdate
     ) -> "ServiceProblemRecovery":
         """Create ServiceProblemRecovery from ServiceUpdate."""

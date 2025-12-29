@@ -102,7 +102,7 @@ async def receive_alert(
                 )
                 event_data = TriggerAlertRecovery.from_problem_update(
                     problemUpdate,
-                    id=problemExists._id,
+                    id=problemExists["_id"],
                     client_id=client.id,
                     update_item=updateItem
                 )
@@ -147,7 +147,7 @@ async def receive_alert(
                 )
                 event_data = TriggerAlertUpdate.from_problem_update(
                     problemUpdate,
-                    id=problemExists._id,
+                    id=problemExists["_id"],
                     client_id=client.id,
                     update_item=updateItem
                 )
@@ -210,7 +210,7 @@ async def receive_alert(
                 )
                 event_data = ServiceProblemRecovery.from_service_update(
                     serviceUpdate,
-                    id=serviceExists._id,
+                    id=serviceExists["_id"],
                     client_id=client.id,
                     update_item=updateItem
                 )
@@ -256,7 +256,7 @@ async def receive_alert(
                 )
                 event_data = ServiceProblemUpdate.from_service_update(
                     serviceUpdate,
-                    id=serviceExists._id,
+                    id=serviceExists["_id"],
                     client_id=client.id,
                     update_item=updateItem
                 )
