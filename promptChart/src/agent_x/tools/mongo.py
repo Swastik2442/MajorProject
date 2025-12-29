@@ -9,7 +9,7 @@ from common.models import Problem, Service
 AVAILABLE_COLLECTIONS = [Problem, Service]
 
 # Ref: https://github.com/langchain-ai/langchain-mongodb/blob/main/libs/langchain-mongodb/langchain_mongodb/agent_toolkit/tool.py#L20
-class MongoDBAggContext(BaseModel):
+class MongoToolContext(BaseModel):
     """Context for MongoDB aggregation tool."""
     db: AsyncDatabase = Field(exclude=True)
 
@@ -17,7 +17,7 @@ class MongoDBAggContext(BaseModel):
 
 @tool
 async def run_mongodb_aggregation(
-    runtime: ToolRuntime[MongoDBAggContext],
+    runtime: ToolRuntime[MongoToolContext],
     collection_name: str,
     aggregation_pipeline: list[dict]
 ) -> list[dict]:

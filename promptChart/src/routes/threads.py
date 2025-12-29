@@ -23,6 +23,7 @@ router = APIRouter(
     tags=["threads"]
 )
 
+# TODO: Add Update and Delete endpoints for threads
 @router.get("/{user_id}", response_model=PaginatedDataResponse[Sequence[ThreadLean]])
 async def get_user_threads(
     query: Annotated[PaginationParams, Query()],

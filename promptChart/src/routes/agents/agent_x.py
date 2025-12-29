@@ -24,28 +24,20 @@ router = APIRouter(
     tags=["agents", "agent_x"]
 )
 
-async def start_agent_x(
+async def execute_agent_x(
     prompt: str,
-    user_id: str,
-    thread_id: PyObjectId,
     context: ContextSchema,
-    db: Database
-):
-    agent_config = RunnableConfig(
-        configurable={"thread_id": thread_id},
-        recursion_limit=100
+    thread_id: PyObjectId
+) -> ResponseFormat | None:
+    aiResponse = await agent_x.ainvoke(
+        {"messages": [{"role": "user", "content": prompt}]},
+        config=RunnableConfig(
+            configurable={"thread_id": thread_id},
+            recursion_limit=100
+        ),
+        context=context # type: ignore
     )
-
-    try:
-        aiResponse = await agent_x.ainvoke(
-            {"messages": [{"role": "user", "content": prompt}]},
-            config=agent_config,
-            context=context
-        )
-        aiContent = aiResponse["messages"][-1].content
-    except Exception as e:
-        logger.error("Error while invoking Agent X for thread %s: %s", thread_id, str(e))
-        aiContent = None
+    aiContent = aiResponse["messages"][-1].content
 
     if aiContent is None or aiContent.strip() == "":
         finalResponse = None
@@ -55,19 +47,26 @@ async def start_agent_x(
         logger.info("Agent X completed for thread %s", thread_id)
         logger.debug("Final Response: %s", finalResponse)
 
-    # save last response to database
+    return finalResponse
+
+async def update_or_insert_thread(
+    thread_id: PyObjectId,
+    prompt: str,
+    response: ResponseFormat | None,
+    user_id: str,
+    db: Database
+):
     thread_exists = await db[Thread.Meta.collection_name()].find_one(
         {"_id": ObjectId(thread_id), fields(Thread).userId: user_id},
         {k: False for k in Thread.model_fields.keys()}
     )
+
     if thread_exists is None:
         await db[Thread.Meta.collection_name()].insert_one({**to_doc(Thread(
             userId=user_id,
             title=prompt,
             numberOfPrompts=1,
-            promptResponses=[
-                PromptResponse(prompt=prompt, response=finalResponse)
-            ]
+            promptResponses=[PromptResponse(prompt=prompt, response=response)]
         )), "_id": ObjectId(thread_id)})
     else:
         await db[Thread.Meta.collection_name()].update_one(
@@ -76,12 +75,27 @@ async def start_agent_x(
                 "$push": {
                     fields(Thread).promptResponses: to_doc(PromptResponse(
                         prompt=prompt,
-                        response=finalResponse
+                        response=response
                     ))
                 },
                 "$inc": {fields(Thread).numberOfPrompts: 1}
             }
         )
+
+async def start_agent_x(
+    prompt: str,
+    user_id: str,
+    thread_id: PyObjectId,
+    context: ContextSchema,
+    db: Database
+):
+    try:
+        response = await execute_agent_x(prompt, context, thread_id)
+    except Exception as e:
+        logger.error("Error executing Agent X for thread %s: %s", thread_id, e)
+        response = None
+
+    await update_or_insert_thread(thread_id, prompt, response, user_id, db)
 
 # TODO: Add Langfuse for tracing
 @router.post("/invoke", response_model=DataResponse[InvokeResponseSchema])
@@ -91,17 +105,19 @@ async def invoke_agent_x(
     body: Annotated[InvokeRequestSchema, Body()],
     query: Annotated[InvokeParams, Query()],
 ):
-    context = ContextSchema(db=db)
-
+    # Sanitize inputs
     thread_id = query.thread_id or body.thread_id
     user_id = query.user_id or body.user_id
     if thread_id is None:
         thread_id = PyObjectId(ObjectId())
     if user_id is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="user_id is required either in query params or in body.")
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "user_id is required either in query params or in body.")
 
+    # Start agent in background
+    context = ContextSchema(db=db, user_id=user_id, thread_id=str(thread_id))
     background_tasks.add_task(start_agent_x, body.prompt, user_id, thread_id, context, db)
+
     return JSONResponse(
         {"data": {"thread_id": str(thread_id)}, "message": "Agent execution started in background."},
-        status_code=status.HTTP_202_ACCEPTED,
+        status.HTTP_202_ACCEPTED
     )

@@ -1,3 +1,5 @@
+"""Middleware to log agent and model interactions."""
+
 from collections.abc import Awaitable, Callable
 from logging import getLogger
 from typing import Any

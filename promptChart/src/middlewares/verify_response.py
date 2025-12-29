@@ -1,3 +1,5 @@
+"""Middleware to verify model responses against a specified schema."""
+
 from logging import getLogger
 from typing import Any
 

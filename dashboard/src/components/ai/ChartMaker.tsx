@@ -3,7 +3,7 @@
 import {
   Bar,
   BarChart,
-  Cell,
+  CartesianGrid,
   Line,
   LineChart,
   Pie,
@@ -11,10 +11,27 @@ import {
   ResponsiveContainer,
   Scatter,
   ScatterChart,
+  Tooltip,
+  XAxis,
+  YAxis,
+  Legend,
+  Cell,
 } from "recharts";
-import type { TChartAndData } from "@/schemas/api"
+import type { TChartAndData } from "@/schemas/api";
+
+/** Truncate long labels but show full in tooltip */
+const formatLabel = (value: string) => {
+  if (!value) return "";
+  return value.length > 10 ? `${value.slice(0, 10)}…` : value;
+};
+
+const glowShadow: React.CSSProperties = {
+  filter: "drop-shadow(0 0 6px rgba(0, 255, 180, 0.35))",
+};
 
 export function ChartMaker({ data }: { data: TChartAndData }) {
+  const colors = data.data_series.map((s) => s.color ?? "#4ade80");
+
   return (
     <div className="space-y-3">
       <h3 className="text-lg font-semibold tracking-wide text-[#d8e1ec] truncate">
@@ -123,30 +140,128 @@ export function ChartMaker({ data }: { data: TChartAndData }) {
               </LineChart>
             )}
 
-          {data.type === "pie" && (<>
-            <PieChart>
-              <Pie
-                data={data.data}
-                dataKey={data.dataSeries[0].key}
-              >
-                {data.dataSeries.map((s) => (
-                  <Cell key={s.key} fill={s.color} />
+                {data.data_series.map((s, i) => (
+                  <Bar
+                    key={s.key}
+                    dataKey={s.key}
+                    fill={colors[i]}
+                    // fill={`url(#grad${i % colors.length})`}
+                    radius={[10, 10, 0, 0]}
+                    style={glowShadow}
+                  />
                 ))}
-              </Pie>
-            </PieChart>
-          </>)}
+              </BarChart>
+            )}
 
-          {data.type === "scatter" && (<>
-            <ScatterChart data={data.data}>
-              {data.dataSeries.map((s) => (
-                <Scatter
-                  key={s.key}
-                  dataKey={s.key}
-                  fill={s.color}
+            {/* ---------------- LINE CHART ---------------- */}
+            {data.type === "line" && (
+              <LineChart
+                data={data.data}
+                margin={{ top: 10, right: 20, left: 0, bottom: 60 }}
+              >
+                <CartesianGrid strokeDasharray="5 5" opacity={0.08} />
+                <XAxis
+                  dataKey="name"
+                  stroke="#b5bcc7"
+                  tickFormatter={formatLabel}
+                  angle={-12}
+                  textAnchor="end"
+                  interval={0}
+                  height={60}
                 />
-              ))}
-            </ScatterChart>
-          </>)}
+                <YAxis stroke="#b5bcc7" />
+                <Tooltip
+                  contentStyle={{
+                    background: "#1c2a3c",
+                    borderRadius: "8px",
+                    border: "none",
+                  }}
+                />
+                <Legend verticalAlign="top" height={36} />
+                {data.data_series.map((s, i) => (
+                  <Line
+                    key={s.key}
+                    dataKey={s.key}
+                    type="monotone"
+                    stroke={`url(#grad${i})`}
+                    strokeWidth={3}
+                    dot={{ r: 4, strokeWidth: 2, stroke: colors[i] }}
+                    activeDot={{ r: 7, style: glowShadow }}
+                    style={glowShadow}
+                  />
+                ))}
+              </LineChart>
+            )}
+
+            {/* ---------------- PIE CHART ---------------- */}
+            {data.type === "pie" && (
+              <PieChart>
+                <Tooltip
+                  contentStyle={{
+                    background: "#1c2a3c",
+                    borderRadius: "8px",
+                    border: "none",
+                  }}
+                />
+                <Legend verticalAlign="top" height={36} />
+                <Pie
+                  data={data.data}
+                  dataKey={data.data_series[1]?.key}
+                  nameKey={data.data_series[0]?.key}
+                  outerRadius={120}
+                  paddingAngle={4}
+                  animationBegin={100}
+                  animationDuration={800}
+                >
+                  {colors.map((c, i) => (
+                    <Cell key={i} fill={c} style={glowShadow} />
+                  ))}
+                </Pie>
+              </PieChart>
+            )}
+
+            {/* ---------------- SCATTER CHART ---------------- */}
+            {data.type === "scatter" && (
+              <ScatterChart margin={{ top: 10, right: 20, left: 0, bottom: 60 }}>
+                <CartesianGrid strokeDasharray="5 5" opacity={0.08} />
+                <XAxis
+                  dataKey="x"
+                  stroke="#b5bcc7"
+                  tickFormatter={formatLabel}
+                  angle={-12}
+                  textAnchor="end"
+                  interval={0}
+                  height={60}
+                />
+                <YAxis stroke="#b5bcc7" />
+                <Tooltip
+                  contentStyle={{
+                    background: "#1c2a3c",
+                    borderRadius: "8px",
+                    border: "none",
+                  }}
+                />
+                <Legend verticalAlign="top" height={36} />
+
+                {data.data_series.map((s, i) => (
+                  <Scatter
+                    key={s.key}
+                    data={data.data}
+                    fill={colors[i]}
+                    shape="circle"
+                    strokeWidth={2}
+                    style={glowShadow}
+                  />
+                ))}
+              </ScatterChart>
+            )}
+
+            {data.type === "box" && (
+              <div className="text-gray-400 text-center py-10">
+                📦 BoxPlot coming soon!
+              </div>
+            )}
+          </>
         </ResponsiveContainer>
       </div>
     </div>

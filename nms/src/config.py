@@ -6,6 +6,7 @@ from typing import Literal
 from pydantic import AliasChoices, Field, MongoDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=('.env', '.env.local'),
@@ -24,6 +25,11 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices('MONGO_URI', 'MONGO_CONNECTION_URI', 'MONGODB_URI', 'MONGODB_CONNECTION_URI'),
     )
     DB_NAME: str = Field("nms")
+
+    RABBITMQ_HOST: str = Field(
+        default="localhost",
+        validation_alias=AliasChoices('RABBITMQ_HOST', 'RABBIT_HOST', 'RABBITMQ_URI', 'RABBIT_URI'),
+    )
 
     ALLOWED_ORIGINS: Sequence[str] = Field(
         default_factory=lambda: ["http://localhost:5173"],

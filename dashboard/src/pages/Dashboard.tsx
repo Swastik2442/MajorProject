@@ -34,7 +34,9 @@ const SelectView = ({
   <Select
     value={view}
     onValueChange={(v) => {
-      if (!Views.includes(v as View)) throw new Error(`Invalid view selected: ${v}`);
+      if (!Views.includes(v as View)) {
+        throw new Error(`Invalid view selected: ${v}`);
+      }
       setView(v as View);
     }}
   >
@@ -51,8 +53,20 @@ const SelectView = ({
   </Select>
 );
 
-export default function Dashboard(): JSX.Element {
-  const [view, setView] = useState<View>("Dashboard");
+export default function Dashboard() {
+  const [view, setView] = useState<View>(() => {
+    const saved = localStorage.getItem(DASHBOARD_VIEW_KEY);
+    if (saved && Views.includes(saved as View)) {
+      return saved as View;
+    }
+    localStorage.setItem(DASHBOARD_VIEW_KEY, Views[0]);
+    return Views[0];
+  });
+  const setViewWithStorage = (v: View) => {
+    localStorage.setItem(DASHBOARD_VIEW_KEY, v);
+    setView(v);
+  };
+
   const { organization } = useOrganization();
   const clients = useClientele((s) => s.clients);
   const { dateRange, setDateRange } = useDateRange(
@@ -83,14 +97,15 @@ export default function Dashboard(): JSX.Element {
       <Metadata title={`${pageTitle} | ${import.meta.env.VITE_APP_TITLE}`} />
       <nav className="flex flex-col md:flex-row gap-2 justify-between items-center mb-6">
         <div className="flex gap-2">
-          <SelectView view={view} setView={setView} />
+          <SelectView view={view} setView={setViewWithStorage} />
           <DateRangeFilter dateRange={dateRange} setDateRange={setDateRange} />
         </div>
         <SetClientele />
       </nav>
 
       <div className="relative w-full no-scrollbar">
-        <AlertBanner text="SQL Injection on DB-SRV01 - High" />
+        {/* <AlertBanner text="SQL Injection on DB-SRV01 - High" /> */}
+
         <AnimatePresence mode="wait" initial={false}>
           {view === "Dashboard" && (
             <motion.div

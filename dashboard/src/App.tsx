@@ -4,6 +4,7 @@ import { RouterProvider } from "react-router/dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ClerkProvider, SignedIn, SignedOut } from "@clerk/clerk-react";
 
+import { UserEventsProvider } from "@/contexts/userEvents";
 const PrivateRoutes = lazy(() => import("@/components/PrivateRoutes"));
 const RootErrorBoundary = lazy(() => import("@/components/RootErrorBoundary"));
 const AppLayout = lazy(() => import("@/layouts/AppLayout"));
@@ -76,7 +77,9 @@ export default function App() {
   return (
     <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} afterSignOutUrl="/">
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <UserEventsProvider>
+          <RouterProvider router={router} />
+        </UserEventsProvider>
       </QueryClientProvider>
     </ClerkProvider>
   );
