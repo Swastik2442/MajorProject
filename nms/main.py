@@ -23,7 +23,10 @@ logger = logging.getLogger()
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     await db_service.connect(dsn=config.MONGO_CONNECTION_URI, db_name=config.DB_NAME)
-    await mq_service.connect(rabbit_host=config.RABBITMQ_HOST)
+    try:
+        await mq_service.connect(rabbit_host=config.RABBITMQ_HOST)
+    except Exception as e:
+        logger.error("Failed to connect to RabbitMQ: %s", e)
     yield
     await db_service.disconnect()
     await mq_service.disconnect()
