@@ -6,28 +6,18 @@ from datetime import datetime, timedelta
 from math import ceil
 from typing import Annotated
 
-from fastapi import APIRouter, Response, Query
-from pymongo import DESCENDING
-
-from common.models import Problem, ProblemDatetimesAndStatus, ProblemDatetimesStatusAndSeverity, ProblemClientIdAndHostname
-from common.models.utils import fields, now, Severity
+from common.models import Problem, ProblemClientIdAndHostname, ProblemDatetimesAndStatus, ProblemDatetimesStatusAndSeverity
+from common.models.utils import Severity, fields, now
+from common.schemas import DataResponse, PaginatedDataResponse
 from common.services.auth import ClerkSdk, JwtUserId
 from common.services.db import Database
-from common.schemas import DataResponse, PaginatedDataResponse
-from src.middlewares.client import get_clients_from_query, ClientsFromQuery
-from src.schemas import (
-    InfiniteTimePeriodWithClientsParams,
-    IntervalSeconds,
-    PaginationWithClientsParams,
-    StatAlertDurations,
-    StatCounts,
-    StatHealthScores,
-    StatHostAlertCount,
-    StatProblematicAlertTrends,
-    StatTrends,
-    TimePeriodWithClientsAndSeverityParams,
-    TimePeriodWithClientsParams
-)
+from fastapi import APIRouter, Query, Response
+from pymongo import DESCENDING
+
+from src.middlewares.client import ClientsFromQuery, get_clients_from_query
+from src.schemas import (InfiniteTimePeriodWithClientsParams, IntervalSeconds, PaginationWithClientsParams, StatAlertDurations, StatCounts,
+                         StatHealthScores, StatHostAlertCount, StatProblematicAlertTrends, StatTrends, TimePeriodWithClientsAndSeverityParams,
+                         TimePeriodWithClientsParams)
 
 router = APIRouter(
     prefix="/triggers",
@@ -45,7 +35,7 @@ async def get_trigger_alerts(
     offset = (query.page - 1) * query.limit
     cursor = db[Problem.Meta.collection_name()].find(
         {fields(Problem).clientId: {"$in": [client.id for client in clients if client.id is not None]}},
-        sort=[(fields(Problem).updatedAt, DESCENDING), (fields(Problem).createdAt, DESCENDING)],
+        sort=[(fields(Problem).startedAt, DESCENDING), (fields(Problem).updatedAt, DESCENDING), (fields(Problem).createdAt, DESCENDING)],
         skip=offset,
         limit=query.limit
     )
@@ -68,19 +58,19 @@ async def get_trigger_alerts_count(
         db[Problem.Meta.collection_name()].count_documents({
             fields(Problem).clientId: {"$in": clientIds},
             fields(Problem).status: {"$ne": "Recovered"},
-            fields(Problem).createdAt: {"$gte": curr - timedelta(days=1)} # type: ignore
+            fields(Problem).startedAt: {"$gte": curr - timedelta(days=1)} # type: ignore
         }),
         db[Problem.Meta.collection_name()].count_documents({
             fields(Problem).clientId: {"$in": clientIds},
-            fields(Problem).createdAt: {"$gte": curr - timedelta(days=1)} # type: ignore
+            fields(Problem).startedAt: {"$gte": curr - timedelta(days=1)} # type: ignore
         }),
         db[Problem.Meta.collection_name()].count_documents({
             fields(Problem).clientId: {"$in": clientIds},
-            fields(Problem).createdAt: {"$gte": curr - timedelta(weeks=1)} # type: ignore
+            fields(Problem).startedAt: {"$gte": curr - timedelta(weeks=1)} # type: ignore
         }),
         db[Problem.Meta.collection_name()].count_documents({
             fields(Problem).clientId: {"$in": clientIds},
-            fields(Problem).createdAt: {"$gte": curr - timedelta(days=30)} # type: ignore
+            fields(Problem).startedAt: {"$gte": curr - timedelta(days=30)} # type: ignore
         })
     )
 

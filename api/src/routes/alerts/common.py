@@ -6,23 +6,16 @@ from datetime import datetime, timedelta
 from math import ceil
 from typing import Annotated
 
+from common.models import Problem, ProblemDatetimesAndStatus, Service, ServiceDatetimesAndStatus
+from common.models.utils import fields, now
+from common.schemas import DataResponse, PaginatedDataResponse
+from common.services.auth import ClerkSdk, JwtUserId
+from common.services.db import Database
 from fastapi import APIRouter, Query, Response
 from pymongo import DESCENDING
 
-from common.models import Problem, Service, ProblemDatetimesAndStatus, ServiceDatetimesAndStatus
-from common.models.utils import fields, now
-from common.services.auth import ClerkSdk, JwtUserId
-from common.services.db import Database
-from common.schemas import DataResponse, PaginatedDataResponse
-from src.middlewares.client import get_clients_from_query, ClientsFromQuery
-from src.schemas import (
-    IntervalSeconds,
-    PaginationWithClientsParams,
-    StatCommonCounts,
-    StatCommonTrends,
-    StatCounts,
-    TimePeriodWithClientsParams
-)
+from src.middlewares.client import ClientsFromQuery, get_clients_from_query
+from src.schemas import IntervalSeconds, PaginationWithClientsParams, StatCommonCounts, StatCommonTrends, StatCounts, TimePeriodWithClientsParams
 
 router = APIRouter(
     prefix="/common",
@@ -41,19 +34,19 @@ async def get_common_alerts(
 
     cursorProblem = db[Problem.Meta.collection_name()].find(
         {fields(Problem).clientId: {"$in": [client.id for client in clients if client.id is not None]}},
-        sort=[(fields(Problem).updatedAt, DESCENDING), (fields(Problem).createdAt, DESCENDING)],
+        sort=[(fields(Problem).startedAt, DESCENDING), (fields(Problem).updatedAt, DESCENDING), (fields(Problem).createdAt, DESCENDING)],
         skip=offset,
         limit=query.limit
     )
     cursorService = db[Service.Meta.collection_name()].find(
         {fields(Service).clientId: {"$in": [client.id for client in clients if client.id is not None]}},
-        sort=[(fields(Service).updatedAt, DESCENDING), (fields(Service).createdAt, DESCENDING)],
+        sort=[(fields(Problem).startedAt, DESCENDING), (fields(Service).updatedAt, DESCENDING), (fields(Service).createdAt, DESCENDING)],
         skip=offset,
         limit=query.limit
     )
 
     results = [Problem(**doc) async for doc in cursorProblem] + [Service(**doc) async for doc in cursorService]
-    results = sorted(results, key=lambda x: (x.updatedAt, x.createdAt), reverse=True)
+    results = sorted(results, key=lambda x: (x.startedAt, x.updatedAt, x.createdAt), reverse=True)
     results = results[:query.limit]
 
     return PaginatedDataResponse(data=results, page=query.page, limit=query.limit)
@@ -74,19 +67,19 @@ async def get_common_alerts_count(
         db[Problem.Meta.collection_name()].count_documents({
             fields(Problem).clientId: {"$in": clientIds},
             fields(Problem).status: {"$ne": "Recovered"},
-            fields(Problem).createdAt: {"$gte": curr - timedelta(days=1)} # type: ignore
+            fields(Problem).startedAt: {"$gte": curr - timedelta(days=1)} # type: ignore
         }),
         db[Problem.Meta.collection_name()].count_documents({
             fields(Problem).clientId: {"$in": clientIds},
-            fields(Problem).createdAt: {"$gte": curr - timedelta(days=1)} # type: ignore
+            fields(Problem).startedAt: {"$gte": curr - timedelta(days=1)} # type: ignore
         }),
         db[Problem.Meta.collection_name()].count_documents({
             fields(Problem).clientId: {"$in": clientIds},
-            fields(Problem).createdAt: {"$gte": curr - timedelta(weeks=1)} # type: ignore
+            fields(Problem).startedAt: {"$gte": curr - timedelta(weeks=1)} # type: ignore
         }),
         db[Problem.Meta.collection_name()].count_documents({
             fields(Problem).clientId: {"$in": clientIds},
-            fields(Problem).createdAt: {"$gte": curr - timedelta(days=30)} # type: ignore
+            fields(Problem).startedAt: {"$gte": curr - timedelta(days=30)} # type: ignore
         }),
 
         db[Service.Meta.collection_name()].count_documents({
@@ -96,19 +89,19 @@ async def get_common_alerts_count(
         db[Service.Meta.collection_name()].count_documents({
             fields(Service).clientId: {"$in": clientIds},
             fields(Service).status: {"$ne": "Recovered"},
-            fields(Service).createdAt: {"$gte": curr - timedelta(days=1)} # type: ignore
+            fields(Service).startedAt: {"$gte": curr - timedelta(days=1)} # type: ignore
         }),
         db[Service.Meta.collection_name()].count_documents({
             fields(Service).clientId: {"$in": clientIds},
-            fields(Service).createdAt: {"$gte": curr - timedelta(days=1)} # type: ignore
+            fields(Service).startedAt: {"$gte": curr - timedelta(days=1)} # type: ignore
         }),
         db[Service.Meta.collection_name()].count_documents({
             fields(Service).clientId: {"$in": clientIds},
-            fields(Service).createdAt: {"$gte": curr - timedelta(weeks=1)} # type: ignore
+            fields(Service).startedAt: {"$gte": curr - timedelta(weeks=1)} # type: ignore
         }),
         db[Service.Meta.collection_name()].count_documents({
             fields(Service).clientId: {"$in": clientIds},
-            fields(Service).createdAt: {"$gte": curr - timedelta(days=30)} # type: ignore
+            fields(Service).startedAt: {"$gte": curr - timedelta(days=30)} # type: ignore
         })
     )
 

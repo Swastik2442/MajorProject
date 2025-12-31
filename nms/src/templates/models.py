@@ -3,9 +3,8 @@
 import json
 from typing import Any, Literal
 
+from common.models.utils import Severity
 from pydantic import BaseModel, Field
-
-Severity = Literal["Not classified", "Information", "Warning", "Average", "High", "Disaster"]
 
 ZABBIX_DATETIME_FORMAT = "%Y.%m.%d %H:%M:%S"
 ZABBIX_DATE_REGEX = r"^\d{4}.\d{2}.\d{2}$"

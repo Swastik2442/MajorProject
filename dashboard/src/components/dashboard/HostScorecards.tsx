@@ -10,11 +10,11 @@ export default function HostScorecards({ client_id = null, org_id = null }: TCli
     queryFn: () => apiService.getHostsHealthScores({ client_id, org_id }),
     staleTime: 300000, // 5 minutes
   });
-  const hosts = data?.data ?? [];
+  const hosts = (data?.data ?? []).filter(h => h.healthScore < 100).sort((a, b) => a.healthScore - b.healthScore);
 
   return (
     <div className="card">
-      <div className="font-semibold mb-4 text-primary uppercase">Host Health Scorecards</div>
+      <div className="font-semibold mb-4 text-primary uppercase">Host Health Scorecards {Math.min(4, hosts.length)}/{hosts.length}</div>
       <div className="grid grid-cols-2 gap-4">
         {hosts.slice(0, 4).map((h) => (
           <motion.div

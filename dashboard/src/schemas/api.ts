@@ -175,7 +175,7 @@ export const StatHealthScoresSchema = z.object({
   average: z.number().int().min(0),
   high: z.number().int().min(0),
   disaster: z.number().int().min(0),
-  healthScore: z.number().int().min(0).max(100),
+  healthScore: z.number().min(0).max(100),
 });
 
 export const StatTrendsSchema = z.object({

@@ -38,6 +38,7 @@ def normalize_to_utc(dt: datetime) -> datetime:
 MyDatetime = Annotated[datetime, AfterValidator(normalize_to_utc)]
 
 Severity = Literal["Not classified", "Information", "Warning", "Average", "High", "Disaster"]
+severities = ("Not classified", "Information", "Warning", "Average", "High", "Disaster")
 
 # Ref: https://github.com/pydantic/pydantic/discussions/8600#discussioncomment-8212526
 @dataclass(frozen=True)

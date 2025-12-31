@@ -1,12 +1,10 @@
 from collections.abc import Sequence
-
 from logging import getLogger
-from typing import Self, Literal
+from typing import Literal, Self
 
+from common.models.utils import MyDatetime, PyObjectId, Severity, none, now
 from fastapi import Query
 from pydantic import BaseModel, Field, model_validator
-
-from common.models.utils import MyDatetime, PyObjectId, none, now, Severity
 
 logger = getLogger(__name__)
 
@@ -120,7 +118,7 @@ class StatHealthScores(BaseModel):
     average: int = Field(ge=0)
     high: int = Field(ge=0)
     disaster: int = Field(ge=0)
-    healthScore: int = Field(ge=0, le=100)
+    healthScore: float = Field(ge=0, le=100)
 
 class StatAlertCount(BaseModel, frozen=True):
     clientId: PyObjectId

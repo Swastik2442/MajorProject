@@ -1,0 +1,6 @@
+common @ file:///../common
+pymongo>=4.15.3
+python-dotenv>=1.2.1
+tqdm>=4.67.1
+tzdata>=2025.2
+zabbix-utils>=2.0.4

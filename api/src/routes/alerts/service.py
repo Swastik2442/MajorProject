@@ -6,28 +6,18 @@ from datetime import datetime, timedelta
 from math import ceil
 from typing import Annotated
 
+from common.models import Service, ServiceClientIdAndServiceName, ServiceDatetimesAndStatus, ServiceDatetimesStatusAndSeverity
+from common.models.utils import Severity, fields, now
+from common.schemas import DataResponse, PaginatedDataResponse
+from common.services.auth import ClerkSdk, JwtUserId
+from common.services.db import Database
 from fastapi import APIRouter, Query, Response
 from pymongo import DESCENDING
 
-from common.models import Service, ServiceDatetimesAndStatus, ServiceDatetimesStatusAndSeverity, ServiceClientIdAndServiceName
-from common.models.utils import fields, now, Severity
-from common.services.auth import ClerkSdk, JwtUserId
-from common.services.db import Database
-from common.schemas import DataResponse, PaginatedDataResponse
-from src.middlewares.client import get_clients_from_query, ClientsFromQuery
-from src.schemas import (
-    InfiniteTimePeriodWithClientsParams,
-    IntervalSeconds,
-    PaginationWithClientsParams,
-    StatAlertDurations,
-    StatCounts,
-    StatHealthScores,
-    StatProblematicAlertTrends,
-    StatServiceAlertCount,
-    StatTrends,
-    TimePeriodWithClientsAndSeverityParams,
-    TimePeriodWithClientsParams
-)
+from src.middlewares.client import ClientsFromQuery, get_clients_from_query
+from src.schemas import (InfiniteTimePeriodWithClientsParams, IntervalSeconds, PaginationWithClientsParams, StatAlertDurations, StatCounts,
+                         StatHealthScores, StatProblematicAlertTrends, StatServiceAlertCount, StatTrends, TimePeriodWithClientsAndSeverityParams,
+                         TimePeriodWithClientsParams)
 
 router = APIRouter(
     prefix="/services",
@@ -45,7 +35,7 @@ async def get_service_alerts(
     offset = (query.page - 1) * query.limit
     cursor = db[Service.Meta.collection_name()].find(
         {fields(Service).clientId: {"$in": [client.id for client in clients if client.id is not None]}},
-        sort=[(fields(Service).updatedAt, DESCENDING), (fields(Service).createdAt, DESCENDING)],
+        sort=[(fields(Service).startedAt, DESCENDING), (fields(Service).updatedAt, DESCENDING), (fields(Service).createdAt, DESCENDING)],
         skip=offset,
         limit=query.limit
     )
@@ -68,19 +58,19 @@ async def get_service_alerts_count(
         db[Service.Meta.collection_name()].count_documents({
             fields(Service).clientId: {"$in": clientIds},
             fields(Service).status: {"$ne": "Recovered"},
-            fields(Service).createdAt: {"$gte": curr - timedelta(days=1)} # type: ignore
+            fields(Service).startedAt: {"$gte": curr - timedelta(days=1)} # type: ignore
         }),
         db[Service.Meta.collection_name()].count_documents({
             fields(Service).clientId: {"$in": clientIds},
-            fields(Service).createdAt: {"$gte": curr - timedelta(days=1)} # type: ignore
+            fields(Service).startedAt: {"$gte": curr - timedelta(days=1)} # type: ignore
         }),
         db[Service.Meta.collection_name()].count_documents({
             fields(Service).clientId: {"$in": clientIds},
-            fields(Service).createdAt: {"$gte": curr - timedelta(weeks=1)} # type: ignore
+            fields(Service).startedAt: {"$gte": curr - timedelta(weeks=1)} # type: ignore
         }),
         db[Service.Meta.collection_name()].count_documents({
             fields(Service).clientId: {"$in": clientIds},
-            fields(Service).createdAt: {"$gte": curr - timedelta(days=30)} # type: ignore
+            fields(Service).startedAt: {"$gte": curr - timedelta(days=30)} # type: ignore
         })
     )
 
