@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CoercedCanonicalTimezoneSchema } from 'zod-timezone-validation';
 
 // --- Zod Schemas generated from OpenAPI ---
 
@@ -11,12 +12,14 @@ export const ClientSchema = z.object({
   ownerId: z.string(),
   name: z.string().min(3).max(100),
   description: z.string().nullable().optional(),
+  timezone: CoercedCanonicalTimezoneSchema,
 });
 
 export const ClientCreateSchema = z.object({
   ownerId: z.string(),
   name: z.string().min(3).max(100),
   description: z.string().nullable().optional(),
+  timezone: CoercedCanonicalTimezoneSchema,
 });
 
 export const ClientListItemSchema = z.object({
@@ -26,11 +29,13 @@ export const ClientListItemSchema = z.object({
   ownerId: z.string(),
   name: z.string().min(3).max(100),
   description: z.string().nullable().optional(),
+  timezone: CoercedCanonicalTimezoneSchema,
 });
 
 export const ClientUpdateSchema = z.object({
   name: z.string().min(3).max(100).nullable().optional(),
   description: z.string().nullable().optional(),
+  timezone: CoercedCanonicalTimezoneSchema.nullable().optional(),
 });
 
 export const ClientOwnerUpdateSchema = z.object({

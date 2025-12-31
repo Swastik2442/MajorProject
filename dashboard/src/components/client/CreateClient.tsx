@@ -3,7 +3,6 @@ import { useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { useMutation } from "@tanstack/react-query";
-import { z } from "zod";
 import { PlusIcon } from "lucide-react";
 import { ClientCreateSchema } from "@/schemas/api";
 import { apiService } from "@/services/api";
@@ -28,9 +27,16 @@ import {
   FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-const formSchema = ClientCreateSchema.pick({ name: true, description: true }).extend({
-  description: ClientCreateSchema.shape.description.unwrap().unwrap()
+const formSchema = ClientCreateSchema.pick({ name: true, description: true, timezone: true }).extend({
+  description: ClientCreateSchema.shape.description.unwrap().unwrap(),
 });
 
 export function CreateClientDialog({ ownerId, children }: { ownerId: string; children?: React.ReactNode; }) {
@@ -38,7 +44,7 @@ export function CreateClientDialog({ ownerId, children }: { ownerId: string; chi
   const navigate = useNavigate();
 
   const { mutate, isPending, error, isError } = useMutation({
-    mutationKey: ['client', 'new'],
+    mutationKey: ["client", "new"],
     mutationFn: apiService.createClient,
     onSuccess: (data) => {
       const apiKey = data.data;
@@ -49,7 +55,7 @@ export function CreateClientDialog({ ownerId, children }: { ownerId: string; chi
 
       setOpen(false);
       form.reset();
-      void navigate('/client/new');
+      void navigate("/client/new");
     },
     onError: (error) => {
       if (import.meta.env.DEV)
@@ -57,16 +63,17 @@ export function CreateClientDialog({ ownerId, children }: { ownerId: string; chi
     }
   });
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      description: ""
+      description: "",
+      timezone: formSchema.shape.timezone.parse(Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"),
     },
   });
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = form.handleSubmit((values) => {
     mutate({ ...values, ownerId });
-  };
+  });
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -82,7 +89,7 @@ export function CreateClientDialog({ ownerId, children }: { ownerId: string; chi
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={(e) => {void form.handleSubmit(onSubmit)(e)}} className="space-y-8">
+          <form onSubmit={(e) => {void onSubmit(e)}} className="space-y-8">
             <div className="grid gap-4">
               <div className="grid gap-3">
                 <FormField
@@ -108,6 +115,31 @@ export function CreateClientDialog({ ownerId, children }: { ownerId: string; chi
                       <FormLabel>Description</FormLabel>
                       <FormControl>
                         <Input placeholder="XYZ Corporation" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="grid gap-3">
+                <FormField
+                  control={form.control}
+                  name="timezone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Timezone</FormLabel>
+                      <FormControl>
+                        <Select {...field} value={field.value as string}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Timezone" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="UTC">UTC</SelectItem>
+                            {Intl.supportedValuesOf("timeZone").map((tz) => (
+                              <SelectItem key={tz} value={tz}>{tz}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                       <FormMessage />
                     </FormItem>

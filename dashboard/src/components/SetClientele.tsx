@@ -6,6 +6,7 @@ import {
   ChangeOwnerButton,
   DeleteClientButton,
   RegenApiKeyButton,
+  UpdateClientButton,
 } from "@/components/client";
 import useClientele from "@/stores/clientele";
 
@@ -23,6 +24,7 @@ export function SetClientele() {
         <>
           <RegenApiKeyButton clientId={clients._id} />
           <ChangeOwnerButton clientId={clients._id} />
+          <UpdateClientButton clientId={clients._id} />
           <DeleteClientButton clientId={clients._id} />
         </>
       )}
