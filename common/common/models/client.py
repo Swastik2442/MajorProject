@@ -1,9 +1,11 @@
 "Client Model Schema"
 
+from annotated_types import Timezone
 from pydantic import BaseModel, Field
 
 from .base import BaseInterface
-from .utils import none, uuid4_hex
+from .utils import TimezoneStr, none, uuid4_hex
+
 
 class Client(BaseInterface):
     """Client model representing an NMS server sending alerts."""
@@ -37,6 +39,11 @@ class Client(BaseInterface):
         title="Client Description",
         description="Description for the Client given by the owner"
     )
+    timezone: TimezoneStr = Field(
+        default_factory=lambda: "UTC",
+        title="Client Timezone",
+        description="Timezone for the Client"
+    )
 
 class ClientCreate(BaseModel):
     ownerId: str = Field(
@@ -44,13 +51,20 @@ class ClientCreate(BaseModel):
         description="ID of the Org who owns this Client"
     )
     name: str = Field(
-        title="Client Name",
         min_length=3,
-        max_length=100
+        max_length=100,
+        title="Client Name",
+        description="Name for the Client given by the owner"
     )
     description: str | None = Field(
         default_factory=none,
-        title="Client Description"
+        title="Client Description",
+        description="Description for the Client given by the owner"
+    )
+    timezone: TimezoneStr = Field(
+        default_factory=lambda: "UTC",
+        title="Client Timezone",
+        description="Timezone for the Client"
     )
 
 class ClientUpdate(BaseModel):
@@ -63,6 +77,11 @@ class ClientUpdate(BaseModel):
     description: str | None = Field(
         default_factory=none,
         title="Client Description"
+    )
+    timezone: TimezoneStr = Field(
+        default_factory=lambda: "UTC",
+        title="Client Timezone",
+        description="Timezone for the Client"
     )
 
 class ClientOwnerUpdate(BaseModel):

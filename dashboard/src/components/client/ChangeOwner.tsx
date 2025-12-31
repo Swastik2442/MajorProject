@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useOrganization } from "@clerk/clerk-react";
-import { EditIcon } from "lucide-react";
+import { UserPenIcon } from "lucide-react";
 import { ClientOwnerUpdateSchema, type TClientOwnerUpdate } from "@/schemas/api";
 import { apiService } from "@/services/api";
 import { OrganizationSelect } from "@/components/clerk";
@@ -122,7 +122,7 @@ export function ChangeOwnerDialog({
 export function ChangeOwnerButton({ clientId }: { clientId: string }) {
   return (
     <ChangeOwnerDialog clientId={clientId}>
-      <Button title="Change Owner" variant="ghost" size="icon"><EditIcon /></Button>
+      <Button title="Change Owner" variant="ghost" size="icon"><UserPenIcon /></Button>
     </ChangeOwnerDialog>
   );
 }

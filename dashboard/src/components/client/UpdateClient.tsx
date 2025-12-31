@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { PencilIcon } from "lucide-react";
 import { ClientUpdateSchema, type TClientUpdate } from "@/schemas/api";
 import { apiService } from "@/services/api";
@@ -26,10 +26,24 @@ import {
   FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function UpdateClientDialog({ clientId, children }: { clientId: string; children?: React.ReactNode; }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+
+  const { data } = useQuery({
+    queryKey: ['client', clientId],
+    queryFn: () => apiService.getClient(clientId),
+    select: (res) => res.data,
+    enabled: open
+  });
 
   const { mutate, error, isError } = useMutation({
     mutationKey: ['client', 'update'],
@@ -45,16 +59,18 @@ export function UpdateClientDialog({ clientId, children }: { clientId: string; c
     }
   });
 
-  const form = useForm<TClientUpdate>({
+  const form = useForm({
     resolver: zodResolver(ClientUpdateSchema),
-    defaultValues: {
-      name: "",
-      description: ""
-    },
+    defaultValues: data ?? {},
   });
   const onSubmit = (values: TClientUpdate) => {
     mutate(values);
   };
+
+  useEffect(() => {
+    if (data && !form.formState.defaultValues)
+      form.reset(data, { keepDirtyValues: true});
+  }, [form, data]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -101,6 +117,31 @@ export function UpdateClientDialog({ clientId, children }: { clientId: string; c
                   )}
                 />
               </div>
+              <div className="grid gap-3">
+                <FormField
+                  control={form.control}
+                  name="timezone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Timezone</FormLabel>
+                      <FormControl>
+                        <Select {...field} value={field.value as string} onValueChange={field.onChange}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Timezone" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="UTC">UTC</SelectItem>
+                            {Intl.supportedValuesOf("timeZone").map((tz) => (
+                              <SelectItem key={tz} value={tz}>{tz}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               {isError && (
                 <div className="text-sm text-red-600">
                   Error: {error instanceof Error ? error.message : "An unknown error occurred. Please try again."}
@@ -123,7 +164,7 @@ export function UpdateClientDialog({ clientId, children }: { clientId: string; c
 export function UpdateClientButton({ clientId }: { clientId: string }) {
   return (
     <UpdateClientDialog clientId={clientId}>
-      <Button variant="ghost" size="icon"><PencilIcon /></Button>
+      <Button title="Update Client" variant="ghost" size="icon"><PencilIcon /></Button>
     </UpdateClientDialog>
   )
 }

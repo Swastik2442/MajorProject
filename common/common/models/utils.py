@@ -3,12 +3,12 @@
 from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
-from typing import Annotated, Any, Literal, TypeVar, cast, TYPE_CHECKING
+from typing import TYPE_CHECKING, Annotated, Any, Literal, TypeVar, cast
 from uuid import uuid4
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from bson import ObjectId
-from pydantic import BaseModel, AfterValidator
+from pydantic import AfterValidator, BaseModel
 from pydantic_core import core_schema
 
 utc_tz = ZoneInfo("UTC")
@@ -21,6 +21,15 @@ def uuid4_hex() -> str:
     return uuid4().hex
 def to_doc(obj: BaseModel):
     return obj.model_dump(exclude_none=True)
+
+def validate_iana_timezone(tz_name: str) -> str:
+    try:
+        tz_name = tz_name.strip()
+        ZoneInfo(tz_name)
+        return tz_name
+    except ZoneInfoNotFoundError as e:
+        raise ValueError(f"Invalid IANA timezone: {tz_name}") from e
+TimezoneStr = Annotated[str, AfterValidator(validate_iana_timezone)]
 
 def normalize_to_utc(dt: datetime) -> datetime:
     if dt.tzinfo is None:

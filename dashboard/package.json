@@ -40,6 +40,7 @@
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.13",
     "zod": "^4.1.12",
+    "zod-timezone-validation": "^1.0.5",
     "zustand": "^5.0.8"
   },
   "devDependencies": {

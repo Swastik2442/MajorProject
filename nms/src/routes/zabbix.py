@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from logging import getLogger
+from zoneinfo import ZoneInfo
 
 from common.exceptions import HTTPException as CustomHTTPException
 from common.models import Problem, ProblemUpdate, Service, ServiceUpdate
@@ -44,6 +45,9 @@ async def receive_alert(
         logger.warning("Failed to parse alert message: %s", e)
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Invalid alert message") from e
 
+    def to_db_datetime(date_str: str, time_str: str) -> datetime:
+        return datetime.strptime(f"{date_str} {time_str}", ZABBIX_DATETIME_FORMAT).astimezone(ZoneInfo(client.timezone))
+
     # Insert/Update in the Database
     match data.type:
         case "problem":
@@ -52,7 +56,7 @@ async def receive_alert(
                 zid=data.event.id,
                 name=data.event.name,
                 severity=data.event.severity,
-                startedAt=datetime.strptime(f"{data.event.date} {data.event.time}", ZABBIX_DATETIME_FORMAT),
+                startedAt=to_db_datetime(data.event.date, data.event.time),
                 hostname=data.host.name,
                 status="Started"
             )
@@ -65,7 +69,7 @@ async def receive_alert(
                 fields(Problem).zid: data.event.id
             }
             problemExists = await db[Problem.Meta.collection_name()].find_one(docFilter)
-            recTime = datetime.strptime(f"{data.event.recovery.date} {data.event.recovery.time}", ZABBIX_DATETIME_FORMAT)
+            recTime = to_db_datetime(data.event.recovery.date, data.event.recovery.time)
             if problemExists is None:
                 problem = Problem(
                     clientId=client.id,
@@ -112,7 +116,7 @@ async def receive_alert(
                 fields(Problem).zid: data.event.id
             }
             problemExists = await db[Problem.Meta.collection_name()].find_one(docFilter)
-            updateTime = datetime.strptime(f"{data.event.update.date} {data.event.update.time}", ZABBIX_DATETIME_FORMAT)
+            updateTime = to_db_datetime(data.event.update.date, data.event.update.time)
             if problemExists is None:
                 problem = Problem(
                     clientId=client.id,
@@ -160,7 +164,7 @@ async def receive_alert(
                 serviceName=data.service.name,
                 description=data.service.description,
                 rootcause=data.service.rootcause,
-                startedAt=datetime.strptime(f"{data.event.date} {data.event.time}", ZABBIX_DATETIME_FORMAT),
+                startedAt=to_db_datetime(data.event.date, data.event.time),
                 severity=data.event.severity
             )
             ins = await db[Service.Meta.collection_name()].insert_one(to_doc(service))
@@ -172,7 +176,7 @@ async def receive_alert(
                 fields(Service).zid: data.event.id
             }
             serviceExists = await db[Service.Meta.collection_name()].find_one(docFilter)
-            recTime = datetime.strptime(f"{data.event.recovery.date} {data.event.recovery.time}", ZABBIX_DATETIME_FORMAT)
+            recTime = to_db_datetime(data.event.recovery.date, data.event.recovery.time)
             if serviceExists is None:
                 service = Service(
                     clientId=client.id,
@@ -220,7 +224,7 @@ async def receive_alert(
                 fields(Service).zid: data.event.id
             }
             serviceExists = await db[Service.Meta.collection_name()].find_one(docFilter)
-            updateTime = datetime.strptime(f"{data.event.update.date} {data.event.update.time}", ZABBIX_DATETIME_FORMAT)
+            updateTime = to_db_datetime(data.event.update.date, data.event.update.time)
             if serviceExists is None:
                 service = Service(
                     clientId=client.id,
