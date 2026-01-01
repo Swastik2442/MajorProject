@@ -36,9 +36,7 @@ const router = createBrowserRouter([
     element: (
       <>
         <SignedIn>
-          <AppLayout>
-            <Dashboard />
-          </AppLayout>
+          <Dashboard />
         </SignedIn>
         <SignedOut>
           <Home />

@@ -45,7 +45,7 @@ export default function StatusCards({ client_id = null, org_id = null }: TClient
         </div>
       </motion.div>
 
-      {/* Problems Today */}
+      {/* Problems Last 24 Hours */}
       <motion.div
         initial={{ opacity: 0.0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -54,17 +54,17 @@ export default function StatusCards({ client_id = null, org_id = null }: TClient
         className="bg-card rounded-xl shadow-md p-5 border"
       >
         <div className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-          Total
+          Last 24 Hours
         </div>
         <div className="mt-2 text-5xl font-extrabold text-blue-500">
           {counts.problemsInLast24Hours}
         </div>
         <div className="mt-1 text-sm">
-          Total Problems Today
+          Problems in Last 24 Hours
         </div>
       </motion.div>
 
-      {/* Optional: Problems Last Week */}
+      {/* Problems Last Week */}
       <motion.div
         initial={{ opacity: 0.0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -83,7 +83,7 @@ export default function StatusCards({ client_id = null, org_id = null }: TClient
         </div>
       </motion.div>
 
-      {/* Optional: Problems Last Month */}
+      {/* Problems Last Month */}
       <motion.div
         initial={{ opacity: 0.0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}

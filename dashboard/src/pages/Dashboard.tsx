@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import AppLayout from "@/layouts/AppLayout";
 
 const DashboardComponent = lazy(() => import("@/components/dashboard"));
 const ChartsDashboard = lazy(() => import("@/components/charts"));
@@ -93,7 +94,7 @@ export default function Dashboard() {
       : null;
 
   return (
-    <>
+    <AppLayout showFooter={view !== "AI"}>
       <Metadata title={`${pageTitle} | ${import.meta.env.VITE_APP_TITLE}`} />
       <nav className="flex flex-col md:flex-row gap-2 justify-between items-center mb-6">
         <div className="flex gap-2">
@@ -144,6 +145,6 @@ export default function Dashboard() {
           )}
         </AnimatePresence>
       </div>
-    </>
+    </AppLayout>
   );
 }

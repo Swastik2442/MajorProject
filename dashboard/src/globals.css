@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin 'tailwind-scrollbar';
 
 @custom-variant light (&:is(.light *));
 
@@ -124,6 +125,7 @@ html, body, #root {
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
+  @apply scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent
 }
 
 @keyframes fadeIn {
