@@ -33,7 +33,7 @@ export function ChartMaker({ data }: { data: TChartAndData }) {
   const colors = data.data_series.map((s) => s.color ?? "#4ade80");
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 w-full">
       <h3 className="text-lg font-semibold tracking-wide text-[#d8e1ec] truncate">
         {data.description}
       </h3>

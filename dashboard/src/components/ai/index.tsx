@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Send, Bot, ChevronLeft, ChevronRight } from "lucide-react";
 import type { TClientsParams, TDataResponseThreadParams, TResponse } from "@/schemas/api";
 import { apiService } from "@/services/api";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import ChartMaker from "./ChartMaker";
 import PromptHistory from "./promptHistory";
 import AiEventShowcase from "./AiEventShowcase";
+import { cn } from "@/utils/css";
 
 // TODO: This is just a testing implementation and should be improved for actual use.
 export default function LLMChatPage({ client_id = null, org_id = null }: TClientsParams) {
@@ -73,76 +74,83 @@ export default function LLMChatPage({ client_id = null, org_id = null }: TClient
         className="flex flex-col bg-[#0f1720] border border-[#1b2430] rounded-xl shadow-lg p-5 md:p-6 h-[78vh]"
       >
         {/* Chat Header */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 flex items-center justify-center rounded-md bg-gradient-to-br from-indigo-600 to-cyan-400 shadow-md">
-            <Bot className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold text-gray-100">AI Assistant</h2>
-            <p className="text-sm text-gray-400">
-              Ask about network stats, predictions, or analytics insights.
-            </p>
-          </div>
-        </div>
+        <AnimatePresence>
+          {threadId === null && (
+            <motion.div
+              initial={{ opacity: 0, y: -40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -40 }}
+              transition={{ duration: 0.25 }}
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+              className={cn("flex items-center gap-3 mb-4", threadId === null ? "absolute" : "")}
+            >
+              <div className="w-10 h-10 flex items-center justify-center rounded-md bg-gradient-to-br from-indigo-600 to-cyan-400 shadow-md">
+                <Bot className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-gray-100">AI Assistant</h2>
+                <p className="text-sm text-gray-400">
+                  Ask about network stats or analytics insights.
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Chat Area */}
-        <div className="flex flex-col flex-1 overflow-hidden">
-          <div className="flex-1 overflow-y-auto pr-2 space-y-4 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
-            {history.length === 0 && !isPending && (
-              <p className="text-gray-500 italic mt-10 text-center">
-                No analysis yet. Start by typing a prompt below.
-              </p>
-            )}
-
-            {data && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.25 }}
-                className="space-y-3"
-              >
-                {/* USER MESSAGE */}
-                <div className="flex justify-end">
-                  <div className="max-w-[75%] bg-[#111c2b] border border-[#1f2b3b] text-gray-100 rounded-xl px-4 py-2 shadow-sm break-words">
-                    <p className="text-sm whitespace-pre-wrap">
-                      {data.prompt}
-                    </p>
-                    <div className="text-[0.7rem] text-gray-500 text-right mt-1">
-                      {data.createdAt.toLocaleString()}
+        <div className="flex flex-col flex-1 overflow-hidden justify-center">
+          {threadId !== null && (
+            <div className="flex-1 overflow-y-auto pr-2 space-y-4 no-scrollbar">
+              {data && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="space-y-3"
+                >
+                  {/* USER MESSAGE */}
+                  <div className="flex justify-end">
+                    <div className="max-w-[75%] bg-[#111c2b] border border-[#1f2b3b] text-gray-100 rounded-xl px-4 py-2 shadow-sm break-words">
+                      <p className="text-sm whitespace-pre-wrap">
+                        {data.prompt}
+                      </p>
+                      <div className="text-[0.7rem] text-gray-500 text-right mt-1">
+                        {data.createdAt.toLocaleString()}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* AI RESPONSE */}
-                <div className="flex relative">
-                  <div className="bg-[#071522] border border-[#0d2940] rounded-xl px-4 py-3 shadow break-words">
-                    {data.charts?.map((chart, idx) => (
-                      <ChartMaker key={`chart-${idx}`} data={chart} />
-                    )) ?? "No charts generated. Please refine your prompt."}
+                  {/* AI RESPONSE */}
+                  <div className="flex relative">
+                    <div className="bg-[#071522] border border-[#0d2940] rounded-xl px-4 py-3 shadow break-words w-full">
+                      {data.charts?.map((chart, idx) => (
+                        <ChartMaker key={`chart-${idx}`} data={chart} />
+                      )) ?? "No charts generated. Please refine your prompt."}
+                    </div>
+                    {index !== null && <div className="flex justify-center items-center absolute -bottom-5 z-10">
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => {console.log("Not Implemented Yet")}}
+                      >
+                        <ChevronLeft />
+                      </Button>
+                      <span>{index}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => {console.log("Not Implemented Yet")}}
+                      >
+                        <ChevronRight />
+                      </Button>
+                    </div>}
                   </div>
-                  {index !== null && <div className="flex justify-center items-center absolute -bottom-5 z-10">
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      onClick={() => {console.log("Not Implemented Yet")}}
-                    >
-                      <ChevronLeft />
-                    </Button>
-                    <span>{index}</span>
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      onClick={() => {console.log("Not Implemented Yet")}}
-                    >
-                      <ChevronRight />
-                    </Button>
-                  </div>}
-                </div>
-              </motion.div>
-            )}
+                </motion.div>
+              )}
 
-            {isPending && <LoadingAnimation />}
-          </div>
+              {isPending && <LoadingAnimation />}
+            </div>
+          )}
 
           {threadId ? <AiEventShowcase threadId={threadId} /> : <div className="mt-4"></div>}
 
