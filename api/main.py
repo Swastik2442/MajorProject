@@ -1,20 +1,21 @@
 "API Service to serve NMS Alerts"
 
-from contextlib import asynccontextmanager
 import logging
+from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Response, status
-from fastapi.exceptions import RequestValidationError
-from fastapi.middleware.cors import CORSMiddleware
-from starlette.exceptions import HTTPException as StarletteHTTPException
-
-from common.exceptions import RequestValidationError as CustomRequestValidationError, http_exception_handler, validation_exception_handler
+from common.exceptions import RequestValidationError as CustomRequestValidationError
+from common.exceptions import http_exception_handler, validation_exception_handler
+from common.schemas import Response as CustomResponse
 from common.services.auth.clerk import clerk_service
 from common.services.db import db_service
 from common.services.hishel import hishel_service
 from common.services.mq import mq_service
 from common.services.redis import redis_service
-from common.schemas import Response as CustomResponse
+from fastapi import FastAPI, Response, status
+from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
 from src.config import config
 from src.routes import alerts_router, clients_router, prompt_chart_router, sse_router
 
@@ -40,7 +41,7 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(
     title="NMS API",
-    version="0.4.1",
+    version="0.4.2",
     description="API Service to serve NMS Alerts",
     lifespan=lifespan,
     exception_handlers={

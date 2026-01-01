@@ -8,6 +8,7 @@ from fastapi import Depends
 
 try:
     import hishel
+
     from common.services.redis import redis_service
 except ImportError as e:
     raise ImportError("To work with Caching service, please install using 'pip install common[caching]'.") from e
@@ -29,7 +30,6 @@ class HishelService(Service):
 
         self._hishel_controller = hishel.Controller(
             allow_heuristics=True,
-            force_cache=True
         )
 
     def get_cache_client(self) -> hishel.CacheClient | None:

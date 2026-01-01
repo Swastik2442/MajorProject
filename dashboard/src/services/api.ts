@@ -280,6 +280,21 @@ export const apiService: ApiService = {
     );
     return DataResponseChartsDataSchema.parse(response.data);
   },
+
+  updateThread: async (thread_id, body) => {
+    const response = await api.patch(
+      `/promptChart/threads/${thread_id}`,
+      { ...body }
+    );
+    return ResponseSchema.parse(response.data);
+  },
+
+  deleteThread: async (thread_id) => {
+    const response = await api.delete(
+      `/promptChart/threads/${thread_id}`
+    );
+    return ResponseSchema.parse(response.data);
+  },
 };
 
 export default api;

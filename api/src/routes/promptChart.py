@@ -1,25 +1,23 @@
 "API Routes for handling promptChart API Endpoints"
 
 from collections.abc import Sequence
-from logging import getLogger
 from typing import Annotated
 
+from common.exceptions import HTTPException as CustomHTTPException
+from common.models import ThreadLean
+from common.models.thread import PromptResponse, ThreadUpdate
+from common.models.utils import PyObjectId
+from common.schemas import ChartAndData, ChartsData, DataResponse, PaginatedDataResponse
+from common.schemas import Response as CustomResponse
+from common.services.auth import JwtUserId
+from common.services.db import Database
+from common.services.hishel import HishelAsyncCacheClient
 from fastapi import APIRouter, Body, HTTPException, Path, Query, status
 from fastapi.responses import JSONResponse
-
-from common.models import ThreadLean
-from common.models.thread import PromptResponse
-from common.models.utils import PyObjectId
-from common.services.db import Database
-from common.services.auth import JwtUserId
-from common.services.hishel import HishelAsyncCacheClient
-from common.schemas import ChartsData, ChartAndData, DataResponse, PaginatedDataResponse, Response as CustomResponse
 
 from src.config import config
 from src.middlewares.client import ClientsFromQuery
 from src.schemas import PaginationParams, PromptParams, ThreadParams
-
-logger = getLogger(__name__)
 
 router = APIRouter(
     prefix="/promptChart",
@@ -39,7 +37,6 @@ async def start_prompt_chart(
             "prompt": body.prompt
         }
     )
-    logger.warning("Response from hishel: %s", res.text)
     res.raise_for_status()
     return JSONResponse(
         res.json(),
@@ -97,8 +94,16 @@ async def run_aggregation_pipeline(
     ], comment="AI-Generated Pipeline Execution")
     return await result.to_list()
 
-@router.get("/threads/{thread_id}", response_model=DataResponse[ChartsData])
-@router.get("/threads/{thread_id}/{index}", response_model=DataResponse[ChartsData])
+@router.get(
+    "/threads/{thread_id}",
+    response_model=DataResponse[ChartsData],
+    responses={404: {"model": CustomHTTPException}, 422: {"model": CustomHTTPException}}
+)
+@router.get(
+    "/threads/{thread_id}/{index}",
+    response_model=DataResponse[ChartsData],
+    responses={404: {"model": CustomHTTPException}, 422: {"model": CustomHTTPException}}
+)
 async def get_prompt_chart_thread_details(
     thread_id: Annotated[PyObjectId, Path()],
     clients: ClientsFromQuery,
@@ -119,9 +124,7 @@ async def get_prompt_chart_thread_details(
     if res.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, data.get('message', 'Unprocessable content'))
     res.raise_for_status()
-
     data = PromptResponse(**data['data'])
-    logger.warning("Fetched PromptResponse: %s", data)
 
     return {"data": ChartsData(
         createdAt=data.createdAt,
@@ -141,3 +144,47 @@ async def get_prompt_chart_thread_details(
             ) for chart in (data.response.charts or []) # pylint: disable=E1101
         ] if data.response is not None else None
     )}
+
+@router.patch(
+    "/threads/{thread_id}",
+    response_model=CustomResponse,
+    responses={404: {"model": CustomHTTPException}}
+)
+async def update_thread(
+    user_id: JwtUserId,
+    thread_id: Annotated[PyObjectId, Path()],
+    body: Annotated[ThreadUpdate, Body()],
+    hishel: HishelAsyncCacheClient,
+):
+    res = await hishel.patch(
+        f"{config.LANGCHAIN_API_URL}/threads/{user_id}/{thread_id}",
+        json=body.model_dump(),
+    )
+    data = res.json()
+
+    if res.status_code == status.HTTP_404_NOT_FOUND:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, data.get('message', 'No Thread found'))
+    if res.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, data.get('message', 'Unprocessable content'))
+    res.raise_for_status()
+    return {"message": "Thread updated successfully"}
+
+@router.delete(
+    "/threads/{thread_id}",
+    response_model=CustomResponse,
+    responses={404: {"model": CustomHTTPException}}
+)
+async def delete_thread(
+    user_id: JwtUserId,
+    thread_id: Annotated[PyObjectId, Path()],
+    hishel: HishelAsyncCacheClient,
+):
+    res = await hishel.delete(
+        f"{config.LANGCHAIN_API_URL}/threads/{user_id}/{thread_id}",
+    )
+    data = res.json()
+
+    if res.status_code == status.HTTP_404_NOT_FOUND:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, data.get('message', 'No Thread found'))
+    res.raise_for_status()
+    return {"message": "Thread deleted successfully"}

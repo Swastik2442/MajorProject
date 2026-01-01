@@ -119,6 +119,10 @@ export const ThreadLeanSchema = z.object({
   numberOfPrompts: z.number().int().min(0),
 });
 
+export const ThreadUpdateSchema = z.object({
+  title: z.string().min(1),
+});
+
 export const DataSeriesSchema = z.object({
   key: z.string().min(1),
   label: z.string().min(1),
@@ -328,6 +332,7 @@ export type TSeveritySchema = z.infer<typeof SeveritySchema>;
 export type TProblem = z.infer<typeof ProblemSchema>;
 export type TService = z.infer<typeof ServiceSchema>;
 export type TThreadLean = z.infer<typeof ThreadLeanSchema>;
+export type TThreadUpdate = z.infer<typeof ThreadUpdateSchema>;
 export type TDataSeries = z.infer<typeof DataSeriesSchema>;
 export type TChartAndData = z.infer<typeof ChartAndDataSchema>;
 export type TChartsData = z.infer<typeof ChartsDataSchema>;
@@ -484,4 +489,6 @@ export interface ApiService {
   continuePromptChart: (body: TPromptAndThreadParams) => Promise<TResponse>;
   getPromptChartThreads: (params: TPaginationParams) => Promise<TPaginatedThreadLeanDataResponse>;
   getPromptChartThreadDetails: (params: TThreadAndIndexWithClientsParams) => Promise<TDataResponseChartsData>;
+  updateThread: (thread_id: string, body: TThreadUpdate) => Promise<TResponse>;
+  deleteThread: (thread_id: string) => Promise<TResponse>;
 }

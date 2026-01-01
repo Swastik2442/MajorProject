@@ -1,9 +1,9 @@
 "MongoDB Schema Models"
 
-from .client import Client, ClientCreate, ClientListItem, ClientUpdate, ClientOwnerUpdate
-from .problem import Problem, ProblemUpdate, ProblemDatetimesAndStatus, ProblemDatetimesStatusAndSeverity, ProblemClientIdAndHostname
-from .service import Service, ServiceUpdate, ServiceDatetimesAndStatus, ServiceDatetimesStatusAndSeverity, ServiceClientIdAndServiceName
-from .thread import Thread, ThreadLean
+from .client import Client, ClientCreate, ClientListItem, ClientOwnerUpdate, ClientUpdate
+from .problem import Problem, ProblemClientIdAndHostname, ProblemDatetimesAndStatus, ProblemDatetimesStatusAndSeverity, ProblemUpdate
+from .service import Service, ServiceClientIdAndServiceName, ServiceDatetimesAndStatus, ServiceDatetimesStatusAndSeverity, ServiceUpdate
+from .thread import Thread, ThreadLean, ThreadUpdate
 
 __all__ = [
     "Client",
@@ -23,4 +23,5 @@ __all__ = [
     "ServiceClientIdAndServiceName",
     "Thread",
     "ThreadLean",
+    "ThreadUpdate",
 ]

@@ -9,6 +9,7 @@ from common.schemas.chartAgg import ChartAgg
 from .base import BaseInterface
 from .utils import MyDatetime, none, now
 
+
 class PromptResponse(BaseModel):
     """PromptResponse model representing a response in a Thread."""
     prompt: str = Field(
@@ -66,4 +67,12 @@ class ThreadLean(BaseInterface):
         default_factory=lambda: 0,
         title="Number of Prompts",
         description="Total number of prompts in the thread"
+    )
+
+class ThreadUpdate(BaseModel):
+    """Model for updating a Thread."""
+    title: str = Field(
+        default_factory=lambda: "Untitled Thread",
+        title="Title",
+        description="Title for the thread"
     )

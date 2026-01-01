@@ -1,17 +1,17 @@
 """API Service to serve LangChain based agents"""
 
-from contextlib import asynccontextmanager
 import logging
+from contextlib import asynccontextmanager
 
+from common.exceptions import RequestValidationError as CustomRequestValidationError
+from common.exceptions import http_exception_handler, validation_exception_handler
+from common.schemas import Response as CustomResponse
+from common.services.db import db_service
+from common.services.mq import mq_service
 from fastapi import FastAPI, Response, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
-
-from common.exceptions import RequestValidationError as CustomRequestValidationError, http_exception_handler, validation_exception_handler
-from common.services.db import db_service
-from common.services.mq import mq_service
-from common.schemas import Response as CustomResponse
 
 from src.config import config
 from src.routes import agents_router, threads_router
@@ -30,7 +30,7 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(
     title="LangChain API",
-    version="0.2.0",
+    version="0.2.1",
     description="API Service to serve LangChain based agents",
     lifespan=lifespan,
     exception_handlers={

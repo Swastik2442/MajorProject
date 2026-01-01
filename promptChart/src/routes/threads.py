@@ -5,14 +5,15 @@ from logging import getLogger
 from typing import Annotated
 
 from bson import ObjectId
-from fastapi import APIRouter, HTTPException, Path, Query, status
-from pymongo import DESCENDING
-
-from common.models import Thread, ThreadLean
+from common.exceptions import HTTPException as CustomHTTPException
+from common.models import Thread, ThreadLean, ThreadUpdate
 from common.models.thread import PromptResponse
-from common.models.utils import fields, PyObjectId
-from common.services.db import Database
+from common.models.utils import PyObjectId, fields, now, to_doc
 from common.schemas import DataResponse, PaginatedDataResponse
+from common.schemas import Response as CustomResponse
+from common.services.db import Database
+from fastapi import APIRouter, Body, HTTPException, Path, Query, status
+from pymongo import DESCENDING
 
 from src.schemas import PaginationParams
 
@@ -23,7 +24,6 @@ router = APIRouter(
     tags=["threads"]
 )
 
-# TODO: Add Update and Delete endpoints for threads
 @router.get("/{user_id}", response_model=PaginatedDataResponse[Sequence[ThreadLean]])
 async def get_user_threads(
     query: Annotated[PaginationParams, Query()],
@@ -41,8 +41,16 @@ async def get_user_threads(
     threads = [ThreadLean(**thread_doc) async for thread_doc in threads_cursor]
     return PaginatedDataResponse(data=threads, page=query.page, limit=query.limit)
 
-@router.get("/{user_id}/{thread_id}/response", response_model=DataResponse[PromptResponse])
-@router.get("/{user_id}/{thread_id}/response/{index}", response_model=DataResponse[PromptResponse])
+@router.get(
+    "/{user_id}/{thread_id}/response",
+    response_model=DataResponse[PromptResponse],
+    responses={404: {"model": CustomHTTPException}, 422: {"model": CustomHTTPException}}
+)
+@router.get(
+    "/{user_id}/{thread_id}/response/{index}",
+    response_model=DataResponse[PromptResponse],
+    responses={404: {"model": CustomHTTPException}, 422: {"model": CustomHTTPException}}
+)
 async def get_thread_response(
     user_id: Annotated[str, Path()],
     thread_id: Annotated[PyObjectId, Path()],
@@ -65,3 +73,39 @@ async def get_thread_response(
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Index out of bounds for prompt responses.")
 
     return DataResponse(data=thread.promptResponses[index])
+
+@router.patch(
+    "/{user_id}/{thread_id}",
+    response_model=CustomResponse,
+    responses={404: {"model": CustomHTTPException}}
+)
+async def update_thread(
+    user_id: Annotated[str, Path()],
+    thread_id: Annotated[PyObjectId, Path()],
+    body: Annotated[ThreadUpdate, Body()],
+    db: Database,
+) -> CustomResponse:
+    result = await db[Thread.Meta.collection_name()].update_one(
+        {"_id": thread_id, fields(Thread).userId: user_id},
+        {"$set": {**to_doc(body), fields(Thread).updatedAt: now()}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such thread ID found")
+    return CustomResponse(message="Thread updated successfully")
+
+@router.delete(
+    "/{user_id}/{thread_id}",
+    response_model=CustomResponse,
+    responses={404: {"model": CustomHTTPException}}
+)
+async def delete_thread(
+    user_id: Annotated[str, Path()],
+    thread_id: Annotated[PyObjectId, Path()],
+    db: Database,
+) -> CustomResponse:
+    result = await db[Thread.Meta.collection_name()].delete_one(
+        {"_id": ObjectId(thread_id), fields(Thread).userId: user_id}
+    )
+    if result.deleted_count == 0:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such thread ID found")
+    return CustomResponse(message="Thread deleted successfully")
