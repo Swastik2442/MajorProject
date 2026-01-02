@@ -6,7 +6,7 @@ import { cn } from "@/utils/css";
 import DeleteThreadButton from "./DeleteThread";
 import UpdateThreadButton from "./UpdateThread";
 
-const PromptHistory = ({ setThreadId }: { setThreadId: (id: string | null) => void }) => {
+const PromptHistory = ({ thread, setThread }: { thread: TThreadLean | null; setThread: (thread: TThreadLean | null) => void }) => {
   const { data: raw } = useQuery({
     queryKey: ["promptHistory"],
     queryFn: () => apiService.getPromptChartThreads({ limit: 50 }),
@@ -19,34 +19,42 @@ const PromptHistory = ({ setThreadId }: { setThreadId: (id: string | null) => vo
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.35 }}
-      className="bg-[#0e1620] border border-[#1f2933] rounded-xl shadow-md flex flex-col h-[78vh] overflow-hidden"
+      className="bg-card border rounded-xl shadow-md flex flex-col h-[78vh] overflow-hidden"
     >
-      <h3 className="text-lg font-semibold text-gray-100 mb-3 p-4 pb-0">Prompt History</h3>
-
       {history.length === 0 ? (
-        <p className="text-gray-400 text-sm italic flex-1 flex items-center justify-center text-center py-4 px-6">
+        <p className="text-muted-foreground text-sm italic flex-1 flex items-center justify-center text-center px-6">
           No history yet. Try submitting a prompt.
         </p>
-      ) : (
-        <div className="space-y-3 overflow-y-auto pl-4 pb-4 pr-4 flex-1 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
-          <NewThread onClick={() => {setThreadId(null)}} />
+      ) : (<>
+        <h4 className="text-md font-semibold text-muted-foreground px-7 pt-4 pb-3">History</h4>
+        <div className="overflow-y-auto p-4 pt-0 flex-1 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
+          <NewThread
+            onClick={() => {setThread(null)}}
+            className={thread === null ? "border-indigo-600" : ""}
+          />
           {history.map((item) => (
-            <ThreadItem key={item._id} thread={item} onClick={() => {setThreadId(item._id)}} onDelete={() => {setThreadId(null)}} />
+            <ThreadItem
+              key={item._id}
+              thread={item}
+              onClick={() => {setThread(item)}}
+              onDelete={() => {setThread(null)}}
+              className={(thread?._id === item._id) ? "border-indigo-600" : ""}
+            />
           ))}
         </div>
-      )}
+      </>)}
     </motion.aside>
   );
 };
 
-const ThreadItemClass = "w-full text-left p-3 rounded-lg bg-[#0f1a26] border border-[#1b2732] hover:border-indigo-600 transition-colors cursor-default";
+const ThreadItemClass = "p-3 rounded-lg bg-card-darker border border-transparent hover:border-indigo-600 transition-colors cursor-default";
 
 const NewThread = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(ThreadItemClass, className)}
     {...props}
   >
-    <p aria-label="New Chat" className="text-sm text-gray-100 font-medium truncate">New Chat</p>
+    <p aria-label="New Chat" className="text-sm text-primary font-medium truncate h-5">New Chat</p>
   </div>
 );
 
@@ -64,11 +72,11 @@ const ThreadItem = ({
       className={cn(ThreadItemClass, "group", className)}
       {...props}
     >
-      <div className="flex justify-between items-center gap-1">
-        <p title={thread.title} className="text-sm text-gray-100 font-medium truncate">
+      <div className="flex justify-between items-center gap-1 h-5">
+        <p title={thread.title} className="text-sm text-primary font-medium truncate">
           {thread.title}
         </p>
-        <div className="flex invisible group-hover:visible">
+        <div className="hidden group-hover:flex">
           <UpdateThreadButton thread={thread} />
           <DeleteThreadButton threadId={thread._id} onDelete={onDelete} />
         </div>
