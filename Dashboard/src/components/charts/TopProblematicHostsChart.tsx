@@ -59,7 +59,7 @@ export default function TopProblematicHostsChart({
 }: {
   dateRange?: DateRange;
 } & TClientsParams) {
-  const { data: raw } = useQuery({
+  const { data: raw, isError, error } = useQuery({
     queryKey: [
       "hostsProblemsCount",
       client_id,
@@ -126,6 +126,17 @@ export default function TopProblematicHostsChart({
               <Cell key={`cell-${i}`} fill={colors[i % colors.length]} />
             ))}
           </Bar>
+          {isError && (
+            <text
+              x='50%'
+              y='50%'
+              dy='-12'
+              textAnchor='middle'
+              fill="#cbd5e1"
+            >
+              {error instanceof Error ? error.message : "Error loading data"}
+            </text>
+          )}
         </BarChart>
       </ResponsiveContainer>
     </motion.div>

@@ -37,7 +37,7 @@ export default function About() {
       {/* === Floating Back Button (Top Right) === */}
       <Link
         to="/"
-        className="fixed top-6 right-8 z-50 px-6 py-2 rounded-full bg-gradient-to-br from-green-400 to-blue-500 text-white font-semibold text-sm md:text-base shadow-lg hover:opacity-90 transition-all border border-white/10"
+        className="fixed top-6 right-8 z-50 px-6 py-2 rounded-full bg-linear-to-br from-green-400 to-blue-500 text-white font-semibold text-sm md:text-base shadow-lg hover:opacity-90 transition-all border border-white/10"
       >
         ⬅ Back to Home
       </Link>
@@ -48,7 +48,7 @@ export default function About() {
         style={{ transform: "translateY(var(--bg-translate-y, 0))" }}
         className="pointer-events-none fixed inset-0 -z-20 will-change-transform"
       >
-        <div className="absolute left-1/2 top-32 -translate-x-1/2 w-[1300px] h-[1300px] bg-[radial-gradient(circle,rgba(0,255,153,0.12),transparent_70%)] blur-3xl opacity-90" />
+        <div className="absolute left-1/2 top-32 -translate-x-1/2 size-325 bg-[radial-gradient(circle,rgba(0,255,153,0.12),transparent_70%)] blur-3xl opacity-90" />
         <svg
           className="absolute inset-0 w-full h-full opacity-70"
           viewBox="0 0 1600 1200"
@@ -171,7 +171,7 @@ export default function About() {
       </div>
 
       {/* === SMOOTH TRANSITION SECTION === */}
-      <div className="h-40 bg-gradient-to-b from-[#050b16] to-[#020617]" />
+      <div className="h-40 bg-linear-to-b from-[#050b16] to-[#020617]" />
 
       {/* === THREAT DETECTION VISUAL === */}
       <ThreatDetectionVisual />

@@ -5,9 +5,9 @@ import type { TClientsParams } from "@/schemas/api";
 import { apiService } from "@/services/api";
 import { LoadingSpinner } from "@/components/ui/icons";
 
-function MiniSpark({ data = [] }: { data: { v: number }[] }) {
+function MiniSpark({ data }: { data: { v: number }[] }) {
   return (
-    <div className="w-[80px] h-[28px]">
+    <div className="w-20 h-7">
       <ResponsiveContainer width={80} height={28}>
         <LineChart data={data}>
           <Line

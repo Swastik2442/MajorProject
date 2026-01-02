@@ -46,6 +46,7 @@ export default function DateRangeFilter({
 }) {
   const [open, setOpen] = useState(false);
   const [openCustom, setOpenCustom] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(quickRanges.length);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -84,30 +85,20 @@ export default function DateRangeFilter({
 
           {/* === Quick Range Buttons === */}
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 p-2 rounded-xl border border-border bg-background/60">
-            {quickRanges.map((item) => {
-              const range = item.range();
-              const isActive =
-                dateRange?.from &&
-                dateRange.to &&
-                range.from &&
-                // range.to &&
-                dateRange.from.toDateString() === range.from.toDateString() &&
-                dateRange.to.toDateString() === range.to.toDateString();
-
-              return (
-                <Button
-                  key={item.label}
-                  variant={isActive ? "default" : "outline"}
-                  className="text-xs px-2 py-1 hover:scale-[1.02] transition"
-                  onClick={() => {
-                    setDateRange(range);
-                    setOpen(false);
-                  }}
-                >
-                  {item.label}
-                </Button>
-              );
-            })}
+            {quickRanges.map((item, idx) => (
+              <Button
+                key={item.label}
+                variant={idx == selectedIndex ? "default" : "outline"}
+                className="text-xs px-2 py-1 hover:scale-[1.02] transition"
+                onClick={() => {
+                  setSelectedIndex(idx);
+                  setDateRange(item.range());
+                  setOpen(false);
+                }}
+              >
+                {item.label}
+              </Button>
+            ))}
 
             {/* === Custom Range Button === */}
             <Popover modal={false} open={openCustom} onOpenChange={setOpenCustom}>
@@ -143,6 +134,7 @@ export default function DateRangeFilter({
                     className="hover:cursor-pointer"
                     aria-label="Apply Selection"
                     onClick={() => {
+                      setSelectedIndex(quickRanges.length);
                       setOpenCustom(false);
                       setOpen(false);
                     }}

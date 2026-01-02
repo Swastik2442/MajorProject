@@ -11,3 +11,12 @@ for (const varName of [
 }
 
 export const API_KEY_TEMP_STORAGE_KEY = "nms.temp.apiKey";
+
+export const SEVERITY_COLORS = {
+    notClassified: "#6b7280",
+    information: "#10b981",
+    warning: "#eab308",
+    average: "#3b82f6",
+    high: "#f59e0b",
+    disaster: "#ef4444",
+} as const;

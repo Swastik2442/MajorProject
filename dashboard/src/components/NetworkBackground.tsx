@@ -1,6 +1,11 @@
 // src/components/NetworkBackground.tsx
 import { useEffect, useRef } from "react";
 
+// fewer dots, smarter connections = no lag
+const numDots = 70;
+const maxDistance = 130;
+const colors = ["#00f5d4", "#00bbf9", "#9b5de5", "#00f0ff"];
+
 export default function NetworkBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -13,13 +18,7 @@ export default function NetworkBackground() {
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
-    // fewer dots, smarter connections = no lag
-    const numDots = 70;
-    const maxDistance = 130;
     const dots: { x: number; y: number; vx: number; vy: number }[] = [];
-
-    const colors = ["#00f5d4", "#00bbf9", "#9b5de5", "#00f0ff"];
-
     for (let i = 0; i < numDots; i++) {
       const speed = 0.6 + Math.random() * 1.2;
       dots.push({

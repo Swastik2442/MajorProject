@@ -1,6 +1,19 @@
 import { useEffect, useRef } from "react";
 import eyeImage from "/eyeImage.png";
 
+const numDots = 100;
+const baseRadius = 180;
+const spread = 90;
+const maxDist = 120;
+
+const colors: string[] = [];
+for (let i = 0; i < numDots; i++) {
+  if (i < numDots * 0.4) colors.push("#ffffff");
+  else if (i < numDots * 0.7) colors.push("#00e0ff");
+  else if (i < numDots * 0.9) colors.push("#aaaaaa");
+  else colors.push("#7fff00");
+}
+
 export default function PredictiveAnalysisVisual() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -14,18 +27,6 @@ export default function PredictiveAnalysisVisual() {
     const height = (canvas.height = 600);
     const centerX = width / 2;
     const centerY = height / 2;
-
-    const numDots = 100;
-    const baseRadius = 180;
-    const spread = 90;
-
-    const colors: string[] = [];
-    for (let i = 0; i < numDots; i++) {
-      if (i < numDots * 0.4) colors.push("#ffffff");
-      else if (i < numDots * 0.7) colors.push("#00e0ff");
-      else if (i < numDots * 0.9) colors.push("#aaaaaa");
-      else colors.push("#7fff00");
-    }
 
     const dots = Array.from({ length: numDots }, () => {
       const angle = Math.random() * Math.PI * 2;
@@ -50,7 +51,6 @@ export default function PredictiveAnalysisVisual() {
     ctx.arc(centerX, centerY, 300, 0, Math.PI * 2);
     ctx.fill();
 
-    const maxDist = 120;
     ctx.lineWidth = 0.4;
     ctx.strokeStyle = "rgba(255,255,255,0.15)";
     for (let i = 0; i < numDots; i++) {
@@ -81,7 +81,7 @@ export default function PredictiveAnalysisVisual() {
     <section className="relative w-full min-h-screen bg-[#020617] flex flex-col lg:flex-row items-center justify-between px-10 lg:px-20 py-24 overflow-hidden">
       {/* === LEFT CONTENT BOX === */}
       <div className="relative z-10 max-w-xl bg-[#0d162b]/60 border border-cyan-400/10 rounded-2xl p-10 backdrop-blur-xl shadow-[0_0_40px_rgba(0,255,255,0.08)]">
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-400/10 to-transparent blur-md pointer-events-none"></div>
+        <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-cyan-400/10 to-transparent blur-md pointer-events-none"></div>
 
         <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
           Predictive <br />
@@ -116,7 +116,7 @@ export default function PredictiveAnalysisVisual() {
       </div>
 
       {/* === RIGHT VISUAL (EYE + NETWORK) === */}
-      <div className="relative w-[600px] h-[600px] mt-20 lg:mt-0 flex items-center justify-center">
+      <div className="relative size-150 mt-20 lg:mt-0 flex items-center justify-center">
         <canvas
           ref={canvasRef}
           width={600}
@@ -133,7 +133,7 @@ export default function PredictiveAnalysisVisual() {
           />
         </div>
 
-        <div className="absolute w-[480px] h-[480px] rounded-full bg-[radial-gradient(circle,rgba(0,255,255,0.15)_0%,rgba(0,0,0,0)_70%)] blur-3xl"></div>
+        <div className="absolute size-120 rounded-full bg-[radial-gradient(circle,rgba(0,255,255,0.15)_0%,rgba(0,0,0,0)_70%)] blur-3xl"></div>
       </div>
     </section>
   );

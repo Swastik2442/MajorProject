@@ -11,6 +11,7 @@ import type { TClientsParams } from "@/schemas/api";
 import { apiService } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import CustomTooltip from "@/components/CustomTooltip";
+import { SEVERITY_COLORS } from "@/config";
 
 export default function HostScorecards({ client_id = null, org_id = null }: TClientsParams) {
   const [indices, setIndices] = useState<number[]>([0, 4]);
@@ -57,16 +58,16 @@ export default function HostScorecards({ client_id = null, org_id = null }: TCli
                 <div className="text-2xl font-bold">{Math.round(h.healthScore)}</div>
                 <div className="text-sm text-muted-foreground">Score</div>
               </div>
-              <div className="w-[140px] h-[60px]">
+              <div className="w-35 h-15">
                 <ResponsiveContainer width={140} height={60}>
                   <BarChart data={[h]}>
                     <Tooltip content={CustomTooltip} />
-                    <Bar dataKey="notClassified" fill="#6b7280" />
-                    <Bar dataKey="information" fill="#10b981" />
-                    <Bar dataKey="warning" fill="#eab308" />
-                    <Bar dataKey="average" fill="#3b82f6" />
-                    <Bar dataKey="high" fill="#f59e0b" />
-                    <Bar dataKey="disaster" fill="#ef4444" />
+                    <Bar dataKey="notClassified" fill={SEVERITY_COLORS.notClassified} />
+                    <Bar dataKey="information" fill={SEVERITY_COLORS.information} />
+                    <Bar dataKey="warning" fill={SEVERITY_COLORS.warning} />
+                    <Bar dataKey="average" fill={SEVERITY_COLORS.average} />
+                    <Bar dataKey="high" fill={SEVERITY_COLORS.high} />
+                    <Bar dataKey="disaster" fill={SEVERITY_COLORS.disaster} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

@@ -4,7 +4,6 @@ import type { TClientsParams } from "@/schemas/api";
 import useDateRange from "@/stores/dateRange";
 import StatusCards from "./StatusCards";
 import ActivityStream from "./ActivityStream";
-import SeverityMatrix from "./SeverityMatrix";
 import TrendsChart from "./TrendsChart";
 import HostScorecards from "./HostScorecards";
 import KPIring from "./KPIring";
@@ -45,7 +44,6 @@ export default function Dashboard({ client_id = null, org_id = null }: TClientsP
         {/* Right Side */}
         <div className="col-span-12 lg:col-span-4 space-y-6">
           <TrendsChart client_id={client_id} org_id={org_id} dateRange={dateRange} interval={interval} />
-          <SeverityMatrix />
           <KPIring client_id={client_id} org_id={org_id} />
         </div>
       </div>

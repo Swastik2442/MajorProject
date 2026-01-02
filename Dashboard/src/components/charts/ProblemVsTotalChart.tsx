@@ -30,7 +30,7 @@ export default function ProblemVsTotalChart({
     (!dateRange?.from && !dateRange?.to) ||
     !!(dateRange.from && dateRange.to && ((dateRange.to.getTime() - dateRange.from.getTime()) >= (TimeIntervalSecondsMap[interval ?? "day"] * 1000)))
   );
-  const { data: raw } = useQuery({
+  const { data: raw, isError, error } = useQuery({
     queryKey: [
       "problemVsTotal",
       client_id,
@@ -108,7 +108,17 @@ export default function ProblemVsTotalChart({
             radius={[8, 8, 0, 0]}
             animationDuration={1000}
           />
-          {!enabled && (
+          {enabled ? (isError && (
+            <text
+              x='50%'
+              y='50%'
+              dy='-12'
+              textAnchor='middle'
+              fill="#cbd5e1"
+            >
+              {error instanceof Error ? error.message : "Error loading data"}
+            </text>
+          )) : (
             <text
               x='50%'
               y='50%'

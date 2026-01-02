@@ -56,7 +56,7 @@ export default function Home() {
         style={{ transform: "translateY(var(--bg-translate-y, 0))" }}
         className="pointer-events-none fixed inset-0 -z-20 will-change-transform"
       >
-        <div className="absolute left-1/2 top-32 -translate-x-1/2 w-[1300px] h-[1300px] bg-[radial-gradient(circle,rgba(0,255,153,0.12),transparent_70%)] blur-3xl opacity-90" />
+        <div className="absolute left-1/2 top-32 -translate-x-1/2 size-325 bg-[radial-gradient(circle,rgba(0,255,153,0.12),transparent_70%)] blur-3xl opacity-90" />
 
         <svg
           className="absolute inset-0 w-full h-full opacity-70"
@@ -123,18 +123,18 @@ export default function Home() {
             className="relative bg-[rgba(255,255,255,0.06)] backdrop-blur-xl border border-[rgba(255,255,255,0.08)]
               rounded-3xl p-16 w-[92%] max-w-5xl text-center shadow-[0_0_100px_rgba(0,255,180,0.15)] z-20"
           >
-            <div className="absolute -z-10 w-[700px] h-[700px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[radial-gradient(circle,rgba(0,200,255,0.25),transparent_70%)] blur-3xl" />
+            <div className="absolute -z-10 size-175 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[radial-gradient(circle,rgba(0,200,255,0.25),transparent_70%)] blur-3xl" />
 
-            <h2 className="text-5xl sm:text-6xl font-extrabold bg-gradient-to-r from-green-400 to-blue-500 text-transparent bg-clip-text mb-6 leading-tight">
+            <h2 className="text-5xl sm:text-6xl font-extrabold bg-linear-to-r from-green-400 to-blue-500 text-transparent bg-clip-text mb-6 leading-tight">
               {headline1}
               {headline1.length < HEADLINE_1.length && (
-                <span className="animate-caret-blink inline-block w-[2px] h-10 bg-white ml-1" />
+                <span className="animate-caret-blink inline-block w-0.5 h-10 bg-white ml-1" />
               )}
               <br />
               <span className="text-blue-300">{headline2}</span>
               {headline1.length === HEADLINE_1.length &&
                 headline2.length < HEADLINE_2.length && (
-                  <span className="animate-caret-blink inline-block w-[2px] h-10 bg-white ml-1" />
+                  <span className="animate-caret-blink inline-block w-0.5 h-10 bg-white ml-1" />
                 )}
             </h2>
 
@@ -146,7 +146,7 @@ export default function Home() {
             <div className="flex flex-wrap justify-center gap-6">
               <Link
                 to="/login"
-                className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-green-400 to-blue-500 p-[1px] text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-green-700"
+                className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-linear-to-br from-green-400 to-blue-500 p-px text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-green-700"
               >
                 <span className="relative px-10 py-3 transition-all bg-[#050b16] rounded-full group-hover:bg-transparent group-hover:text-white">
                   Access Dashboard
@@ -166,7 +166,7 @@ export default function Home() {
             className="absolute bottom-0 left-0 w-full h-40 pointer-events-none z-10"
             aria-hidden
           >
-            <div className="w-full h-full bg-gradient-to-b from-transparent via-[#051026] to-[#08101f] opacity-95" />
+            <div className="w-full h-full bg-linear-to-b from-transparent via-[#051026] to-[#08101f] opacity-95" />
           </div>
         </section>
 

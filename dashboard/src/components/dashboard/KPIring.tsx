@@ -34,7 +34,7 @@ export default function KPIring({ client_id = null, org_id = null }: TClientsPar
       viewport={{ once: true }}
       className="card flex flex-col items-center justify-center p-4"
     >
-      <div className="relative size-[140px]">
+      <div className="relative size-35">
         <PieChart width={140} height={140}>
           <Pie
             data={data}
