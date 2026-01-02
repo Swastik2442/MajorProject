@@ -143,6 +143,7 @@ export const ChartsDataSchema = z.object({
   createdAt: z.iso.datetime(),
   description: z.string(),
   charts: z.array(ChartAndDataSchema).nullable().optional(),
+  error: z.string().nullable().optional(),
 });
 
 export const ProblemOrServiceSchema = z.union([ProblemSchema, ServiceSchema]);

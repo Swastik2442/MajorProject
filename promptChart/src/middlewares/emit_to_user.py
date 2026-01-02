@@ -1,6 +1,5 @@
 """Middleware to emit agent and model interactions to the user via RabbitMQ."""
 
-import asyncio
 from collections.abc import Awaitable, Callable
 from logging import getLogger
 from typing import Any, Literal

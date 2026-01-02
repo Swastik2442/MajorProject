@@ -2,7 +2,7 @@
 
 from collections.abc import Sequence
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from common.schemas.chartAgg import ChartAgg
 
@@ -10,16 +10,29 @@ from .base import BaseInterface
 from .utils import MyDatetime, none, now
 
 
-class PromptResponse(BaseModel):
-    """PromptResponse model representing a response in a Thread."""
-    prompt: str = Field(
-        title="Prompt",
-        description="The prompt sent in the thread"
-    )
+class ChartAggOrError(BaseModel):
     response: ChartAgg | None = Field(
         default_factory=none,
         title="Response",
         description="The response received for the prompt"
+    )
+    error: str | None = Field(
+        title="Error",
+        description="Error message if any error occurred during processing",
+        default_factory=none
+    )
+
+    @model_validator(mode='after')
+    def is_ok(self):
+        if (self.error is None and self.response is None) or (self.error is not None and self.response is not None):
+            raise ValueError("Either one error or response must be provided.")
+        return self
+
+class PromptResponse(ChartAggOrError):
+    """PromptResponse model representing a response in a Thread."""
+    prompt: str = Field(
+        title="Prompt",
+        description="The prompt sent in the thread"
     )
     createdAt: MyDatetime = Field(
         default_factory=now,

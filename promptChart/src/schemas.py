@@ -1,7 +1,7 @@
+from common.models.utils import PyObjectId, none
 from fastapi import Query
 from pydantic import BaseModel, Field
 
-from common.models.utils import PyObjectId, none
 
 class PaginationParams(BaseModel):
     page: int = Query(1, ge=1)

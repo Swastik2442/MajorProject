@@ -10,7 +10,7 @@ export type LastAiEvent = TAiEvent & { timestamp: number; type: "out" | "err" };
 
 const EVENT_TIMEOUT_MS = 30000;
 
-export function AiEventShowcase({ threadId }: { threadId: string; }) {
+export function AiEventShowcase({ threadId, setLoading }: { threadId: string; setLoading: React.Dispatch<React.SetStateAction<boolean>>; }) {
   const { addListener } = useUserEvents();
   const [tick, setTick] = useState(new Date().getTime());
   const [lastAiEvent, setLastAiEvent] = useState<LastAiEvent | null>(null);
@@ -24,9 +24,20 @@ export function AiEventShowcase({ threadId }: { threadId: string; }) {
   }, [setTick]);
 
   useEffect(() => {
+    if (eventTimedOut) {
+      setLoading(false);
+    }
+  }, [eventTimedOut, setLoading]);
+
+  useEffect(() => {
     const onOut = (data: unknown) => {
       const parsed = SSEResponseAiEventSchema.parse(data);
       setLastAiEvent({ ...parsed.data, timestamp: new Date().getTime(), type: "out" });
+      if (parsed.data.entity_type === "agent" && parsed.data.entity_state === "end") {
+        setLoading(false);
+      } else {
+        setLoading(true);
+      }
     };
     const onErr = (data: unknown) => {
       const parsed = SSEResponseAiEventSchema.parse(data);
@@ -40,7 +51,7 @@ export function AiEventShowcase({ threadId }: { threadId: string; }) {
       removeOutListener?.();
       removeErrListener?.();
     };
-  }, [addListener, threadId]);
+  }, [addListener, threadId, setLoading]);
 
   return (
     <div className="h-4 p-1 pl-3 text-xs text-gray-400">

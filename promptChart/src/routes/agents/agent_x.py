@@ -4,17 +4,16 @@ import logging
 from typing import Annotated
 
 from bson import ObjectId
-from fastapi import APIRouter, BackgroundTasks, Body, HTTPException, status, Query
+from common.models.thread import ChartAggOrError, PromptResponse, Thread
+from common.models.utils import PyObjectId, fields, to_doc
+from common.schemas import DataResponse
+from common.schemas.chartAgg import ChartAgg as ResponseFormat
+from common.services.db import Database
+from fastapi import APIRouter, BackgroundTasks, Body, HTTPException, Query, status
 from fastapi.responses import JSONResponse
 from langchain_core.runnables import RunnableConfig
 
-from common.models.thread import Thread, PromptResponse
-from common.models.utils import fields, to_doc, PyObjectId
-from common.services.db import Database
-from common.schemas import DataResponse
-from common.schemas.chartAgg import ChartAgg as ResponseFormat
-
-from src.agent_x import agent_x, ContextSchema
+from src.agent_x import ContextSchema, agent_x
 from src.schemas import InvokeParams, InvokeRequestSchema, InvokeResponseSchema
 
 logger = logging.getLogger(__name__)
@@ -28,7 +27,7 @@ async def execute_agent_x(
     prompt: str,
     context: ContextSchema,
     thread_id: PyObjectId
-) -> ResponseFormat | None:
+) -> ChartAggOrError:
     aiResponse = await agent_x.ainvoke(
         {"messages": [{"role": "user", "content": prompt}]},
         config=RunnableConfig(
@@ -40,19 +39,18 @@ async def execute_agent_x(
     aiContent = aiResponse["messages"][-1].content
 
     if aiContent is None or aiContent.strip() == "":
-        finalResponse = None
         logger.error("Agent X returned empty content for thread %s", thread_id)
-    else:
-        finalResponse = ResponseFormat.model_validate_json(aiContent)
-        logger.info("Agent X completed for thread %s", thread_id)
-        logger.debug("Final Response: %s", finalResponse)
+        return ChartAggOrError(error="Agent returned Empty response")
 
-    return finalResponse
+    finalResponse = ResponseFormat.model_validate_json(aiContent)
+    logger.info("Agent X completed for thread %s", thread_id)
+    logger.debug("Final Response: %s", finalResponse)
+    return ChartAggOrError(response=finalResponse)
 
 async def update_or_insert_thread(
     thread_id: PyObjectId,
     prompt: str,
-    response: ResponseFormat | None,
+    responseOrError: ChartAggOrError,
     user_id: str,
     db: Database
 ):
@@ -66,7 +64,11 @@ async def update_or_insert_thread(
             userId=user_id,
             title=prompt,
             numberOfPrompts=1,
-            promptResponses=[PromptResponse(prompt=prompt, response=response)]
+            promptResponses=[PromptResponse(
+                prompt=prompt,
+                response=responseOrError.response,
+                error=responseOrError.error
+            )]
         )), "_id": ObjectId(thread_id)})
     else:
         await db[Thread.Meta.collection_name()].update_one(
@@ -75,7 +77,8 @@ async def update_or_insert_thread(
                 "$push": {
                     fields(Thread).promptResponses: to_doc(PromptResponse(
                         prompt=prompt,
-                        response=response
+                        response=responseOrError.response,
+                        error=responseOrError.error
                     ))
                 },
                 "$inc": {fields(Thread).numberOfPrompts: 1}
@@ -91,11 +94,10 @@ async def start_agent_x(
 ):
     try:
         response = await execute_agent_x(prompt, context, thread_id)
+        await update_or_insert_thread(thread_id, prompt, response, user_id, db)
     except Exception as e:
         logger.error("Error executing Agent X for thread %s: %s", thread_id, e)
-        response = None
-
-    await update_or_insert_thread(thread_id, prompt, response, user_id, db)
+        await update_or_insert_thread(thread_id, prompt, ChartAggOrError(error=type(e).__name__), user_id, db)
 
 # TODO: Add Langfuse for tracing
 @router.post("/invoke", response_model=DataResponse[InvokeResponseSchema])

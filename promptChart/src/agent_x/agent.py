@@ -1,15 +1,15 @@
 """Agent definition for MongoDB aggregation pipeline and chart generation."""
 
+from common.schemas.chartAgg import ChartAgg as ResponseFormat
+from common.schemas.chartAgg import chart_agg_format_text as response_format_text
 from langchain.agents import create_agent
 from langchain.agents.middleware import SummarizationMiddleware, ToolRetryMiddleware
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.checkpoint.postgres import PostgresSaver
 
-from common.schemas.chartAgg import ChartAgg as ResponseFormat, chart_agg_format_text as response_format_text
-
 from src.agent_x.tools import ToolContextSchema, tools, tools_description
 from src.config import config
-from src.middlewares import LoggingMiddleware, VerifyResponseMiddleware, EmitToUserMiddleware, UserMiddlewareContext
+from src.middlewares import EmitToUserMiddleware, LoggingMiddleware, UserMiddlewareContext, VerifyResponseMiddleware
 from src.models import aws_model, local_model
 
 SYSTEM_PROMPT = f"""\

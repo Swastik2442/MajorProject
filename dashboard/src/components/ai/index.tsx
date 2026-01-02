@@ -15,6 +15,7 @@ export default function LLMChatPage({ client_id = null, org_id = null }: TClient
   const [threadId, setThreadId] = useState<string | null>(null);
   const [index, setIndex] = useState<number | null>(null);
   const [prompt, setPrompt] = useState("");
+  const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
   const { data } = useQuery({
@@ -44,6 +45,8 @@ export default function LLMChatPage({ client_id = null, org_id = null }: TClient
     onSuccess: (data) => {
       if ("data" in data && data.data?.thread_id) {
         setThreadId(data.data.thread_id);
+        setLoading(true);
+        setPrompt("");
       }
       setIndex(null);
     },
@@ -57,10 +60,9 @@ export default function LLMChatPage({ client_id = null, org_id = null }: TClient
   // Handle submitting a prompt
   const handleSubmit = (): void => {
     const trimmed = prompt.trim();
-    if (!trimmed || isPending) return;
+    if (!trimmed || isPending || loading) return;
 
     mutate({ prompt: trimmed, thread_id: threadId });
-    setPrompt("");
   };
 
   return (
@@ -110,7 +112,7 @@ export default function LLMChatPage({ client_id = null, org_id = null }: TClient
                 >
                   {/* USER MESSAGE */}
                   <div className="flex justify-end">
-                    <div className="max-w-[75%] bg-[#111c2b] border border-[#1f2b3b] text-gray-100 rounded-xl px-4 py-2 shadow-sm break-words">
+                    <div className="max-w-[75%] bg-[#111c2b] border border-[#1f2b3b] text-gray-100 rounded-xl px-4 py-2 shadow-sm wrap-break-word">
                       <p className="text-sm whitespace-pre-wrap">
                         {data.prompt}
                       </p>
@@ -122,10 +124,10 @@ export default function LLMChatPage({ client_id = null, org_id = null }: TClient
 
                   {/* AI RESPONSE */}
                   <div className="flex relative">
-                    <div className="bg-[#071522] border border-[#0d2940] rounded-xl px-4 py-3 shadow break-words w-full">
+                    <div className="bg-[#071522] border border-[#0d2940] rounded-xl px-4 py-3 shadow wrap-break-word w-full">
                       {data.charts?.map((chart, idx) => (
                         <ChartMaker key={`chart-${idx}`} data={chart} />
-                      )) ?? "No charts generated. Please refine your prompt."}
+                      )) ?? (data.error ?? "No charts generated. Please refine your prompt.")}
                     </div>
                     {index !== null && <div className="flex justify-center items-center absolute -bottom-5 z-10">
                       <Button
@@ -148,11 +150,11 @@ export default function LLMChatPage({ client_id = null, org_id = null }: TClient
                 </motion.div>
               )}
 
-              {isPending && <LoadingAnimation />}
+              {(isPending || loading) && <LoadingAnimation />}
             </div>
           )}
 
-          {threadId ? <AiEventShowcase threadId={threadId} /> : <div className="mt-4"></div>}
+          {threadId ? <AiEventShowcase threadId={threadId} setLoading={setLoading} /> : <div className="mt-4"></div>}
 
           {/* INPUT BAR */}
           <form
@@ -160,7 +162,7 @@ export default function LLMChatPage({ client_id = null, org_id = null }: TClient
               e.preventDefault();
               handleSubmit();
             }}
-            className="flex items-center gap-3 flex-shrink-0"
+            className="flex items-center gap-3 shrink-0"
           >
             <textarea
               ref={inputRef}
@@ -177,16 +179,16 @@ export default function LLMChatPage({ client_id = null, org_id = null }: TClient
                   handleSubmit();
                 }
               }}
-              disabled={isPending}
+              disabled={isPending || loading}
             />
             <button
               type="button"
               onClick={() => {
                 handleSubmit();
               }}
-              disabled={isPending}
+              disabled={isPending || loading}
               aria-label="Send prompt"
-              className="inline-flex items-center justify-center rounded-lg p-2 bg-gradient-to-br from-indigo-500 to-cyan-400 shadow-lg hover:scale-105 transition"
+              className="inline-flex items-center justify-center rounded-lg p-2 bg-linear-to-br from-indigo-500 to-cyan-400 shadow-lg hover:scale-105 transition"
             >
               <Send className="w-4 h-4 text-white" />
             </button>
