@@ -209,15 +209,17 @@ export const StatProblematicAlertTrendsSchema = z.object({
 });
 
 export const StatAlertDurationsSchema = z.object({
-  durationSeconds: z.array(z.union([
-    z.number().int().min(0),
-    z.literal("Infinity")
-  ])),
+  count: z.number().int().min(0),
 });
 
-export const StatAlertDurationPerHostSchema = StatAlertDurationsSchema.extend(ProblemClientIdAndHostnameSchema.shape);
+export const StatAlertDurationSplitSchema = z.object({
+  lesser: z.number().int().min(0),
+  greaterOrEqual: z.number().int().min(0),
+})
 
-export const StatAlertDurationPerServiceSchema = StatAlertDurationsSchema.extend(ServiceClientIdAndServiceNameSchema.shape);
+export const StatAlertDurationsOverThresholdSchema = StatAlertDurationsSchema.extend(ProblemClientIdAndHostnameSchema.shape);
+
+export const StatServiceAlertDurationsOverThresholdSchema = StatAlertDurationsSchema.extend(ServiceClientIdAndServiceNameSchema.shape);
 
 export const AiEventSchema = z.object({
   thread_id: z.string(),
@@ -265,6 +267,12 @@ export const PaginatedDataResponseSchema = <T extends z.ZodType>(itemSchema: T) 
 
 export const IdSchema = z.string().min(1);
 export const TimeIntervalSchema = z.enum(["hour", "day", "week", "month"]);
+export const TimeIntervalSecondsMap = {
+  hour: 3600,
+  day: 86400,
+  week: 604800,
+  month: 2592000,
+} as const;
 
 export const ClientParamSchema = z.object({
   client_id: IdSchema,
@@ -280,6 +288,10 @@ export const ClientsParamsSchema = z.object({
     IdSchema,
     z.null(),
   ]).optional(),
+});
+
+export const ThresholdParamSchema = z.object({
+  threshold: z.number().int().min(0),
 });
 
 export const PromptParamsSchema = z.object({
@@ -318,6 +330,7 @@ export const TimePeriodWithClientsAndSeverityParamsSchema = TimePeriodWithClient
   severity: SeveritySchema.nullable().optional(),
 });
 export const InfiniteTimePeriodWithClientsParamsSchema = InfiniteTimePeriodParamsSchema.extend(ClientsParamsSchema.shape);
+export const InfiniteTimePeriodWithClientsAndThresholdParamsSchema = InfiniteTimePeriodWithClientsParamsSchema.extend(ThresholdParamSchema.shape);
 export const PaginationWithClientsParamsSchema = PaginationParamsSchema.extend(ClientsParamsSchema.shape);
 export const PaginationWithOwnerIdParamsSchema = PaginationParamsSchema.extend({
   owner_id: z.union([
@@ -349,8 +362,9 @@ export type TStatHostsProblemsCount = z.infer<typeof StatHostsProblemsCountSchem
 export type TStatServicesProblemsCount = z.infer<typeof StatServicesProblemsCountSchema>;
 export type TStatProblematicAlertTrends = z.infer<typeof StatProblematicAlertTrendsSchema>;
 export type TStatAlertDurations = z.infer<typeof StatAlertDurationsSchema>;
-export type TStatAlertDurationPerHost = z.infer<typeof StatAlertDurationPerHostSchema>;
-export type TStatAlertDurationPerService = z.infer<typeof StatAlertDurationPerServiceSchema>;
+export type TStatAlertDurationSplit = z.infer<typeof StatAlertDurationSplitSchema>;
+export type TStatAlertDurationsOverThreshold = z.infer<typeof StatAlertDurationsOverThresholdSchema>;
+export type TStatAlertDurationPerService = z.infer<typeof StatServiceAlertDurationsOverThresholdSchema>;
 export type TAiEvent = z.infer<typeof AiEventSchema>;
 
 export type TClient = z.infer<typeof ClientSchema>;
@@ -405,11 +419,14 @@ export type TStatServicesProblemsCountDataResponse = z.infer<typeof StatServices
 export const StatProblematicAlertTrendsDataResponseSchema = DataResponseSchema(z.array(StatProblematicAlertTrendsSchema));
 export type TStatProblematicAlertTrendsDataResponse = z.infer<typeof StatProblematicAlertTrendsDataResponseSchema>;
 
-export const StatAlertDurationPerHostDataResponseSchema = DataResponseSchema(z.array(StatAlertDurationPerHostSchema));
-export type TStatAlertDurationPerHostDataResponse = z.infer<typeof StatAlertDurationPerHostDataResponseSchema>;
+export const StatAlertDurationsOverThresholdDataResponseSchema = DataResponseSchema(z.array(StatAlertDurationsOverThresholdSchema));
+export type TStatAlertDurationsOverThresholdDataResponse = z.infer<typeof StatAlertDurationsOverThresholdDataResponseSchema>;
 
-export const StatAlertDurationPerServiceDataResponseSchema = DataResponseSchema(z.array(StatAlertDurationPerServiceSchema));
-export type TStatAlertDurationPerServiceDataResponse = z.infer<typeof StatAlertDurationPerServiceDataResponseSchema>;
+export const StatServiceAlertDurationsOverThresholdDataResponseSchema = DataResponseSchema(z.array(StatServiceAlertDurationsOverThresholdSchema));
+export type TStatServiceAlertDurationsOverThresholdDataResponse = z.infer<typeof StatServiceAlertDurationsOverThresholdDataResponseSchema>;
+
+export const StatAlertDurationSplitDataResponseSchema = DataResponseSchema(StatAlertDurationSplitSchema);
+export type TStatAlertDurationSplitDataResponse = z.infer<typeof StatAlertDurationSplitDataResponseSchema>;
 
 export const PaginatedClientListItemDataResponseSchema = PaginatedDataResponseSchema(ClientListItemSchema);
 export type TPaginatedClientListItemDataResponse = z.infer<typeof PaginatedClientListItemDataResponseSchema>;
@@ -446,6 +463,7 @@ export type TThreadAndIndexWithClientsParams = z.infer<typeof ThreadAndIndexWith
 export type TTimePeriodWithClientsParams = z.infer<typeof TimePeriodWithClientsParamsSchema>;
 export type TTimePeriodWithClientsAndSeverityParams = z.infer<typeof TimePeriodWithClientsAndSeverityParamsSchema>;
 export type TInfiniteTimePeriodWithClientsParams = z.infer<typeof InfiniteTimePeriodWithClientsParamsSchema>;
+export type TInfiniteTimePeriodWithClientsAndThresholdParams = z.infer<typeof InfiniteTimePeriodWithClientsAndThresholdParamsSchema>;
 export type TPaginationWithClientsParams = z.infer<typeof PaginationWithClientsParamsSchema>;
 export type TPaginationWithOwnerIdParams = z.infer<typeof PaginationWithOwnerIdParamsSchema>;
 
@@ -464,7 +482,8 @@ export interface ApiService {
   getHostsHealthScores: (params: TClientsParams) => Promise<TStatHealthScoresDataResponse>;
   getHostsProblemsCount: (params: TInfiniteTimePeriodWithClientsParams) => Promise<TStatHostsProblemsCountDataResponse>;
   getProblematicTriggerAlertTrends: (params: TTimePeriodWithClientsAndSeverityParams) => Promise<TStatProblematicAlertTrendsDataResponse>;
-  getAlertDurationPerHost: (params: TInfiniteTimePeriodWithClientsParams) => Promise<TStatAlertDurationPerHostDataResponse>;
+  getTriggerAlertDurationsOverThreshold: (params: TInfiniteTimePeriodWithClientsAndThresholdParams) => Promise<TStatAlertDurationsOverThresholdDataResponse>;
+  getTriggerAlertDurationSplit: (params: TInfiniteTimePeriodWithClientsAndThresholdParams) => Promise<TStatAlertDurationSplitDataResponse>;
 
   // Service Alert endpoints
   getServiceAlerts: (params: TPaginationWithClientsParams) => Promise<TPaginatedServiceDataResponse>;
@@ -473,7 +492,8 @@ export interface ApiService {
   getServicesHealthScores: (params: TClientsParams) => Promise<TStatHealthScoresDataResponse>;
   getServicesProblemsCount: (params: TInfiniteTimePeriodWithClientsParams) => Promise<TStatServicesProblemsCountDataResponse>;
   getProblematicServiceAlertTrends: (params: TTimePeriodWithClientsAndSeverityParams) => Promise<TStatProblematicAlertTrendsDataResponse>;
-  getAlertDurationPerService: (params: TInfiniteTimePeriodWithClientsParams) => Promise<TStatAlertDurationPerServiceDataResponse>;
+  getServiceAlertDurationsOverThreshold: (params: TInfiniteTimePeriodWithClientsAndThresholdParams) => Promise<TStatServiceAlertDurationsOverThresholdDataResponse>;
+  getServiceAlertDurationSplit: (params: TInfiniteTimePeriodWithClientsAndThresholdParams) => Promise<TStatAlertDurationSplitDataResponse>;
 
   // Client endpoints
   createClient: (body: TClientCreate) => Promise<TDataResponseStr>;

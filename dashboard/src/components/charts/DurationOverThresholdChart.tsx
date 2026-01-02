@@ -53,58 +53,51 @@ export default function DurationOverThresholdChart({
   threshold?: number;
   dateRange?: DateRange;
 } & TClientsParams) {
-  const { data: raw } = useQuery({
+  const { data: raw, isError, error } = useQuery({
     queryKey: [
-      "durationOver4hrs",
+      "durationOverThreshold",
       client_id,
       org_id,
       dateRange?.from?.toISOString(),
       dateRange?.to?.toISOString(),
+      threshold,
     ],
     queryFn: async () =>
-      apiService.getAlertDurationPerHost({
+      apiService.getTriggerAlertDurationsOverThreshold({
         client_id,
         org_id,
         start: dateRange?.from?.toISOString(),
         end: dateRange?.to?.toISOString(),
+        threshold,
       }),
+    retry: 1,
   });
 
   const rows = raw?.data ?? [];
-
   const chartData = rows
-    .map((r) => {
-      const countLong = r.durationSeconds.filter((d) =>
-        typeof d === "number" ? d > threshold : true
-      ).length;
-      return { clientId: r.clientId, name: r.hostname, long: countLong };
-    })
-    .sort((a, b) => b.long - a.long)
+    .sort((a, b) => b.count - a.count)
     .slice(0, 20);
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
   const thresholdAsWords = ms(threshold * 1000, { long: true });
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 shadow-xl"
+      className="p-4 rounded-2xl bg-linear-to-br from-slate-900 to-slate-800 shadow-xl"
     >
       <ResponsiveContainer width="100%" height={320}>
         <BarChart data={chartData} barSize={28}>
           <defs>
-  <linearGradient id="barGradientYellow" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0%" stopColor="#fbbf24" stopOpacity={1} />
-    <stop offset="60%" stopColor="#f59e0b" stopOpacity={0.9} />
-    <stop offset="100%" stopColor="#78350f" stopOpacity={0.7} />
-  </linearGradient>
-</defs>
-
-
+            <linearGradient id="barGradientYellow" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#fbbf24" stopOpacity={1} />
+              <stop offset="60%" stopColor="#f59e0b" stopOpacity={0.9} />
+              <stop offset="100%" stopColor="#78350f" stopOpacity={0.7} />
+            </linearGradient>
+          </defs>
           <CartesianGrid strokeDasharray="4 4" opacity={0.2} vertical={false} />
           <XAxis
-            dataKey="name"
+            dataKey="hostname"
             tick={{ fill: "#cbd5e1", fontSize: 12 }}
             tickLine={false}
           />
@@ -119,7 +112,7 @@ export default function DurationOverThresholdChart({
             iconType="circle"
           />
           <Bar
-            dataKey="long"
+            dataKey="count"
             name={`> ${thresholdAsWords}`}
             fill="url(#barGradientYellow)"
             radius={[8, 8, 0, 0]}
@@ -129,6 +122,17 @@ export default function DurationOverThresholdChart({
               <Cell key={`cell-${i}`} fill={colors[i % colors.length]} />
             ))}
           </Bar>
+          {isError && (
+            <text
+              x='50%'
+              y='50%'
+              dy='-12'
+              textAnchor='middle'
+              fill="#cbd5e1"
+            >
+              {error instanceof Error ? error.message : "Error loading data"}
+            </text>
+          )}
         </BarChart>
       </ResponsiveContainer>
     </motion.div>

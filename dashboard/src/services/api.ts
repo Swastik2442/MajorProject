@@ -15,8 +15,9 @@ import {
   StatHostsProblemsCountDataResponseSchema,
   StatTrendsDataResponseSchema,
   StatProblematicAlertTrendsDataResponseSchema,
-  StatAlertDurationPerHostDataResponseSchema,
-  StatAlertDurationPerServiceDataResponseSchema,
+  StatAlertDurationsOverThresholdDataResponseSchema,
+  StatAlertDurationSplitDataResponseSchema,
+  StatServiceAlertDurationsOverThresholdDataResponseSchema,
   StatServicesProblemsCountDataResponseSchema,
   DataResponseThreadParamsSchema,
   PaginatedThreadLeanDataResponseSchema,
@@ -100,12 +101,20 @@ export const apiService: ApiService = {
     return StatProblematicAlertTrendsDataResponseSchema.parse(response.data);
   },
 
-  getAlertDurationPerHost: async (params) => {
+  getTriggerAlertDurationsOverThreshold: async (params) => {
     const response = await api.get(
-      "/alerts/triggers/hosts/duration",
+      "/alerts/triggers/hosts/duration/threshold",
       { params }
     );
-    return StatAlertDurationPerHostDataResponseSchema.parse(response.data);
+    return StatAlertDurationsOverThresholdDataResponseSchema.parse(response.data);
+  },
+
+  getTriggerAlertDurationSplit: async (params) => {
+    const response = await api.get(
+      "/alerts/triggers/hosts/duration/split",
+      { params }
+    );
+    return StatAlertDurationSplitDataResponseSchema.parse(response.data);
   },
 
   // --- SERVICE ALERTS ---
@@ -158,12 +167,20 @@ export const apiService: ApiService = {
     return StatProblematicAlertTrendsDataResponseSchema.parse(response.data);
   },
 
-  getAlertDurationPerService: async (params) => {
+  getServiceAlertDurationsOverThreshold: async (params) => {
     const response = await api.get(
-      "/alerts/services/duration",
+      "/alerts/services/duration/threshold",
       { params }
     );
-    return StatAlertDurationPerServiceDataResponseSchema.parse(response.data);
+    return StatServiceAlertDurationsOverThresholdDataResponseSchema.parse(response.data);
+  },
+
+  getServiceAlertDurationSplit: async (params) => {
+    const response = await api.get(
+      "/alerts/services/duration/split",
+      { params }
+    );
+    return StatAlertDurationSplitDataResponseSchema.parse(response.data);
   },
 
   // --- COMMON ALERTS ---

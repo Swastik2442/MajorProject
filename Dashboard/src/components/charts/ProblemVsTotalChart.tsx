@@ -12,6 +12,7 @@ import {
   CartesianGrid,
   Legend,
 } from "recharts";
+import { TimeIntervalSecondsMap } from "@/schemas/api";
 import type { TTimeIntervalParam, TClientsParams } from "@/schemas/api";
 import { apiService } from "@/services/api";
 import CustomTooltip from "@/components/CustomTooltip";
@@ -25,6 +26,10 @@ export default function ProblemVsTotalChart({
   dateRange?: DateRange;
   interval?: TTimeIntervalParam;
 } & TClientsParams) {
+  const enabled = (
+    (!dateRange?.from && !dateRange?.to) ||
+    !!(dateRange.from && dateRange.to && ((dateRange.to.getTime() - dateRange.from.getTime()) >= (TimeIntervalSecondsMap[interval ?? "day"] * 1000)))
+  );
   const { data: raw } = useQuery({
     queryKey: [
       "problemVsTotal",
@@ -42,6 +47,7 @@ export default function ProblemVsTotalChart({
         end: dateRange?.to?.toISOString() ?? new Date().toISOString(),
         interval
       }),
+      enabled
   });
 
   const rows = raw?.data ?? [];
@@ -57,7 +63,7 @@ export default function ProblemVsTotalChart({
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 shadow-lg"
+      className="p-4 rounded-2xl bg-linear-to-br from-slate-900 to-slate-800 shadow-lg"
     >
       <ResponsiveContainer width="100%" height={320}>
         <BarChart data={chartData} barGap={6}>
@@ -102,6 +108,17 @@ export default function ProblemVsTotalChart({
             radius={[8, 8, 0, 0]}
             animationDuration={1000}
           />
+          {!enabled && (
+            <text
+              x='50%'
+              y='50%'
+              dy='-12'
+              textAnchor='middle'
+              fill="#cbd5e1"
+            >
+              Select a larger date range to view the chart
+            </text>
+          )}
         </BarChart>
       </ResponsiveContainer>
     </motion.div>

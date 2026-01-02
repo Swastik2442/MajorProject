@@ -7,7 +7,7 @@ from math import ceil
 from typing import Annotated
 
 from common.models import Service, ServiceClientIdAndServiceName, ServiceDatetimesAndStatus, ServiceDatetimesStatusAndSeverity
-from common.models.utils import Severity, fields, now
+from common.models.utils import Severity, fields, now, utc_tz
 from common.schemas import DataResponse, PaginatedDataResponse
 from common.services.auth import ClerkSdk, JwtUserId
 from common.services.db import Database
@@ -15,8 +15,9 @@ from fastapi import APIRouter, Query, Response
 from pymongo import DESCENDING
 
 from src.middlewares.client import ClientsFromQuery, get_clients_from_query
-from src.schemas import (InfiniteTimePeriodWithClientsParams, IntervalSeconds, PaginationWithClientsParams, StatAlertDurations, StatCounts,
-                         StatHealthScores, StatProblematicAlertTrends, StatServiceAlertCount, StatTrends, TimePeriodWithClientsAndSeverityParams,
+from src.schemas import (InfiniteTimePeriodWithClientsAndThresholdParams, InfiniteTimePeriodWithClientsParams, IntervalSeconds,
+                         PaginationWithClientsParams, StatAlertDurations, StatAlertDurationsSplit, StatCounts, StatHealthScores,
+                         StatProblematicAlertTrends, StatServiceAlertCount, StatTrends, TimePeriodWithClientsAndSeverityParams,
                          TimePeriodWithClientsParams)
 
 router = APIRouter(
@@ -243,8 +244,16 @@ async def get_services_problems_count(
         # Get relevant problems for the clients
         {"$match": {
             fields(Service).clientId: {"$in": [c.id for c in clients if c.id is not None]},
-            **({fields(Service).startedAt: {"$gte": query.start}} if query.start is not None else {}),
-            **({fields(Service).startedAt: {"$lte": query.end}} if query.end is not None else {})
+            **({
+                "$and": [
+                    ({
+                        fields(Service).startedAt: {"$gte": query.start}
+                    } if query.start is not None else {}),
+                    ({
+                        fields(Service).startedAt: {"$lte": query.end}
+                    } if query.end is not None else {}),
+                ]
+            } if query.start is not None or query.end is not None else {}),
         }},
 
         # Get relevant fields only
@@ -352,9 +361,9 @@ async def get_problematic_service_alert_trends(
 class AlertDurationPerService(ServiceClientIdAndServiceName, StatAlertDurations):
     pass
 
-@router.get("/duration", response_model=DataResponse[Sequence[AlertDurationPerService]])
-async def get_alert_duration_per_service(
-    query: Annotated[InfiniteTimePeriodWithClientsParams, Query()],
+@router.get("/duration/threshold", response_model=DataResponse[Sequence[AlertDurationPerService]])
+async def get_alert_durations_over_threshold(
+    query: Annotated[InfiniteTimePeriodWithClientsAndThresholdParams, Query()],
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database,
@@ -362,31 +371,38 @@ async def get_alert_duration_per_service(
 ) -> DataResponse[Sequence[AlertDurationPerService]]:
     clients = await get_clients_from_query(query, user_id, clerk, db)
 
+    # Set a minimum possible start time to avoid scanning the entire DB
+    maxPossibleEnd = datetime.now(utc_tz)
+    minPossibleStart = maxPossibleEnd - timedelta(days=365)
+    query.start = max(query.start, minPossibleStart) if query.start is not None else minPossibleStart
+    query.end = min(query.end, maxPossibleEnd) if query.end is not None else maxPossibleEnd
+
     pipeline = [
         # Get relevant problems for the clients
         {"$match": {
             fields(Service).clientId: {"$in": [c.id for c in clients if c.id is not None]},
-            **({fields(Service).startedAt: {"$gte": query.start}} if query.start is not None else {}),
-            **({fields(Service).startedAt: {"$lte": query.end}} if query.end is not None else {})
+            **({"$and": [
+                {fields(Service).startedAt: {"$gte": query.start}},
+                {fields(Service).startedAt: {"$lte": query.end}},
+            ]}),
         }},
 
         # Get relevant fields only
         {"$project": {
             fields(Service).clientId: 1,
             fields(Service).serviceName: 1,
-            fields(Service).startedAt: 1,
-            fields(Service).recoveryAt: 1
-        }},
-
-        # Group by serviceName and list durations
-        {"$group": {
-            "_id": {
-                fields(Service).clientId: "$" + fields(Service).clientId,
-                fields(Service).serviceName: "$" + fields(Service).serviceName
-            },
-            "durationSeconds": {"$push": {"$cond": {
-                "if": {"$" + fields(Service).recoveryAt: None}, # type: ignore
-                "then": "Infinity",
+            "durations": {"$cond": {
+                "if": {"$or": [
+                    {"$eq": ["$" + fields(Service).recoveryAt, None]}, # type: ignore
+                    {"$not": ["$" + fields(Service).recoveryAt]} # type: ignore
+                ]},
+                "then": {"$divide": [
+                    {"$subtract": [
+                        query.end,
+                        "$" + fields(Service).startedAt # type: ignore
+                    ]},
+                    1000
+                ]},
                 "else": {"$divide": [
                     {"$subtract": [
                         "$" + fields(Service).recoveryAt, # type: ignore
@@ -394,6 +410,19 @@ async def get_alert_duration_per_service(
                     ]},
                     1000
                 ]}
+            }}
+        }},
+
+        # Group by hostname and list durations
+        {"$group": {
+            "_id": {
+                fields(Service).clientId: "$" + fields(Service).clientId,
+                fields(Service).serviceName: "$" + fields(Service).serviceName
+            },
+            "count": {"$sum": {"$cond": {
+                "if": {"$gt": ["$durations", query.threshold]},
+                "then": 1,
+                "else": 0
             }}}
         }}
     ]
@@ -402,6 +431,86 @@ async def get_alert_duration_per_service(
 
     response.headers["Cache-Control"] = "private, max-age=300"
     return DataResponse(data=[
-        AlertDurationPerService(**doc["_id"], durationSeconds=doc["durationSeconds"])
+        AlertDurationPerService(**doc["_id"], count=doc["count"])
         async for doc in cursor
     ])
+
+@router.get("/duration/split", response_model=DataResponse[StatAlertDurationsSplit])
+async def get_alert_duration_split(
+    query: Annotated[InfiniteTimePeriodWithClientsAndThresholdParams, Query()],
+    user_id: JwtUserId,
+    clerk: ClerkSdk,
+    db: Database,
+    response: Response
+) -> DataResponse[StatAlertDurationsSplit]:
+    clients = await get_clients_from_query(query, user_id, clerk, db)
+
+    # Set a minimum possible start time to avoid scanning the entire DB
+    maxPossibleEnd = datetime.now(utc_tz)
+    minPossibleStart = maxPossibleEnd - timedelta(days=365)
+    query.start = max(query.start, minPossibleStart) if query.start is not None else minPossibleStart
+    query.end = min(query.end, maxPossibleEnd) if query.end is not None else maxPossibleEnd
+
+    pipeline = [
+        # Get relevant problems for the clients
+        {"$match": {
+            fields(Service).clientId: {"$in": [c.id for c in clients if c.id is not None]},
+            **({"$and": [
+                {fields(Service).startedAt: {"$gte": query.start}},
+                {fields(Service).startedAt: {"$lte": query.end}},
+            ]}),
+        }},
+
+        # Get relevant fields only
+        {"$project": {
+            "durations": {"$cond": {
+                "if": {"$or": [
+                    {"$eq": ["$" + fields(Service).recoveryAt, None]}, # type: ignore
+                    {"$not": ["$" + fields(Service).recoveryAt]} # type: ignore
+                ]},
+                "then": {"$divide": [
+                    {"$subtract": [
+                        query.start,
+                        "$" + fields(Service).startedAt # type: ignore
+                    ]},
+                    1000
+                ]},
+                "else": {"$divide": [
+                    {"$subtract": [
+                        "$" + fields(Service).recoveryAt, # type: ignore
+                        "$" + fields(Service).startedAt # type: ignore
+                    ]},
+                    1000
+                ]}
+            }}
+        }},
+
+        # Group durations
+        {"$group": {
+            "_id": None,
+            "lesser": {
+                "$sum": {
+                    "$cond": {
+                        "if": {"$lt": ["$durations", query.threshold]},
+                        "then": 1,
+                        "else": 0
+                    }
+                }
+            },
+            "greaterOrEqual": {
+                "$sum": {
+                    "$cond": {
+                        "if": {"$gte": ["$durations", query.threshold]},
+                        "then": 1,
+                        "else": 0
+                    }
+                }
+            }
+        }}
+    ]
+
+    cursor = await db[Service.Meta.collection_name()].aggregate(pipeline)
+    doc = await cursor.next()
+
+    response.headers["Cache-Control"] = "private, max-age=300"
+    return DataResponse(data=StatAlertDurationsSplit(lesser=doc["lesser"], greaterOrEqual=doc["greaterOrEqual"]))

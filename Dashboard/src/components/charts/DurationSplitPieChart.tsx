@@ -48,43 +48,35 @@ export default function DurationSplitPieChart({
   threshold?: number;
   dateRange?: DateRange;
 } & TClientsParams) {
-  const { data: raw } = useQuery({
+  const { data: raw, isError, error } = useQuery({
     queryKey: [
       "durationSplit",
       client_id,
       org_id,
       dateRange?.from?.toISOString(),
       dateRange?.to?.toISOString(),
+      threshold,
     ],
     queryFn: async () =>
-      apiService.getAlertDurationPerHost({
+      apiService.getTriggerAlertDurationSplit({
         client_id,
         org_id,
         start: dateRange?.from?.toISOString(),
         end: dateRange?.to?.toISOString(),
+        threshold,
       }),
+    retry: 1,
   });
 
-  const rows = raw?.data ?? [];
-
-  const less4 = rows.reduce((acc, host) => {
-    const n = host.durationSeconds.filter(
-      (d) => typeof d === "number" && d <= threshold
-    ).length;
-    return acc + n;
-  }, 0);
-
-  const more4 = rows.reduce((acc, host) => {
-    const n = host.durationSeconds.filter(
-      (d) => (typeof d === "number" ? d > threshold : true)
-    ).length;
-    return acc + n;
-  }, 0);
+  const data = raw?.data ?? {
+    lesser: 0,
+    greaterOrEqual: 0,
+  };
 
   const thresholdAsWords = ms(threshold * 1000, { long: true });
   const chartData = [
-    { name: `< ${thresholdAsWords}`, value: less4 },
-    { name: `> ${thresholdAsWords}`, value: more4 },
+    { name: `< ${thresholdAsWords}`, value: data.lesser },
+    { name: `> ${thresholdAsWords}`, value: data.greaterOrEqual },
   ];
 
   return (
@@ -92,7 +84,7 @@ export default function DurationSplitPieChart({
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 shadow-xl"
+      className="p-4 rounded-2xl bg-linear-to-br from-slate-900 to-slate-800 shadow-xl"
     >
       <ResponsiveContainer width="100%" height={320}>
         <PieChart>
@@ -146,6 +138,17 @@ export default function DurationSplitPieChart({
             wrapperStyle={{ color: "#94a3b8", fontSize: "13px" }}
             iconType="circle"
           />
+          {isError && (
+            <text
+              x='50%'
+              y='50%'
+              dy='-12'
+              textAnchor='middle'
+              fill="#cbd5e1"
+            >
+              {error instanceof Error ? error.message : "Error loading data"}
+            </text>
+          )}
         </PieChart>
       </ResponsiveContainer>
     </motion.div>

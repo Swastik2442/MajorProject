@@ -7,7 +7,7 @@ from math import ceil
 from typing import Annotated
 
 from common.models import Problem, ProblemClientIdAndHostname, ProblemDatetimesAndStatus, ProblemDatetimesStatusAndSeverity
-from common.models.utils import Severity, fields, now
+from common.models.utils import Severity, fields, now, utc_tz
 from common.schemas import DataResponse, PaginatedDataResponse
 from common.services.auth import ClerkSdk, JwtUserId
 from common.services.db import Database
@@ -15,9 +15,9 @@ from fastapi import APIRouter, Query, Response
 from pymongo import DESCENDING
 
 from src.middlewares.client import ClientsFromQuery, get_clients_from_query
-from src.schemas import (InfiniteTimePeriodWithClientsParams, IntervalSeconds, PaginationWithClientsParams, StatAlertDurations, StatCounts,
-                         StatHealthScores, StatHostAlertCount, StatProblematicAlertTrends, StatTrends, TimePeriodWithClientsAndSeverityParams,
-                         TimePeriodWithClientsParams)
+from src.schemas import (InfiniteTimePeriodWithClientsAndThresholdParams, InfiniteTimePeriodWithClientsParams, IntervalSeconds,
+                         PaginationWithClientsParams, StatAlertDurations, StatAlertDurationsSplit, StatCounts, StatHealthScores, StatHostAlertCount,
+                         StatProblematicAlertTrends, StatTrends, TimePeriodWithClientsAndSeverityParams, TimePeriodWithClientsParams)
 
 router = APIRouter(
     prefix="/triggers",
@@ -243,8 +243,16 @@ async def get_hosts_problems_count(
         # Get relevant problems for the clients
         {"$match": {
             fields(Problem).clientId: {"$in": [c.id for c in clients if c.id is not None]},
-            **({fields(Problem).startedAt: {"$gte": query.start}} if query.start is not None else {}),
-            **({fields(Problem).startedAt: {"$lte": query.end}} if query.end is not None else {})
+            **({
+                "$and": [
+                    ({
+                        fields(Problem).startedAt: {"$gte": query.start}
+                    } if query.start is not None else {}),
+                    ({
+                        fields(Problem).startedAt: {"$lte": query.end}
+                    } if query.end is not None else {}),
+                ]
+            } if query.start is not None or query.end is not None else {}),
         }},
 
         # Get relevant fields only
@@ -265,7 +273,7 @@ async def get_hosts_problems_count(
         }}
     ]
 
-    cursor = await db[Problem.Meta.collection_name()].aggregate(pipeline)
+    cursor = await db[Problem.Meta.collection_name()].aggregate(pipeline, allowDiskUse=True)
     results = [StatHostAlertCount(**doc["_id"], count=doc["count"]) async for doc in cursor]
 
     response.headers["Cache-Control"] = "private, max-age=60"
@@ -352,9 +360,9 @@ async def get_problematic_trigger_alert_trends(
 class AlertDurationPerHost(ProblemClientIdAndHostname, StatAlertDurations):
     pass
 
-@router.get("/hosts/duration", response_model=DataResponse[Sequence[AlertDurationPerHost]])
-async def get_alert_duration_per_host(
-    query: Annotated[InfiniteTimePeriodWithClientsParams, Query()],
+@router.get("/hosts/duration/threshold", response_model=DataResponse[Sequence[AlertDurationPerHost]])
+async def get_alert_durations_over_threshold(
+    query: Annotated[InfiniteTimePeriodWithClientsAndThresholdParams, Query()],
     user_id: JwtUserId,
     clerk: ClerkSdk,
     db: Database,
@@ -362,20 +370,46 @@ async def get_alert_duration_per_host(
 ) -> DataResponse[Sequence[AlertDurationPerHost]]:
     clients = await get_clients_from_query(query, user_id, clerk, db)
 
+    # Set a minimum possible start time to avoid scanning the entire DB
+    maxPossibleEnd = datetime.now(utc_tz)
+    minPossibleStart = maxPossibleEnd - timedelta(days=365)
+    query.start = max(query.start, minPossibleStart) if query.start is not None else minPossibleStart
+    query.end = min(query.end, maxPossibleEnd) if query.end is not None else maxPossibleEnd
+
     pipeline = [
         # Get relevant problems for the clients
         {"$match": {
             fields(Problem).clientId: {"$in": [c.id for c in clients if c.id is not None]},
-            **({fields(Problem).startedAt: {"$gte": query.start}} if query.start is not None else {}),
-            **({fields(Problem).startedAt: {"$lte": query.end}} if query.end is not None else {})
+            **({"$and": [
+                {fields(Problem).startedAt: {"$gte": query.start}},
+                {fields(Problem).startedAt: {"$lte": query.end}},
+            ]}),
         }},
 
         # Get relevant fields only
         {"$project": {
             fields(Problem).clientId: 1,
             fields(Problem).hostname: 1,
-            fields(Problem).startedAt: 1,
-            fields(Problem).recoveryAt: 1
+            "durations": {"$cond": {
+                "if": {"$or": [
+                    {"$eq": ["$" + fields(Problem).recoveryAt, None]}, # type: ignore
+                    {"$not": ["$" + fields(Problem).recoveryAt]} # type: ignore
+                ]},
+                "then": {"$divide": [
+                    {"$subtract": [
+                        query.end,
+                        "$" + fields(Problem).startedAt # type: ignore
+                    ]},
+                    1000
+                ]},
+                "else": {"$divide": [
+                    {"$subtract": [
+                        "$" + fields(Problem).recoveryAt, # type: ignore
+                        "$" + fields(Problem).startedAt # type: ignore
+                    ]},
+                    1000
+                ]}
+            }}
         }},
 
         # Group by hostname and list durations
@@ -384,12 +418,62 @@ async def get_alert_duration_per_host(
                 fields(Problem).clientId: "$" + fields(Problem).clientId,
                 fields(Problem).hostname: "$" + fields(Problem).hostname
             },
-            "durationSeconds": {"$push": {"$cond": {
+            "count": {"$sum": {"$cond": {
+                "if": {"$gt": ["$durations", query.threshold]},
+                "then": 1,
+                "else": 0
+            }}}
+        }}
+    ]
+
+    cursor = await db[Problem.Meta.collection_name()].aggregate(pipeline, allowDiskUse=True)
+
+    response.headers["Cache-Control"] = "private, max-age=300"
+    return DataResponse(data=[
+        AlertDurationPerHost(**doc["_id"], count=doc["count"])
+        async for doc in cursor
+    ])
+
+@router.get("/hosts/duration/split", response_model=DataResponse[StatAlertDurationsSplit])
+async def get_alert_duration_split(
+    query: Annotated[InfiniteTimePeriodWithClientsAndThresholdParams, Query()],
+    user_id: JwtUserId,
+    clerk: ClerkSdk,
+    db: Database,
+    response: Response
+) -> DataResponse[StatAlertDurationsSplit]:
+    clients = await get_clients_from_query(query, user_id, clerk, db)
+
+    # Set a minimum possible start time to avoid scanning the entire DB
+    maxPossibleEnd = datetime.now(utc_tz)
+    minPossibleStart = maxPossibleEnd - timedelta(days=365)
+    query.start = max(query.start, minPossibleStart) if query.start is not None else minPossibleStart
+    query.end = min(query.end, maxPossibleEnd) if query.end is not None else maxPossibleEnd
+
+    pipeline = [
+        # Get relevant problems for the clients
+        {"$match": {
+            fields(Problem).clientId: {"$in": [c.id for c in clients if c.id is not None]},
+            **({"$and": [
+                {fields(Problem).startedAt: {"$gte": query.start}},
+                {fields(Problem).startedAt: {"$lte": query.end}},
+            ]}),
+        }},
+
+        # Get relevant fields only
+        {"$project": {
+            "durations": {"$cond": {
                 "if": {"$or": [
                     {"$eq": ["$" + fields(Problem).recoveryAt, None]}, # type: ignore
                     {"$not": ["$" + fields(Problem).recoveryAt]} # type: ignore
                 ]},
-                "then": "Infinity",
+                "then": {"$divide": [
+                    {"$subtract": [
+                        query.start,
+                        "$" + fields(Problem).startedAt # type: ignore
+                    ]},
+                    1000
+                ]},
                 "else": {"$divide": [
                     {"$subtract": [
                         "$" + fields(Problem).recoveryAt, # type: ignore
@@ -397,14 +481,35 @@ async def get_alert_duration_per_host(
                     ]},
                     1000
                 ]}
-            }}}
+            }}
+        }},
+
+        # Group durations
+        {"$group": {
+            "_id": None,
+            "lesser": {
+                "$sum": {
+                    "$cond": {
+                        "if": {"$lt": ["$durations", query.threshold]},
+                        "then": 1,
+                        "else": 0
+                    }
+                }
+            },
+            "greaterOrEqual": {
+                "$sum": {
+                    "$cond": {
+                        "if": {"$gte": ["$durations", query.threshold]},
+                        "then": 1,
+                        "else": 0
+                    }
+                }
+            }
         }}
     ]
 
     cursor = await db[Problem.Meta.collection_name()].aggregate(pipeline)
+    doc = await cursor.next()
 
     response.headers["Cache-Control"] = "private, max-age=300"
-    return DataResponse(data=[
-        AlertDurationPerHost(**doc["_id"], durationSeconds=doc["durationSeconds"])
-        async for doc in cursor
-    ])
+    return DataResponse(data=StatAlertDurationsSplit(lesser=doc["lesser"], greaterOrEqual=doc["greaterOrEqual"]))

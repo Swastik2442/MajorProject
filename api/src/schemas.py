@@ -68,6 +68,13 @@ class SeverityParams(BaseModel):
         description="Severity level to filter/threshold by"
     )
 
+class ThresholdParams(BaseModel):
+    threshold: int = Query(
+        ge=0,
+        title="Threshold",
+        description="Threshold value for filtering"
+    )
+
 class PaginationWithOwnerIdParams(PaginationParams):
     owner_id: str | None = Query(
         default=None,
@@ -82,6 +89,8 @@ class TimePeriodWithClientsParams(TimePeriodParams, ClientsParams):
 class TimePeriodWithClientsAndSeverityParams(TimePeriodParams, ClientsParams, SeverityParams):
     pass
 class InfiniteTimePeriodWithClientsParams(InfiniteTimePeriodParams, ClientsParams):
+    pass
+class InfiniteTimePeriodWithClientsAndThresholdParams(InfiniteTimePeriodParams, ClientsParams, ThresholdParams):
     pass
 
 class StatCounts(BaseModel):
@@ -132,7 +141,11 @@ class StatServiceAlertCount(StatAlertCount, frozen=True):
     serviceName: str
 
 class StatAlertDurations(BaseModel):
-    durationSeconds: Sequence[int | Literal["Infinity"]] = Field()
+    count: int = Field(ge=0)
+
+class StatAlertDurationsSplit(BaseModel):
+    lesser: int = Field(ge=0)
+    greaterOrEqual: int = Field(ge=0)
 
 class PromptParams(BaseModel):
     prompt: str = Field(min_length=3, max_length=5000)
@@ -151,6 +164,7 @@ __all__ = [
     "StatHostAlertCount",
     "StatServiceAlertCount",
     "StatAlertDurations",
+    "StatAlertDurationsSplit",
     "PromptParams",
     "ThreadParams",
 ]
