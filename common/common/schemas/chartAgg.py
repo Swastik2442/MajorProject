@@ -5,6 +5,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
+from common.models.utils import MyDatetime
+
 
 class DataSeries(BaseModel):
     """Schema for individual data keys in the chart."""
@@ -62,6 +64,22 @@ class ChartAgg(BaseModel):
         description="A brief description of the response."
     )
     charts: Sequence[ChartAndMongo] | None = Field(
+        None,
+        description="A list of charts to be generated, if any."
+    )
+
+class ChartsData(BaseModel):
+    """Schema for the complete response including data and message."""
+    prompt: str = Field(
+        description="The prompt associated with the response."
+    )
+    createdAt: MyDatetime = Field(
+        description="The creation timestamp of the response."
+    )
+    description: str = Field(
+        description="A brief description of the response."
+    )
+    charts: Sequence[ChartAndData] | None = Field(
         None,
         description="A list of charts to be generated, if any."
     )
